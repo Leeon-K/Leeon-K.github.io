@@ -7,10 +7,10 @@ subtitle: <a href='#'>Affiliations</a>. Beihang University. lichangkang@buaa.edu
 profile:
   align: right
   image: japan.jpg
-  image_circular: true # crops the image to make it circular
-  more_info: >
-    <p>15623266007</p>
-    <p>lichangkang@buaa.edu.cn</p>
+  image_circular: false # crops the image to make it circular
+  # more_info: >
+    # <p>15623266007</p>
+    # <p>lichangkang@buaa.edu.cn</p>
 
 news: true # includes a list of news items
 selected_papers: true # includes a list of papers marked as "selected={true}"
