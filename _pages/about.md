@@ -6,21 +6,27 @@ subtitle: <a href='#'>Affiliations</a>. Beihang University. lichangkang@buaa.edu
 
 profile:
   align: right
-  image: datou.jpg
-  image_circular: false # crops the image to make it circular
+  image: japan.jpg
+  image_circular: true # crops the image to make it circular
   more_info: >
     <p>15623266007</p>
-    <p>BUAA</p>
+    <p>lichangkang@buaa.edu.cn</p>
 
 news: true # includes a list of news items
 selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
 ---
 
-I received the B.S. degree from 
-Huazhong University of Science and Technology, 
-Wuhan, China, in 2022. I am currently pursuing 
-the master degree with Beihang University.
+Hello, this is Changkang Li, or Leeon if you like, I am  an MS student at [Beihang University(BUAA)](https://ev.buaa.edu.cn/). Before that, I received the B.S. degree from 
+[Huazhong University of Science and Technology(HUST)](https://english.hust.edu.cn/), 
+Wuhan, China, in 2022. My current research interests include the following areas.
+
+- Efficient LLMs
+- Computer Vision, Image/Video Anomaly Detection
+- LLM Reasoning, MLLM, LLM Application
+
+<span style="color: green"> 🌟🌟 I will be in Glasgow, UK for BMVC 2024 on November 25th for BMVC 2024! Hope to meet many of you there! 🤗🤗 </span>
+
 
 <!-- Put your address / P.O. box / other info right below your picture. You can also disable any of these elements by editing `profile` property of the YAML header of your `_pages/about.md`. Edit `_bibliography/papers.bib` and Jekyll will render your [publications page](/al-folio/publications/) automatically. -->
 
