@@ -178,8 +178,8 @@ external_sources:
 # -----------------------------------------------------------------------------
 
 collections:
-  # news:
-  Experience:
+  news:
+  # Experience:
     defaults:
       layout: post
     output: true
