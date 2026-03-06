@@ -187,9 +187,10 @@ pagination:
 
     {% endfor %}
 
-    <!-- HTML 博客列表 -->
+    <!-- HTML 博客列表（按日期倒序） -->
 {% if site.data.blogs %}
-{% for blog in site.data.blogs %}
+{% assign sorted_blogs = site.data.blogs | sort: "date" | reverse %}
+{% for blog in sorted_blogs %}
   <li>
     <h3><a class="post-title" href="{{ blog.file | relative_url }}">{{ blog.title }}</a></h3>
     <p>{{ blog.description }}</p>
