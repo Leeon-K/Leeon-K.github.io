@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAPID: 长上下文推理的检索增强推测解码</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fc; color: #1a1a2e; line-height: 1.85; }
+        .container { max-width: 850px; margin: 0 auto; padding: 30px 20px 60px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 30px; }
+        .back-link:hover { color: #5a6fd6; }
+        .paper-content { background: white; border-radius: 20px; padding: 50px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+        .paper-content h1 { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5em; line-height: 1.3; }
+        .paper-content h2 { font-size: 1.5em; font-weight: 600; color: #1a1a2e; margin: 1.5em 0 0.8em; padding-bottom: 0.3em; border-bottom: 2px solid #f0f0f5; }
+        .paper-content h3 { font-size: 1.25em; font-weight: 600; color: #2d2d44; margin: 1.3em 0 0.6em; }
+        .paper-content h4 { font-size: 1.1em; font-weight: 600; color: #3d3d5c; margin: 1.2em 0 0.5em; }
+        .paper-content p { margin: 1em 0; color: #4a4a6a; }
+        .paper-content strong { color: #1a1a2e; font-weight: 600; }
+        .paper-content a { color: #667eea; text-decoration: none; }
+        .paper-content ul, .paper-content ol { margin: 1em 0; padding-left: 1.5em; color: #4a4a6a; }
+        .paper-content li { margin: 0.5em 0; }
+        .paper-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #f5f5fa; padding: 0.2em 0.5em; border-radius: 4px; color: #e83e8c; }
+        .paper-content pre { background: #2d2d44; border-radius: 12px; padding: 20px; overflow-x: auto; margin: 1.5em 0; }
+        .paper-content pre code { background: transparent; padding: 0; color: #f8f8f2; }
+        .paper-content blockquote { border-left: 4px solid #667eea; padding: 1em 1.5em; margin: 1.5em 0; background: #f8f9fc; border-radius: 0 12px 12px 0; color: #5a5a7a; }
+        .paper-content table { width: 100%; border-collapse: collapse; margin: 1.5em 0; overflow-x: auto; display: block; }
+        
+        /* First table (metadata) - compact list style */
+        .paper-content > table:first-of-type { display: table; border: none; margin: 0.5em 0; }
+        .paper-content > table:first-of-type tr { border-bottom: 1px solid #eee; }
+        .paper-content > table:first-of-type td:first-child { 
+            background: transparent; 
+            font-weight: 600; 
+            width: 100px;
+            white-space: nowrap;
+            padding: 4px 12px 4px 0;
+        }
+        .paper-content > table:first-of-type td:last-child {
+            padding: 4px 0 4px 0;
+        }
+        
+        .paper-content th { background: #f5f5fa; padding: 12px 15px; text-align: left; font-weight: 600; border-bottom: 2px solid #e0e0e8; }
+        .paper-content td { padding: 12px 15px; border-bottom: 1px solid #f0f0f5; }
+        .paper-content hr { border: none; height: 2px; background: #e0e0e8; margin: 2em 0; }
+        .paper-content img { max-width: 100%; height: auto; border-radius: 12px; margin: 1.5em 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .pdf-container { margin: 1.5em 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: #f5f5f5; }
+        .pdf-caption { text-align: center; color: #666; font-size: 14px; padding: 10px; margin: 0; background: #f0f0f0; }
+        .katex { font-size: 1.1em; }
+        .katex-display { margin: 1.5em 0; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回论文列表</a>
+        <div class="paper-content">
+<h1>RAPID: 长上下文推理的检索增强推测解码</h1>
+<h2>论文摘要</h2>
+<p>大型语言模型（LLM）的最新进展使得直接处理百万词文档成为可能，这为传统的检索增强生成（RAG）提供了一种有前景的替代方案。然而，长上下文推理的计算开销带来了显著的效率挑战。传统的推测解码（SD）使用较小的草稿模型来加速推理，但其有效性在长上下文场景中会大幅下降，因为内存受限的键值（KV）缓存操作。我们提出<strong>检索增强推测解码（RAPID）</strong>，该方法将RAG的效率与SD的加速优势相结合。RAPID引入RAG草稿模型——一个在检索到的精简上下文上运行的草稿LLM——来推测长上下文目标LLM的生成。我们的方法开辟了一个新范式，使得同规模甚至更大的LLM可以作为RAG草稿模型来加速较小的目标LLM，同时保持计算效率。为了充分利用来自更强RAG草稿模型的潜在优势，我们开发了一种推理时知识转移机制，通过RAG丰富目标分布。在LLaMA-3.1和Qwen2.5系列模型上的广泛实验表明，RAPID有效地整合了RAG和长上下文LLM的优势，实现了显著的性能提升（例如，LLaMA-3.1-8B在InfiniteBench上从39.33提升到42.83），同时长上下文推理实现了超过2倍的加速。我们的分析还表明，RAPID在各种上下文长度和检索质量下都表现出强大的鲁棒性。</p>
+<hr />
+<h2>基本信息</h2>
+<table>
+<thead>
+<tr>
+  <th>项目</th>
+  <th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>论文ID</strong></td>
+  <td>2502.20330</td>
+</tr>
+<tr>
+  <td><strong>标题</strong></td>
+  <td>RAPID: Long-Context Inference with Retrieval-Augmented Speculative Decoding</td>
+</tr>
+<tr>
+  <td><strong>中文标题</strong></td>
+  <td>RAPID：长上下文推理的检索增强推测解码</td>
+</tr>
+<tr>
+  <td><strong>作者</strong></td>
+  <td>Guanzheng Chen, Qilong Feng, Jinjie Ni, Xin Li, Michael Qizhe Shieh</td>
+</tr>
+<tr>
+  <td><strong>单位</strong></td>
+  <td>National University of Singapore (新加坡国立大学), DAMO Academy, Alibaba Group (阿里巴巴达摩院), Hupan Lab (湖畔实验室)</td>
+</tr>
+<tr>
+  <td><strong>会议</strong></td>
+  <td>ICML 2025</td>
+</tr>
+<tr>
+  <td><strong>arXiv ID</strong></td>
+  <td>2502.20330</td>
+</tr>
+<tr>
+  <td><strong>代码链接</strong></td>
+  <td>https://github.com/NUS-TRAIL/RAPID</td>
+</tr>
+<tr>
+  <td><strong>日期</strong></td>
+  <td>2025年2月</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>1. 引言</h2>
+<h3>1.1 背景与动机</h3>
+<p>大型语言模型（LLM）传统上依赖检索增强生成（RAG）来处理广泛文档，通过选择性检索相关文本片段。虽然有效，但RAG的性能本质上受限于检索器在不同查询中提取相关信息的能力。最近出现的长上下文LLM能够直接处理百万词文档，这为复杂的RAG流程提供了一种有前景的替代方案。然而，这一突破受到长上下文推理计算效率的瓶颈制约，因为处理广泛的键值（KV）缓存成为内存受限的操作，并引入大量延迟。</p>
+<p>推测解码（SD）是加速LLM推理的一种流行方法，通过利用较小的草稿模型提出多个候选token，供目标模型在单次前向传播中进行验证。SD的优势取决于两个关键因素：草稿模型生成候选token的计算效率，以及其产生高质量可接受候选的能力。然而，在长上下文场景中，SD的有效性会降低，因为内存受限的KV缓存操作阻止了较小的LLM保持相对于较大模型的显著速度优势。如图1所示，LLaMA-3.1-8B相对于LLaMA-3.1-70B的吞吐量增益随着上下文长度从1K增加到128K token而急剧下降（23.6 → 9.4）。</p>
+<p>src="images/llama_comparison-1.png"</p>
+<h3>1.2 核心贡献</h3>
+<p>我们引入<strong>检索增强推测解码（RAPID）</strong>，以弥补SD在加速长上下文推理方面的差距，同时提升生成质量。RAPID采用<strong>RAG草稿模型</strong>——一个在RAG检索到的精简上下文上运行的草稿LLM——按照SD流程来推测长上下文LLM的生成。我们提出RAG草稿模型可以作为长上下文目标LLM的理想草稿模型，因为它展现出接近长上下文LLM能力的潜力，同时提供更优的计算效率。如图1所示，LLaMA-3.1-8B配合RAG在4K~16K token上可以恢复使用完整128K token实现的大部分性能。这表明RAG草稿模型能够为长上下文目标LLM生成具有高接受率的高质量候选token，同时消除长上下文上的内存受限KV缓存操作以加速推理过程。</p>
+<p>此外，我们的RAPID为SD开辟了一个新范式，即<strong>利用同规模甚至更大的LLM作为RAG草稿模型来加速较小的目标LLM</strong>。这种范式转变是可能的，因为RAG草稿模型在精简上下文上运行（例如4K），可能比同规模甚至更大规模的目标LLM在长上下文上（例如128K）保持更高的效率。</p>
+<h3>1.3 检索增强目标分布</h3>
+<p>然而，原始SD使用目标LLM预测作为真实分布进行拒绝采样，可能会忽略来自更强RAG草稿模型的高质量候选。这将导致对有效候选的不必要拒绝，从而阻碍效率和性能提升。</p>
+<p>为解决这一限制，RAPID实现了一种检索增强目标分布，将SD中原始长上下文目标分布与<strong>推理时知识转移</strong>相结合。具体而言，我们反向将RAG草稿模型定位为教师，长上下文目标LLM定位为学生，以在推理过程中获得朝向RAG草稿模型的蒸馏logit偏移。通过将该偏移纳入目标LLM的预测logit，我们获得了一个更易于接受高质量推测候选的增强目标分布。</p>
+<hr />
+<h2>2. 方法</h2>
+<h3>2.1 背景：推测解码</h3>
+<p>使用LLM <span class="katex-formula" data-formula="p_\phi" data-display="false"></span>的自回归生成传统上需要顺序的前向传播，其中每个token <span class="katex-formula" data-formula="x_i" data-display="false"></span>从分布 <span class="katex-formula" data-formula="p_\phi(x_i | x_{<i})" data-display="false"></span> 中采样。这种顺序性质因GPU DRAM中LLM参数加载和KV缓存操作而产生大量计算开销。</p>
+<p>SD通过使用较小的草稿模型 <span class="katex-formula" data-formula="q_\psi" data-display="false"></span> 生成<span class="katex-formula" data-formula="\gamma" data-display="false"></span>个候选token来加速这一过程，然后通过拒绝采样在单次前向传播中由目标模型 <span class="katex-formula" data-formula="p_\phi" data-display="false"></span> 验证。对于每个推测token <span class="katex-formula" data-formula="x^{\prime}_i \sim q_\psi(x_i | x_{<i})" data-display="false"></span>，接受标准为：</p>
+<p><span class="katex-formula" data-formula="r \leq \min\left(1, \frac{p_\phi(x^{\prime}_i| x_{<i})}{q_\psi(x^{\prime}_i| x_{<i})}\right)" data-display="true"></span></p>
+<p>其中 <span class="katex-formula" data-formula="r \sim U(0,1)" data-display="false"></span>。当被拒绝时，从残差分布中采样新token：</p>
+<p><span class="katex-formula" data-formula="x_i \sim \texttt{norm}({\max(p_\phi(x_i|x_{<i}) - q_\psi(x_i|x_{<i}), 0)})" data-display="true"></span></p>
+<p>该程序保证重采样的token遵循与直接从目标模型 <span class="katex-formula" data-formula="p_\phi" data-display="false"></span> 采样相同的分布，同时在推测token被接受时可能实现显著加速。</p>
+<h3>2.2 概述</h3>
+<p>传统SD为标准长度上下文提供显著加速，但在处理广泛文档时由于内存受限的KV缓存操作而其优势大幅减少。我们提出RAPID，一种为长上下文场景重新思考SD同时提升生成质量的方法。如算法1所示，RAPID包含两个关键组件：</p>
+<p><strong>RAG草稿模型</strong>：SD在长上下文上变得低效，因为草稿和目标LLM都必须在内存中处理完整上下文，抵消了较小草稿模型的计算优势。为克服这一挑战，RAPID利用<strong>RAG草稿模型</strong>为目标LLM生成候选。RAG草稿模型在选择性检索的上下文片段上运行，能够在保持相关信息访问的同时实现显著加速。</p>
+<p><strong>检索增强目标分布</strong>：SD中的严格接受标准可能会拒绝高质量候选，因为它要求与目标LLM分布严格匹配才能接受。当使用RAG草稿模型时，这一限制变得尤为明显，因为在某些场景下RAG可能产生比长上下文LLM更高质量的输出。为整合来自RAG草稿模型的优势，RAPID采用检索增强目标分布，实现从RAG草稿模型到目标模型在推理时的知识转移。</p>
+<h3>2.3 RAG草稿模型</h3>
+<p>当处理广泛上下文 <span class="katex-formula" data-formula="\mathcal{C}" data-display="false"></span> 的查询时，朴素SD的目标分布为：</p>
+<p><span class="katex-formula" data-formula="p(x_i) = p_\phi(x_i \vert [\mathcal{C};x_{<i}])" data-display="true"></span></p>
+<p>即使使用较小的草稿模型，由于对完整上下文 <span class="katex-formula" data-formula="\mathcal{C}" data-display="false"></span> 进行内存受限的KV缓存操作，计算优势也会大幅减少。</p>
+<p>为克服这一限制，我们建议利用RAG作为草稿模型的基础。与处理完整上下文 <span class="katex-formula" data-formula="\mathcal{C}" data-display="false"></span> 不同，我们的RAG草稿模型在压缩上下文 <span class="katex-formula" data-formula="\mathcal{C^{\text{S}}}" data-display="false"></span> 上运行。具体而言，<span class="katex-formula" data-formula="\mathcal{C^{\text{S}}}" data-display="false"></span> 通过选择性检索构建：将 <span class="katex-formula" data-formula="\mathcal{C}" data-display="false"></span> 中的文本片段编码到密集向量空间，其中语义相似性通过与查询的余弦相似度来衡量，从而实现最相关上下文块的高效识别和提取。</p>
+<p>在获得压缩上下文 <span class="katex-formula" data-formula="\mathcal{C^{\text{S}}}" data-display="false"></span> 后，草稿分布正式定义为：</p>
+<p><span class="katex-formula" data-formula="q(x_i) = q_\psi(x_i \vert [\mathcal{C^{\text{S}}};x_{<i}])" data-display="true"></span></p>
+<p>其中我们通过强制执行 <span class="katex-formula" data-formula="|\mathcal{C^{\text{S}}}| \le |\mathcal{C}|/\lambda" data-display="false"></span> 且 <span class="katex-formula" data-formula="\lambda \gg 1" data-display="false"></span> 来严格控制压缩比。这个压缩上下文使我们的草稿模型能够保持显著的速度优势，同时保留对相关信息的访问。</p>
+<p>基于RAG草稿模型，修改后的推测解码过程如下。对于每个生成步骤，我们从RAG草稿模型采样<span class="katex-formula" data-formula="\gamma" data-display="false"></span>个推测token作为 <span class="katex-formula" data-formula="x^{\prime}_i \sim q(x_i)" data-display="false"></span>。这些候选使用修改后的接受标准针对目标模型进行验证：</p>
+<p><span class="katex-formula" data-formula="r \leq \min\left(1, \frac{p(x_i)}{q(x_i)}\right) = \min\left(1, \frac{p_\phi(x^{\prime}_i| [\mathcal{C};x_{<i}])}{q_\psi(x^{\prime}_i| [\mathcal{C^{\text{S}}};x_{<i}])}\right)" data-display="true"></span></p>
+<p>其中 <span class="katex-formula" data-formula="r \sim U(0,1)" data-display="false"></span>。</p>
+<p>RAG草稿机制提供两个关键优势：（1）通过压缩上下文操作显著减少内存开销和计算成本（<span class="katex-formula" data-formula="|\mathcal{C^{\text{S}}}| \ll |\mathcal{C}|" data-display="false"></span>），（2）通过选择性检索相关信息可能增强推测质量，相比处理稀释的完整上下文。此外，由于在缩短上下文上的显著效率，RAPID甚至可以使用同规模或更大的模型作为草稿模型来加速较小的目标LLM。</p>
+<h3>2.4 检索增强目标分布</h3>
+<p>LLM有效利用上下文的能力通常会随着无关信息的包含而下降。我们 empirical analysis in Figure 1 shows that LLMs，通过聚焦检索到的相关块，有时可以超越完整上下文的生成质量。然而，朴素SD的严格接受标准可能导致对这些优越生成的不必要拒绝，当它们偏离目标分布时，这会导致质量下降和计算效率低下。</p>
+<p>为解决这一限制，我们引入检索增强目标分布，实现从RAG草稿模型到长上下文目标模型在推理时的知识转移。形式上，RAPID中的检索增强目标分布定义为：</p>
+<p><span class="katex-formula" data-formula="\hat{p}(x_i) = \softmax(z(x_i) / T + \eta \cdot (q(x_i) - p(x_i)))" data-display="true"></span></p>
+<p>其中 <span class="katex-formula" data-formula="\eta" data-display="false"></span> 是控制知识转移强度的超参数，<span class="katex-formula" data-formula="z(x_i)" data-display="false"></span> 是目标LLM的未归一化logit，即 <span class="katex-formula" data-formula="p(x_i) = \softmax \left(z(x_i)/T\right)" data-display="false"></span>，<span class="katex-formula" data-formula="T" data-display="false"></span> 是温度。</p>
+<p><strong>命题1</strong>：设 <span class="katex-formula" data-formula="p(x) = \softmax(z(x)/T)" data-display="false"></span> 是由logit <span class="katex-formula" data-formula="z(x)" data-display="false"></span> 和温度 <span class="katex-formula" data-formula="T" data-display="false"></span> 参数化的学生模型分布，<span class="katex-formula" data-formula="q(x)" data-display="false"></span> 是教师模型分布。知识蒸馏损失 <span class="katex-formula" data-formula="\mathcal{L} = T^2 \cdot \text{KL}(q(x) \| p(x))" data-display="false"></span> 相对于 <span class="katex-formula" data-formula="z(x)" data-display="false"></span> 的梯度为：</p>
+<p><span class="katex-formula" data-formula="\frac{\partial \mathcal{L}}{\partial z(x)} = T \cdot (p(x) - q(x))" data-display="true"></span></p>
+<p>检索增强目标分布的设计意味着一个知识蒸馏步骤，通过将RAG草稿模型定位为教师，目标模型定位为学生，将RAG草稿模型的一部分知识注入朴素的长上下文目标分布。</p>
+<p>具体而言，对于RAG草稿分布 <span class="katex-formula" data-formula="q(x_i)" data-display="false"></span>（教师）和长上下文目标分布 <span class="katex-formula" data-formula="p(x_i)" data-display="false"></span>（学生）之间的蒸馏损失 <span class="katex-formula" data-formula="\mathcal{L}" data-display="false"></span>，根据命题1，我们有蒸馏logit偏移：</p>
+<p><span class="katex-formula" data-formula="\frac{\partial \mathcal{L}}{\partial z(x_i)} = T \cdot (p(x_i) - q(x_i))" data-display="true"></span></p>
+<p>现在我们可以通过以下方式获得由RAG草稿模型增强的&quot;蒸馏&quot; <span class="katex-formula" data-formula="z(x_i)" data-display="false"></span>：</p>
+<p><span class="katex-formula" data-formula="\hat{z}(x_i) = z(x_i) - \eta \frac{\partial \mathcal{L}}{\partial z(x_i)} = z(x_i) + \eta T(q(x_i) - p(x_i))" data-display="true"></span></p>
+<p>其中 <span class="katex-formula" data-formula="\eta" data-display="false"></span> 控制知识转移的强度。因此，公式(4)中的检索增强目标分布等同于归一化的 <span class="katex-formula" data-formula="\hat{z}(x_i)" data-display="false"></span>，即 <span class="katex-formula" data-formula="\hat{p}(x_i) = \softmax(\hat{z}(x_i)/T)" data-display="false"></span>。</p>
+<p>检索增强目标分布 <span class="katex-formula" data-formula="\hat{p}(x_i)" data-display="false"></span> 能够在保持验证能力的同时实现从RAG草稿模型的灵活知识转移。由于未归一化logit <span class="katex-formula" data-formula="z(x_i) \in \mathbb{R}" data-display="false"></span> 与归一化分布 <span class="katex-formula" data-formula="p(x_i), q(x_i) \in [0,1]" data-display="false"></span> 相比具有更大的幅度，<span class="katex-formula" data-formula="\hat{p}(x_i)" data-display="false"></span> 保留了目标LLM有效验证候选的长上下文能力。</p>
+<p>对于推理，我们将公式(5)中的 <span class="katex-formula" data-formula="p(x_i)" data-display="false"></span> 替换为 <span class="katex-formula" data-formula="\hat{p}(x_i)" data-display="false"></span>。设 <span class="katex-formula" data-formula="p(x_i) = [\ervw_j]_{j=1}^{|V|}" data-display="false"></span> 和 <span class="katex-formula" data-formula="\hat{p}(x_i) = [\hat{\ervw}_j]_{j=1}^{|V|}" data-display="false"></span> 表示词汇表 <span class="katex-formula" data-formula="V" data-display="false"></span> 上的概率向量。遵循，我们保持：</p>
+<p><span class="katex-formula" data-formula="\hat{\ervw}_{k} = \ervw_{k}, \quad \forall k \in \{v \in [|V|]: \hat{\ervw}_{v} < 0.1 \cdot \max_{j \in [|V|]} \hat{\ervw}_{j}\}" data-display="true"></span></p>
+<p>以防止分布尾部的扭曲。</p>
+<p>当发生拒绝时，我们从调整后的残差分布中采样：</p>
+<p><span class="katex-formula" data-formula="x_i \sim \texttt{norm}({\max(p(x_i)-\hat{p}(x_i), p(x_i)-q(x_i))})" data-display="true"></span></p>
+<p>该采样策略保持了理论保证，我们证明生成的token遵循与直接从原始目标模型 <span class="katex-formula" data-formula="p(x_i)" data-display="false"></span> 采样相同的分布。</p>
+<hr />
+<h2>3. 实验设置</h2>
+<h3>3.1 实现细节</h3>
+<p><strong>目标LLM和草稿LLM</strong>：RAPID使用LLaMA-3.1（8B、70B）和Qwen2.5（7B、72B）作为目标LLM进行评估。我们实现了两种推测设置：（1）<strong>自推测</strong>，其中RAG草稿模型与目标LLM规模相同；（2）<strong>向上推测</strong>，其中较大的RAG草稿模型辅助较小的目标LLM。对于较小的模型（LLaMA-3.1-8B、Qwen2.5-7B），我们评估两种设置，而较大的模型（LLaMA-3.1-70B、Qwen2.5-72B）仅使用自推测。RAG草稿模型为每个步骤生成<span class="katex-formula" data-formula="\gamma=10" data-display="false"></span>个token供目标LLM验证。</p>
+<p><strong>RAG设置</strong>：长上下文被分割成512-token的块，并使用BGE-M3模型编码为嵌入。我们根据与查询嵌入的余弦相似度检索top-<span class="katex-formula" data-formula="k" data-display="false"></span>个块，过滤掉相似度低于0.3的检索块。检索上下文长度限制在4096 token和输入长度的1/24之间。</p>
+<h3>3.2 评估协议</h3>
+<p><strong>基线</strong>：我们将RAPID与以下基线进行比较：（1）长上下文目标LLM（LC），其中目标LLM直接在长上下文上生成响应；（2）RAG，其中目标LLM在RAPID中草稿模型输入的检索上下文上生成响应；（3）朴素推测解码（SD），其使用与RAPID相同的目标和草稿LLM，但使用朴素长上下文目标分布；（4）MagicDec，其利用StreamingLLM来压缩草稿模型的KV缓存。</p>
+<p><strong>基准测试</strong>：我们在两个基准测试上评估RAPID和基线：（1）<strong><span class="katex-formula" data-formula="\infty" data-display="false"></span>Bench</strong>。我们在此基准上评估三种现实任务：长书问答（En.QA，指标：F1）、多项选择问答（En.MC，指标：准确率）和摘要（En.Sum，指标：ROUGE-L-Sum）。（2）<strong>LongBench v2</strong>，涉及上下文长度从8K到2M词的各种多项选择任务。</p>
+<p><strong>评估设置</strong>：我们使用LongBench v2（Long, CoT）子集进行效率评估，其中每个示例包含120K（token）上下文长度和最多1K生成token。效率指标包括：（1）<strong>预填充时间</strong>和（2）<strong>加速比</strong>，计算为每个目标LLM的方法吞吐量与LC吞吐量的比率。</p>
+<hr />
+<h2>4. 结果与分析</h2>
+<h3>4.1 主要结果</h3>
+<p>我们在不同模型规模和基准测试上评估RAPID与基线。结果表明RAPID在提升长上下文推理的生成质量和效率方面都是有效的。</p>
+<p><strong>RAPID通过自推测整合了目标LLM和RAG草稿模型的优势</strong>。在自推测设置中，RAPID使用相同规模的模型作为目标和草稿，在模型家族中观察到一致的改进。对于LLaMA-3.1-8B，RAPID自推测在<span class="katex-formula" data-formula="\infty" data-display="false"></span>Bench上达到42.83（vs LC的39.33，RAG的40.40）和LongBench v2上达到34.2%（vs LC的30.4%，RAG的33.4%）。类似改进也出现在LLaMA-3.1-70B（<span class="katex-formula" data-formula="\infty" data-display="false"></span>Bench上50.62 vs 45.07 LC，47.56 RAG）和Qwen2.5系列中。值得注意的是，RAPID有效地整合了LC和RAG方法的互补优势——虽然RAG在某些任务上表现出色（例如En.MC：79.04% vs LC的53.28%），LC在 others（例如En.QA：34.58% vs RAG的31.91%）。RAPID在推理过程中成功捕获这些互补优势，始终实现与其两个组成部分中较强的相当或更好的性能。</p>
+<p><strong>更大的RAG草稿模型通过有效的知识转移进一步提升性能</strong>。除了自推测，RAPID还支持一种独特的向上推测机制，其中较大的模型作为RAG草稿模型同时保持效率。这种设置产生更显著的改进：使用70B RAG草稿模型的LLaMA-3.1-8B在<span class="katex-formula" data-formula="\infty" data-display="false"></span>Bench上达到49.98，在LongBench v2上达到40.2%的总体准确率，不仅超越了其自推测结果，甚至超越了LLaMA-3.1-70B的LC性能（36.2%）。</p>
+<p><strong>RAPID为长上下文推理展示超过2倍的加速</strong>。在自推测设置中，RAPID相对于LC基线实现了显著的加速（LLaMA-3.1-8B为2.10倍，LLaMA-3.1-70B为2.69倍），显著超越朴素SD和MagicDec。当使用较大草稿模型进行向上推测时，RAPID仍保持相当的吞吐量。</p>
+<p>src="images/gain_drop-1.png"</p>
+<h3>4.2 收益整合分析</h3>
+<p><strong>RAPID在保持目标模型能力的同时纳入了RAG草稿模型的优势</strong>。为分析RAPID如何整合RAG草稿模型和目标LLM的优势，我们检查了RAG草稿模型、SD和RAPID在LongBench v2上的相对成功和失败。如图2所示，RAPID成功处理了目标LLM失败的额外案例，通过纳入RAG草稿模型的有益知识。同时，RAPID保持了目标LLM的能力，与单独使用RAG草稿模型相比表现出显著更低的失败率。这种RAG草稿模型收益与目标LLM能力低降的组合使RAPID能够超越目标和草稿模型。</p>
+<p><strong>RAPID展现出超越单独目标/草稿LLM的能力</strong>。最值得注意的是，我们观察到一种&quot;涌现现象&quot;，其中RAPID成功处理了目标LLM和RAG草稿模型都单独失败的案例。这种涌现准确率随着RAG草稿模型变强而变得更加显著，从LLaMA-3.1-8B到LLaMA-3.1-70B。</p>
+<h3>4.3 上下文和检索长度的影响</h3>
+<p><strong>RAPID在各种上下文配置中展示有效性</strong>。我们分析了RAPID在不同目标上下文长度和RAG草稿模型检索长度下的表现。结果表明RAPID相对于朴素SD在所有配置中都具有一致的优势。首先，RAPID实现了显著更好的性能提升（2-8% Δ准确率）相对于长上下文基线，相比朴素SD的边际或负收益（-5-2%）。这种优越性能伴随着持续更高的接受率（75-85%对比60-70%）和更好的加速比。</p>
+<p><strong>RAPID为超过32K的长上下文推理实现加速</strong>。检索长度的影响揭示了一个有趣的效率-有效性权衡。在计算效率方面，当目标上下文长度超过32K时，RAPID实现加速（加速比&gt;1.0倍），而SD需要超过64K的上下文才能展示加速。</p>
+<h3>4.4 生成质量分析</h3>
+<p><strong>RAPID在实际应用中实现优越的生成质量和吞吐量</strong>。为评估RAPID在实际长上下文应用中的有效性，我们评估了其多轮对话生成的表现。我们构建了一个具有挑战性的评估数据集：对于前100个样本，我们保留它们的最后一轮查询，同时将它们之前的对话上下文分布在由另外500个样本组成的更长聊天历史中。结果显示，RAPID实现了4.21的生成质量分数，显著超越目标LLM（2.82）、RAG草稿模型（3.95）和朴素SD（2.94）。这种质量改进伴随着76.94%的鲁棒接受率（vs SD的56.34%）和18.18 token/秒的增强吞吐量（相比目标LLM加速1.7倍）。</p>
+<h3>4.5 对检索质量的鲁棒性</h3>
+<p><strong>RAPID展示对检索质量的鲁棒性，并通过更强的草稿模型进一步增强</strong>。为评估RAPID关于检索质量的鲁棒性，我们进行压力测试，故意使用不相关的检索上下文，同时变化知识转移参数<span class="katex-formula" data-formula="\eta" data-display="false"></span>。如表4所示，对于自推测（RAG草稿模型8B），即使在不相关检索上下文中，RAPID也保持性能收益（Δ准确率&gt;0）和改进的效率（1.62倍-1.78倍加速）。然而，当<span class="katex-formula" data-formula="\eta>20" data-display="false"></span>时，RAG草稿模型可能过度影响目标分布，导致性能下降。此外，使用70B作为草稿模型的向上推测展示更好的鲁棒性，在完全不相关的检索上下文中保持正性能收益。</p>
+<p>src="images/context_length-1.png"</p>
+<hr />
+<h2>5. 相关工作</h2>
+<h3>5.1 推测解码</h3>
+<p>推测解码通过利用较小的草稿模型提出多个token进行单次验证来加速LLM推理。REST通过从构建的语料库检索可能的延续而不是使用草稿LLM生成来扩展起草机制。Ouroboros提出根据草稿短语从草稿LLM每步产生更长和更可接受的候选。灵感来自推测机制，Speculative RAG提出并行起草-验证机制来改进RAG质量。最近的工作如TriForce和MagicDec尝试通过KV缓存压缩技术将SD扩展到长上下文场景。然而，这种压缩方法通常导致弱化的草稿模型，在复杂应用中速度提升有限。相比之下，RAPID采用RAG草稿模型，在各种应用中保持高质量推测和显著加速。</p>
+<h3>5.2 长上下文推理加速</h3>
+<p>加速长上下文推理的研究主要关注两个方向：通过选择性保留或量化优化KV缓存操作，以及探索提示压缩方法。虽然这些方法提高了效率，但它们经常在没有任何质量保证的情况下 compromising 上下文信息。RAPID通过利用SD从长上下文LLM明确验证来保持生成质量，解决了这一限制，在效率和性能之间提供更可靠的平衡。</p>
+<h3>5.3 RAG与长上下文LLM</h3>
+<p>最近的研究揭示了RAG和长上下文LLM之间的互补优势。尽管长上下文LLM在基于文档的任务中表现优异，RAG在对话式问答等场景中展现优势。先前结合这些方法的尝试（如自反射路由和逐步RAG增强）严重依赖特定任务的提示工程。RAPID通过将RAG优势直接整合到解码过程中提供更原则化的解决方案，在保持两种范式优势的同时实现动态适应。</p>
+<hr />
+<h2>6. 结论</h2>
+<p>在本文中，我们引入RAPID，这是一种新颖的解码方法，弥补了推测解码在长上下文推理中的效率差距，同时通过检索增强推测提升了生成质量。RAPID的关键在于利用RAG草稿模型实现长上下文目标LLM的高效推测，以及一种检索增强目标分布，有效整合来自潜在更强草稿模型的知识。通过广泛实验，我们证明RAPID在不同模型规模和任务中成功实现了计算效率和生成质量的提升。具体而言，RAPID在自推测设置中实现了超过2倍的加速，同时保持性能优势，并通过使用更强的RAG草稿模型通过向上推测实现显著的质量提升。这些结果确立RAPID作为加速长上下文推理同时提升生成质量的实用解决方案。</p>
+<hr />
+<h2>论文简评</h2>
+<h3>创新点</h3>
+<ol>
+<li><p><strong>RAG草稿模型范式</strong>：首次提出使用RAG作为推测解码的草稿模型，开创了&quot;检索增强推测&quot;的新方向。</p>
+</li>
+<li><p><strong>自推测与向上推测</strong>：提出两种新范式——同规模模型自推测，以及使用更大模型作为草稿的向上推测，为SD在长上下文场景的应用提供了新思路。</p>
+</li>
+<li><p><strong>检索增强目标分布</strong>：通过推理时知识蒸馏机制，实现从RAG草稿模型到目标LLM的知识转移，有效整合两者优势。</p>
+</li>
+<li><p><strong>超过2倍加速</strong>：在保持甚至提升生成质量的同时，实现长上下文推理超过2倍的加速。</p>
+</li>
+</ol>
+<h3>局限性</h3>
+<ol>
+<li><p><strong>检索质量依赖</strong>：性能受限于检索器的质量，不相关的检索上下文可能导致性能下降。</p>
+</li>
+<li><p><strong>参数调优</strong>：知识转移强度<span class="katex-formula" data-formula="\eta" data-display="false"></span>需要针对不同场景进行调优。</p>
+</li>
+<li><p><strong>GPU资源需求</strong>：向上推测需要额外的GPU来服务RAG草稿模型。</p>
+</li>
+</ol>
+<h3>应用场景</h3>
+<ol>
+<li><strong>长文档问答</strong>：处理超过100K token的长文档分析</li>
+<li><strong>多轮对话系统</strong>：需要理解长聊天历史的对话系统</li>
+<li><strong>代码理解与分析</strong>：大型代码库的上下文理解</li>
+<li><strong>长篇内容生成</strong>：需要长上下文支持的创作任务</li>
+</ol>
+<hr />
+<p><em>报告生成日期：2026年3月4日</em></p>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    });
+    </script>
+    
+</body>
+</html>
