@@ -15,23 +15,31 @@ layout: default
       <table class="table table-sm table-borderless">
         {% assign tag_found = false %}
 
-        <!-- HTML 博客（从 _data/blogs.yml） -->
+        <!-- HTML 博客（从 _data/blogs.yml）- 按日期倒序 -->
         {% if site.data.blogs %}
+          {% assign tagged_blogs = "" | split: "" %}
           {% for blog in site.data.blogs %}
             {% if blog.tags %}
               {% for tag in blog.tags %}
                 {% assign tag_slug = tag | slugify %}
                 {% if tag_slug == tag_name %}
-                  {% assign tag_found = true %}
-                  <tr>
-                    <th scope="row">{{ blog.date | date: '%b %d, %Y' }}</th>
-                    <td>
-                      <a class="post-link" href="{{ blog.file | relative_url }}">{{ blog.title }}</a>
-                    </td>
-                  </tr>
+                  {% assign tagged_blogs = tagged_blogs | push: blog %}
                 {% endif %}
               {% endfor %}
             {% endif %}
+          {% endfor %}
+
+          <!-- 按日期倒序排序 -->
+          {% assign sorted_blogs = tagged_blogs | sort: "date" | reverse %}
+
+          {% for blog in sorted_blogs %}
+            {% assign tag_found = true %}
+            <tr>
+              <th scope="row">{{ blog.date | date: '%b %d, %Y' }}</th>
+              <td>
+                <a class="post-link" href="{{ blog.file | relative_url }}">{{ blog.title }}</a>
+              </td>
+            </tr>
           {% endfor %}
         {% endif %}
 
