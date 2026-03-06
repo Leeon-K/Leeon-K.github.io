@@ -24,6 +24,20 @@ layout: default
             </td>
           </tr>
         {% endfor %}
+
+        <!-- HTML 博客（从 _data/blogs.yml） -->
+        {% if site.data.blogs %}
+          {% for blog in site.data.blogs %}
+            {% if blog.categories contains page.title %}
+              <tr>
+                <th scope="row">{{ blog.date | date: '%b %d, %Y' }}</th>
+                <td>
+                  <a class="post-link" href="{{ blog.file | relative_url }}">{{ blog.title }}</a>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
       </table>
     </div>
   </article>

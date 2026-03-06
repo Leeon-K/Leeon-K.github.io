@@ -2,52 +2,72 @@
 
 基于 al-folio 的学术个人主页模板。
 
-## 快速添加 HTML 博客
+## 目录
 
-### 推荐：使用脚本（自动复制 HTML 和图片）
+- [快速开始](#快速开始)
+- [添加 HTML 博客](#添加-html-博客)
+- [本地预览](#本地预览)
+- [部署](#部署)
+
+## 快速开始
+
+```bash
+# 安装依赖
+bundle install
+
+# 本地预览
+bundle exec jekyll serve
+```
+
+访问 http://localhost:4000
+
+## 添加 HTML 博客
+
+### 使用脚本（推荐）
 
 ```bash
 ./scripts/add_blog.sh /path/to/blog.html "博客标题" 2026-03-06
 ```
 
-脚本会：
-1. 在 `assets/blog/` 下创建以日期命名的文件夹
-2. 复制 HTML 文件（重命名为 index.html）
-3. 如果源目录有 `images` 文件夹，一并复制
-4. 自动添加到 `_data/blogs.yml`
+**参数说明：**
+1. HTML 文件路径（完整路径）
+2. 博客标题
+3. 日期（格式：2026-03-06）
 
-### 手动流程
+**脚本功能：**
+- 自动在 `assets/blog/日期_标题/` 创建目录
+- 复制 HTML 文件为 `index.html`
+- 解析 HTML 中的图片路径，在源目录下递归搜索图片
+- 复制图片到 `images/` 目录
+- 自动修改 HTML 中的图片路径为相对路径（`images/xxx.png`）
+- 添加博客信息到 `_data/blogs.yml`
 
-#### 1. 复制 HTML 文件
-将写好的 HTML 文件复制到 `assets/blog/` 目录。
-
+**示例：**
 ```bash
-cp /path/to/your/blog.html assets/blog/2026-03-06-your-title.html
+./scripts/add_blog.sh /Users/lichangkang/.openclaw/workspace/papers/20260305_RAPID/report.html "RAPID: 长上下文推理的检索增强推测解码" 2026-03-05
 ```
 
-### 2. 配置博客目录
-在 `_data/blogs.yml` 中添加博客信息：
+### 博客配置
+
+脚本会自动添加基础配置到 `_data/blogs.yml`，手动修改：
 
 ```yaml
-- title: "你的博客标题"
-  file: "/assets/blog/2026-03-06-your-title/"
-  date: 2026-03-06
-  description: "博客描述，会显示在博客列表页"
-  tags: ["Papers", "code"]  # 可选，用于分类
+- title: "博客标题"
+  file: "/assets/blog/2026-03-05_rapid/"
+  date: 2026-03-05
+  description: "博客描述，会显示在博客列表页"  # 必填
+  tags: ["Papers", "code"]  # 分类，可多个
 ```
 
-注意：
-- 路径最后要加 `/`，因为 Jekyll 会把 HTML 转为子目录。
-- `description` 和 `tags` 是可选的，但建议添加，让博客列表页显示更美观
+### 博客结构
 
-### 3. 推送部署
-```bash
-git add -A
-git commit -m "feat: 添加新博客"
-git push
 ```
-
-GitHub Actions 会自动构建并部署到 gh-pages 分支。
+assets/blog/2026-03-05_rapid/
+├── index.html          # 主 HTML 文件，图片用相对路径
+└── images/
+    ├── figure1.png
+    └── figure2.png
+```
 
 ## 本地预览
 
@@ -57,13 +77,12 @@ bundle exec jekyll serve
 
 然后访问 http://localhost:4000
 
-## 图片路径建议
+## 部署
 
-HTML 博客中的图片建议使用相对路径：
+推送到 master 分支后，GitHub Actions 会自动构建并部署到 gh-pages 分支。
 
-```
-assets/blog/2026-03-04_rapid/
-├── index.html          # HTML 中用 <img src="images/figure1.png">
-└── images/
-    └── figure1.png
+```bash
+git add -A
+git commit -m "feat: 添加新博客"
+git push
 ```
