@@ -2,7 +2,7 @@
 layout: about
 title: Home
 permalink: /
-subtitle: <a href='#'>Affiliations</a>. Beihang University. lichangkang@buaa.edu.cn .
+subtitle: <a href='#'>Affiliations</a>. Beihang University. lickluck0920@gmail.com .
 
 profile:
   align: right
@@ -17,8 +17,8 @@ selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true # includes social icons at the bottom of the page
 ---
 
-Hello, this is Changkang Li, or Leeon if you like, I am  an MS student at [Beihang University(BUAA)](https://ev.buaa.edu.cn/). Before that, I received the B.S. degree from 
-[Huazhong University of Science and Technology(HUST)](https://english.hust.edu.cn/), 
+Hello, this is Changkang Li, or Leeon if you like, I am  an MS student at [Beihang University(BUAA)](https://ev.buaa.edu.cn/). Before that, I received the B.S. degree from
+[Huazhong University of Science and Technology(HUST)](https://english.hust.edu.cn/),
 Wuhan, China, in 2022. My current research interests include the following areas.
 
 - Efficient LLMs
@@ -26,8 +26,6 @@ Wuhan, China, in 2022. My current research interests include the following areas
 - LLM Reasoning, Vison-Language Models, LLM Application
 
 I also have a broad interest in other topics in AIG/Diffusion.
-
-<span style="color: green"> 🌟🌟 I will be in Glasgow, UK for BMVC 2024 on November 25th for BMVC 2024! Hope to meet many of you there! 🤗🤗 </span>
 
 🌟🌟🌟<span style="color: red">I am seeking PhD opportunities for Spring/Fall 2025. Please feel free to contact me. </span>
 
