@@ -28,13 +28,19 @@ layout: default
         <!-- HTML 博客（从 _data/blogs.yml） -->
         {% if site.data.blogs %}
           {% for blog in site.data.blogs %}
-            {% if blog.tags contains page.title %}
-              <tr>
-                <th scope="row">{{ blog.date | date: '%b %d, %Y' }}</th>
-                <td>
-                  <a class="post-link" href="{{ blog.file | relative_url }}">{{ blog.title }}</a>
-                </td>
-              </tr>
+            {% if blog.tags %}
+              {% for tag in blog.tags %}
+                {% assign tag_slug = tag | slugify %}
+                {% assign page_title_slug = page.title | slugify %}
+                {% if tag_slug == page_title_slug %}
+                  <tr>
+                    <th scope="row">{{ blog.date | date: '%b %d, %Y' }}</th>
+                    <td>
+                      <a class="post-link" href="{{ blog.file | relative_url }}">{{ blog.title }}</a>
+                    </td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
             {% endif %}
           {% endfor %}
         {% endif %}
