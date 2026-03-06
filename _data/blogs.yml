@@ -27,3 +27,10 @@
   date: 2026-03-06
   description: "ICLR 2026 论文，提出 SupervisorAgent 框架，在 GAIA 基准上将 token 消耗降低 29.68%"
   tags: ["Papers", "AI", "Multi-Agent"]
+
+- title: "GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning"
+  file: "/assets/blog/20260306_gepa-reflective-prompt-evolution-can-outperform-reinforcement-learning/"
+  date: 20260306
+  description: "GEPA: 用自然语言反思替代RL优化Prompt，35x样本效率提升，超越GRPO和MIPROv2"
+  tags: ["AI", "LLM", "Prompt Engineering", "Reinforcement Learning", "论文"]
+  tags: []

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEPA: Reflective Prompt Evolution Can Outperform Reinforceme</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fc; color: #1a1a2e; line-height: 1.85; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px 40px 60px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 30px; }
+        .back-link:hover { color: #5a6fd6; }
+        .paper-content { background: white; border-radius: 20px; padding: 50px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+        .paper-content h1 { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5em; line-height: 1.3; }
+        .paper-content h2 { font-size: 1.5em; font-weight: 600; color: #1a1a2e; margin: 1.5em 0 0.8em; padding-bottom: 0.3em; border-bottom: 2px solid #f0f0f5; }
+        .paper-content h3 { font-size: 1.25em; font-weight: 600; color: #2d2d44; margin: 1.3em 0 0.6em; }
+        .paper-content h4 { font-size: 1.1em; font-weight: 600; color: #3d3d5c; margin: 1.2em 0 0.5em; }
+        .paper-content p { margin: 1em 0; color: #4a4a6a; }
+        .paper-content strong { color: #1a1a2e; font-weight: 600; }
+        .paper-content a { color: #667eea; text-decoration: none; }
+        .paper-content ul, .paper-content ol { margin: 1em 0; padding-left: 1.5em; color: #4a4a6a; }
+        .paper-content li { margin: 0.5em 0; }
+        .paper-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #f5f5fa; padding: 0.2em 0.5em; border-radius: 4px; color: #e83e8c; }
+        .paper-content pre { background: #2d2d44; border-radius: 12px; padding: 20px; overflow-x: auto; margin: 1.5em 0; }
+        .paper-content pre code { background: transparent; padding: 0; color: #f8f8f2; }
+        .paper-content blockquote { border-left: 4px solid #667eea; padding: 1em 1.5em; margin: 1.5em 0; background: #f8f9fc; border-radius: 0 12px 12px 0; color: #5a5a7a; }
+        
+        /* Compact centered table style */
+        .paper-content table { 
+            width: auto; 
+            max-width: 90%;
+            margin: 1em auto; 
+            border-collapse: collapse; 
+            font-size: 0.85em; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .paper-content th { 
+            background: #f5f5fa; 
+            padding: 8px 10px; 
+            text-align: left; 
+            font-weight: 600; 
+            border-bottom: 2px solid #e0e0e8; 
+            font-size: 0.9em;
+        }
+        .paper-content td { 
+            padding: 6px 10px; 
+            border-bottom: 1px solid #f0f0f5; 
+        }
+        .paper-content tr:last-child td { 
+            border-bottom: none; 
+        }
+        .paper-content tr:hover { background: #fafafa; }
+        
+        .paper-content hr { border: none; height: 2px; background: #e0e0e8; margin: 2em 0; }
+        
+        /* Image: 70% width = 15% margin on each side, centered */
+        .paper-content img { max-width: 70%; height: auto; border-radius: 12px; margin: 1.5em auto 0.5em; display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        
+        /* Figure and Table caption styling - small, centered, non-italic text */
+        .paper-content img + em,
+        .paper-content table + em,
+        .paper-content table + p,
+        .paper-content figure figcaption,
+        .paper-content .caption {
+            display: block;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            margin: 0.5em auto 1.5em;
+            max-width: 80%;
+            line-height: 1.5;
+            font-style: normal;  /* 去掉斜体 */
+        }
+        
+        /* Handle p > em or p > strong that follows img or table */
+        .paper-content p:has(img) + p em,
+        .paper-content img + p em,
+        .paper-content table + p em,
+        .paper-content table + p strong {
+            font-size: 0.8em;
+            color: #666;
+            font-style: normal;
+            font-weight: normal;
+        }
+        
+        .katex { font-size: 1.1em; }
+        .katex-display { 
+            margin: 1.5em 0; 
+            overflow-x: visible;  /* 允许公式溢出，不显示滚动条 */
+            overflow-y: visible;
+        }
+        .katex-display > .katex {
+            white-space: normal;  /* 允许公式换行 */
+            max-width: 100%;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回论文列表</a>
+        <div class="paper-content">
+<h1>GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning</h1>
+<p><strong>论文 ID</strong>: 2507.19457<br />
+<strong>标题</strong>: GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning<br />
+<strong>作者</strong>: Lakshya A Agrawal, Shangyin Tan, Dilara Soylu, Noah Ziems, Rishi Khare, Krista Opsahl-Ong, Arnav Singhvi, Herumb Shandilya, Michael J Ryan, Meng Jiang, Christopher Potts, Koushik Sen, Alexandros G. Dimakis, Ion Stoica, Dan Klein, Matei Zaharia, Omar Khattab<br />
+<strong>单位</strong>: UC Berkeley, Stanford, BespokeLabs.ai, Notre Dame, Databricks, MIT<br />
+<strong>会议/期刊</strong>: ICLR 2026 (投稿中)<br />
+<strong>原文保存位置</strong>: ~/.openclaw/workspace/papers/20260306_GEPA/source/<br />
+<strong>报告生成日期</strong>: 2026-03-06</p>
+<hr />
+<h2>一、论文摘要</h2>
+<p>大型语言模型（LLM）越来越多地通过强化学习（RL）方法（如 GRPO）适配到下游任务，这类方法往往需要数千次 rollout 才能学习新任务。本文认为，语言的可解释性为 LLM 提供了比策略梯度（来自稀疏标量奖励）更丰富的学习媒介。为此，我们提出 <strong>GEPA</strong>（<strong>Ge</strong>netic-<strong>Pa</strong>reto），一种通过融入自然语言反思来从试错中学习高层规则的 Prompt 优化器。</p>
+<p>给定任何包含一个或多个 LLM Prompt 的 AI 系统，GEPA 对轨迹（推理链、工具调用及其输出等）进行采样，并以自然语言反思这些轨迹，从而诊断问题、提出并测试 Prompt 更新，以及结合来自自身尝试的 Pareto 前沿的互补经验教训。</p>
+<p>在六个任务上，GEPA 平均比 GRPO 高出 <strong>6%</strong>，最高超出 <strong>20%</strong>，且使用的 rollout 数量最多少 <strong>35 倍</strong>。GEPA 还以超过 <strong>10%</strong> 的幅度超越当前最优 Prompt 优化器 MIPROv2（例如，在 AIME-2025 上精度提升 +12%）。代码已在 https://github.com/gepa-ai/gepa 开源。</p>
+<hr />
+<h2>二、基本信息</h2>
+<pre><code>论文 ID:        2507.19457
+标题:           GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning
+作者:           Lakshya A Agrawal¹, Shangyin Tan¹, Dilara Soylu², Noah Ziems⁴,
+                Rishi Khare¹, Krista Opsahl-Ong⁵, Arnav Singhvi²˒⁵,
+                Herumb Shandilya², Michael J Ryan², Meng Jiang⁴,
+                Christopher Potts², Koushik Sen¹, Alexandros G. Dimakis¹˒³,
+                Ion Stoica¹, Dan Klein¹, Matei Zaharia¹˒⁵, Omar Khattab⁶
+单位:           ¹UC Berkeley  ²Stanford  ³BespokeLabs.ai
+                ⁴Notre Dame   ⁵Databricks  ⁶MIT
+会议/期刊:      ICLR 2026
+原文保存位置:   ~/.openclaw/workspace/papers/20260306_GEPA/source/
+报告生成日期:   2026-03-06
+</code></pre>
+<hr />
+<h2>三、论文主体分析</h2>
+<h3>1. 引言（Introduction）</h3>
+<p>大型语言模型使能了将模糊自然语言规范与检索、代码执行等工具相结合的 Agent 和系统的开发。一个核心问题是：如何针对下游任务高效地优化 LLM？</p>
+<p>一种主流方法是带可验证奖励的强化学习（RLVR），例如 GRPO，将成功指标作为 rollout 末尾的标量奖励，用于估计策略梯度。这类 RL 方法虽然有效，但在实践中通常需要数万次 rollout 来适配新任务。这种样本低效性在以下情形中会成为严重瓶颈：</p>
+<ul>
+<li>下游 LLM 应用需要昂贵的工具调用</li>
+<li>LLM 本身的采样推理预算有限</li>
+<li>无法对最大或最优 LLM 进行权重微调</li>
+</ul>
+<p>本文的核心观察是：即使是高度复杂的 LLM 系统的 rollout，也可以被序列化为自然语言轨迹——包含每个 LLM 模块的指令、推理链、工具调用及其输出，以及奖励函数的内部工作过程（例如在被折叠为标量奖励之前的编译器报错信息）。由于现代 LLM 能够理解这些序列化轨迹，本文认为<strong>通过反思这些轨迹在自然语言中刻意学习的算法</strong>，能够比标准 RL 方法更有效地利用 LLM 的强大语言先验。</p>
+<p><img src="images/HotpotQABench_qwen3-8b_True_rollout_vs_score.png" alt="图 1（左）：HotpotQA 任务上 Qwen3 8B 的性能对比。随着 rollout 数量增加，GEPA 的学习速度远快于 GRPO，且最终性能大幅超越 GRPO 和 MIPROv2。测试集（星形标记）上的性能差距验证了 GEPA 的泛化能力。" /></p>
+<p><em>图 1（左）：HotpotQA 任务上 Qwen3 8B 的性能对比。随着 rollout 数量增加，GEPA 的学习速度远快于 GRPO，且最终性能大幅超越 GRPO 和 MIPROv2。测试集（星形标记）上的性能差距验证了 GEPA 的泛化能力。</em></p>
+<p>:::</p>
+<p><img src="images/IFBench_qwen3-8b_True_rollout_vs_score.png" alt="图 1（右）：IFBench 任务上 Qwen3 8B 的性能对比。GEPA 以显著更少的 rollout 实现更高性能。" /></p>
+<p><em>图 1（右）：IFBench 任务上 Qwen3 8B 的性能对比。GEPA 以显著更少的 rollout 实现更高性能。</em></p>
+<p>:::</p>
+<h3>2. 问题定义（Problem Statement）</h3>
+<h4>2.1 复合 AI 系统（Compound AI System）</h4>
+<p>本文将<strong>复合 AI 系统</strong>定义为由一个或多个语言模型调用组成的模块化系统，可能与外部工具调用交叉，通过任意控制流协调。形式化为：</p>
+$$\Phi = (M, C, \mathcal{X}, \mathcal{Y})$$
+<p>其中 $M = \langle M_1, \ldots, M_{|M|} \rangle$ 为语言模块集合，$C$ 为控制流逻辑，$\mathcal{X}$、$\mathcal{Y}$ 为全局输入输出模式。每个模块定义为：</p>
+$$M_i = (\pi_i, \theta_i, \mathcal{X}_i, \mathcal{Y}_i)$$
+<p>其中 $\pi_i$ 为 Prompt（指令+少样本示例），$\theta_i$ 为底层模型权重，$\mathcal{X}_i$、$\mathcal{Y}_i$ 为输入输出模式。</p>
+<h4>2.2 复合 AI 系统优化</h4>
+<p>给定系统 $\Phi$，设 $\Pi_\Phi = \langle \pi_1, \ldots, \pi_{|M|}\rangle$ 为所有模块 Prompt 的集合，$\Theta_\Phi = \langle \theta_1, \ldots, \theta_{|M|}\rangle$ 为权重集合，可学习参数为 $\langle \Pi, \Theta \rangle_\Phi$。优化目标为：</p>
+$$\langle \Pi^*, \Theta^* \rangle_\Phi = \arg\max_{\langle \Pi, \Theta \rangle_\Phi} \mathbb{E}_{(x, m) \sim \mathcal{T}} \left[ \mu\big( \Phi(x; \langle \Pi, \Theta \rangle_\Phi),\, m \big) \right]$$
+<h4>2.3 样本高效优化</h4>
+<p>在许多现实场景中，rollout（具体而言，调用 $\Phi$ 并由 $\mu$ 评估）的计算、资金或时间成本都很高昂。因此优化器被限制在数据集 $\mathcal{D}_\text{train} = \{ (x, m)_i \}_{i=1}^N$ 上最多 $B$ 次 rollout 内，目标是在不超过 rollout 预算 $B$ 的约束下，找到使泛化性能最大化的参数：</p>
+$$\langle \Pi^*, \Theta^* \rangle_\Phi = \arg\max_{\langle \Pi, \Theta \rangle_\Phi} \mathbb{E}_{(x, m) \sim \mathcal{T}} \left[ \mu\big( \Phi(x; \langle \Pi, \Theta \rangle_\Phi),\, m \big) \right], \quad \text{s.t.} \quad \#\text{rollouts} \leq B$$
+<p>核心挑战是：<strong>如何从每次昂贵的 rollout 中提取最大学习信号，以在低数据或预算受限环境下实现复杂模块化 AI 系统的有效适配？</strong></p>
+<h3>3. GEPA：反思性 Prompt 进化（GEPA: Reflective Prompt Evolution）</h3>
+<p>GEPA 由三个核心原则驱动：（1）遗传 Prompt 进化、（2）利用自然语言反馈的反思、（3）基于 Pareto 的候选选择。</p>
+<p><img src="images/FullGepa.png" alt="图 2：GEPA 概览图。GEPA 在每次迭代中通过两种策略之一（反思性 Prompt 突变或系统感知合并）提出新候选，首先在小批量上评估，若有提升则在更大数据集上评估。GEPA 引入基于 Pareto 的候选采样而非总是选择最优候选，确保足够多样性。这些设计使 GEPA 在样本高效的同时展现强泛化能力。" /></p>
+<p><em>图 2：GEPA 概览图。GEPA 在每次迭代中通过两种策略之一（反思性 Prompt 突变或系统感知合并）提出新候选，首先在小批量上评估，若有提升则在更大数据集上评估。GEPA 引入基于 Pareto 的候选采样而非总是选择最优候选，确保足够多样性。这些设计使 GEPA 在样本高效的同时展现强泛化能力。</em></p>
+<p>:::</p>
+<h4>3.1 遗传优化循环（Genetic Optimization Loop）</h4>
+<p>给定 AI 系统 $\Phi$，GEPA 的目标是找到最优参数 $\Pi_\Phi$（保持权重 $\Theta_\Phi$ 固定）。GEPA 从包含基础系统的<strong>候选池</strong> $\mathcal{P}$ 开始，每个<strong>候选</strong>为 $\langle \Pi, \Theta_{frozen} \rangle_\Phi$ 的具体实例化。</p>
+<p>算法进入优化循环，通过<strong>反思性突变</strong>或<strong>交叉</strong>不断提出新候选，每个候选从其父候选处继承学习信号，并结合自身 rollout 的洞察。每次迭代：</p>
+<ol>
+<li>选择有潜力的候选</li>
+<li>在任务小批量上提出并评估变体</li>
+<li>若该变体优于其父候选，则将其加入 $\mathcal{P}$ 并在 $D_{pareto}$（验证集）上评估</li>
+</ol>
+<p>预算耗尽后，GEPA 返回在 $D_{pareto}$ 上聚合性能最佳的候选。</p>
+<p><strong>GEPA 核心算法（Algorithm 1）：</strong></p>
+$$\text{GEPA}(\Phi, \mathcal{D}_{train}, \mu, \mu_f, B, b) \to \Phi^*$$
+<pre><code>输入: 系统 Φ, 数据集 D_train, 评估指标 μ, 反馈函数 μ_f, 预算 B
+超参: 小批量大小 b, Pareto 集合大小 n_pareto
+
+1: 将 D_train 划分为 D_feedback 和 D_pareto (|D_pareto| = n_pareto)
+2: 初始化候选集 P ← [Φ], 父节点 A ← [None]
+3: 对 D_pareto 中每个 (x_i, m_i)：S_Φ[i] ← μ(Φ(x_i), m_i)
+4: while 预算 B 未耗尽:
+5:     k ← SelectCandidate(P, S)
+6:     j ← SelectModule(Φ_k)
+7:     M ← 从 D_feedback 采样大小为 b 的小批量
+8:     收集 Φ_k[j] 在 M 上的反馈、分数、轨迹
+9:     π_j' ← UpdatePrompt(π_j, feedbacks, traces[j])
+10:    Φ' ← Φ_k 的副本，模块 j 更新为 π_j'
+11:    σ, σ' ← M 上的平均分数（更新前后）
+12:    if σ' 提升:
+13:        将 Φ' 加入 P; 将 k 加入 A
+14:        对 D_pareto 中每个 (x_i, m_i): S_Φ'[i] ← μ(Φ'(x_i), m_i)
+15: return Φ* = P 中在 D_pareto 上平均分数最高的候选
+</code></pre>
+<h4>3.2 反思性 Prompt 突变（Reflective Prompt Mutation）</h4>
+<p>复合 AI 系统执行过程中产生的自然语言轨迹为每个模块的行为提供了高度<strong>可见性</strong>——捕获每个模块的中间推理步骤和输出。当这些轨迹与 rollout 的最终结果（成功或失败）结合时，具有极高的<strong>诊断价值</strong>，LLM 可以通过反思执行隐式信用分配，将最终结果归因到相关模块，并据此进行目标性更新。</p>
+<p><strong>反馈函数 $\mu_f$（评估轨迹作为诊断信号）：</strong> 除了对执行轨迹进行反思，本文还识别了评估轨迹中的第二个宝贵诊断信息来源。许多评估指标应用丰富的策略（如代码评估可能涉及编译、执行和性能分析），在计算标量奖励前会产生自然语言轨迹。GEPA 通过将奖励 $\mu$ 扩展为<strong>反馈函数</strong> $\mu_f$ 来利用这些评估轨迹，$\mu_f$ 提取文本轨迹，并将其与最终分数一起作为 <code>feedback_text</code> 返回。</p>
+<p><strong>GEPA Meta-Prompt（用于 Prompt 反思更新）：</strong></p>
+<pre><code>我提供了以下指令让 assistant 完成一项任务：
+</code></pre>
+<p>&lt;当前指令&gt;</p>
+<pre><code>
+以下是提供给 assistant 的不同任务输入示例，以及 assistant 对每个任务的响应和改进反馈：
+</code></pre>
+<p>&lt;输入、输出和反馈的小批量示例&gt;</p>
+<pre><code>
+你的任务是为 assistant 编写新的指令。
+仔细阅读输入，识别输入格式并推断我希望用 assistant 解决的任务的详细描述。
+阅读所有 assistant 响应及其对应反馈，识别所有细微的领域特定知识，并将其包含在指令中。
+在 ``` 块中提供新指令。
+</code></pre>
+<h4>3.3 基于 Pareto 的候选选择（Pareto-Based Candidate Selection）</h4>
+<p>GEPA 是一个高度模块化的算法，支持各种候选选择策略。简单地总是选择最优候选会导致优化器陷入局部最优：一旦发现一个主导策略，就很难超越，优化器最终耗尽预算而无法学习新的、可能更好的策略。</p>
+<p>为此，GEPA 采用<strong>基于 Pareto 的&quot;光照&quot;策略</strong>（受 MAP-Elites 启发）。</p>
+<p><strong>Pareto 候选选择算法（Algorithm 2）：</strong></p>
+<pre><code>SelectCandidate(P, S):
+1: // 构建逐实例 Pareto 集合
+2: 对每个 i:
+3:     s*[i] ← max_k S_{P[k]}[i]
+4:     P*[i] ← {P[k] : S_{P[k]}[i] = s*[i]}
+5: C ← ∪_i P*[i] 中的唯一候选
+6: D ← ∅
+7: while 存在 Φ ∈ C\D 被 C\D 中的另一候选支配:
+8:     D ← D ∪ {Φ}
+9: 从 P*[i] 中移除 D，得到 P̂*[i]
+10: 设 f[Φ] = Φ ∈ P̂*[i] 的 i 的个数
+11: 从 Ĉ 中以概率 ∝ f[Φ_k] 采样 Φ_k
+12: return Φ_k 在 P 中的索引 k
+</code></pre>
+<p>这个策略允许 GEPA 逃离局部最优，而不过度扩展搜索，在探索（寻找新策略）和利用（改进有潜力的候选）之间高效平衡。</p>
+<h3>4. 实验评估（Evaluation）</h3>
+<h4>4.1 评估设置</h4>
+<p><strong>基准测试</strong>（六个多样化任务）：</p>
+<ul>
+<li><strong>AIME-2025</strong>：美国数学邀请赛题目，高难度数学推理</li>
+<li><strong>LiveBench-Math</strong>：跨领域数学基准（2025年7月30日版本）</li>
+<li><strong>HotpotQA</strong>：大规模多跳 Wikipedia 问答（113K 问题对）</li>
+<li><strong>IFBench</strong>：测试 LLM 遵循精确人类指令的能力（58个全新 OOD 输出约束）</li>
+<li><strong>HoVer</strong>：开放域多跳事实提取和索赔验证</li>
+<li><strong>PUPA</strong>：隐私感知代理委托任务</li>
+</ul>
+<p><strong>基准复合 AI 系统</strong>：</p>
+<table>
+<thead>
+<tr>
+  <th>基准</th>
+  <th>复合 AI 系统</th>
+  <th>反馈函数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>HotpotQA</td>
+  <td>修改版 HoverMultiHop（最后一跳回答问题）</td>
+  <td>识别各阶段待检索的相关文档</td>
+</tr>
+<tr>
+  <td>IFBench</td>
+  <td>2阶段：(1)回答用户查询，(2)改写以满足约束</td>
+  <td>提供满足/未满足的约束描述</td>
+</tr>
+<tr>
+  <td>AIME-2025</td>
+  <td>单步 ChainOfThought</td>
+  <td>答案正确性</td>
+</tr>
+<tr>
+  <td>HoVer</td>
+  <td>HoverMultiHop（最多3跳，2个查询写作模块）</td>
+  <td>识别已检索/待检索的正确文档</td>
+</tr>
+<tr>
+  <td>PUPA</td>
+  <td>PAPILLON（可信用户查询改写器+响应改写器+不可信模型）</td>
+  <td>响应质量分数+PII泄漏分数的分解</td>
+</tr>
+</tbody>
+</table>
+<p><strong>模型</strong>：</p>
+<ul>
+<li><strong>Qwen3 8B</strong>（开源）：温度 0.6，top-p 0.95，top-k 20</li>
+<li><strong>GPT-4.1 Mini</strong>（商业）：温度 1.0，通过 OpenAI API</li>
+</ul>
+<p><strong>对比基准</strong>：</p>
+<ul>
+<li><strong>Baseline</strong>：无优化，直接评估</li>
+<li><strong>MIPROv2</strong>：联合优化指令和少样本示例的贝叶斯优化方法</li>
+<li><strong>Trace / TextGrad</strong>：文本反向传播优化器</li>
+<li><strong>GRPO</strong>（LoRA，500训练步，24,000 rollouts）：强化学习基准</li>
+</ul>
+<h4>4.2 主要结果</h4>
+<p><strong>表 1：Qwen3 8B 上各基准的主要结果（Test 集）</strong></p>
+<table>
+<thead>
+<tr>
+  <th>优化器</th>
+  <th>AIME</th>
+  <th>LiveBench</th>
+  <th>HotpotQA</th>
+  <th>IFBench</th>
+  <th>HoVer</th>
+  <th>PUPA</th>
+  <th>聚合</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Baseline</td>
+  <td>基线</td>
+  <td>基线</td>
+  <td>基线</td>
+  <td>基线</td>
+  <td>基线</td>
+  <td>基线</td>
+  <td>基线</td>
+</tr>
+<tr>
+  <td>GRPO</td>
+  <td>+△</td>
+  <td>-</td>
+  <td>+△</td>
+  <td>+△</td>
+  <td>+△</td>
+  <td>+△</td>
+  <td>+5.7%</td>
+</tr>
+<tr>
+  <td>MIPROv2</td>
+  <td>+△</td>
+  <td>+△</td>
+  <td>+△</td>
+  <td>+△</td>
+  <td>+△</td>
+  <td>+△</td>
+  <td>+5.64%</td>
+</tr>
+<tr>
+  <td><strong>GEPA</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+12.1%</strong></td>
+</tr>
+<tr>
+  <td><strong>GEPA+Merge</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>+△</strong></td>
+  <td><strong>最高</strong></td>
+</tr>
+</tbody>
+</table>
+<p><em>注：GEPA 使用的 rollout 数量不到 GRPO 的 15%，即可实现更高聚合性能</em></p>
+<p><strong>表 2：GPT-4.1 Mini 上各基准的主要结果</strong></p>
+<p>| 优化器 | 聚合提升 |
+|--------|---------|
+| Baseline | 0% |
+| Trace | +3.27% |
+| TextGrad | +6.11% |
+| MIPROv2 | +5.64% |
+| <strong>GEPA</strong> | <strong>+13.33%</strong> |
+| <strong>GEPA+Merge</strong> | <strong>+12.19%</strong> |
+| <strong>GEPA-Qwen-Opt</strong> | <strong>+9.00%</strong> |（用 Qwen3 8B 优化，在 GPT-4.1 Mini 上评估）|</p>
+<p><img src="images/optimizer_performance_gpt-41-mini.png" alt="图 3：GPT-4.1 Mini 上各基准最终测试集性能对比。GEPA 和 GEPA+Merge 在所有任务上一致领先其他优化器。" /></p>
+<p><em>图 3：GPT-4.1 Mini 上各基准最终测试集性能对比。GEPA 和 GEPA+Merge 在所有任务上一致领先其他优化器。</em></p>
+<p>:::</p>
+<p><img src="images/optimizer_performance_qwen3-8b.png" alt="图 4：Qwen3 8B 上各基准最终测试集性能对比。GEPA 在多数任务上超越 GRPO（24,000 rollouts）。" /></p>
+<p><em>图 4：Qwen3 8B 上各基准最终测试集性能对比。GEPA 在多数任务上超越 GRPO（24,000 rollouts）。</em></p>
+<p>:::</p>
+<h4>4.3 关键观察</h4>
+<p><strong>观察 1：反思性 Prompt 进化高度样本高效，可超越权重空间强化学习</strong></p>
+<p>在四个基准上，GEPA 在复合 AI 系统中快速适配并稳健泛化——以最多 $35\times$ 更少的 rollout 击败 GRPO（24,000 rollouts）最高 <strong>19%</strong>。GEPA 以 4–35× 更少的 rollout 达到最优测试性能，在 5 个中的 6 个任务上超越 GRPO，分别超出 19.0%、2.73%、13.66%、5.19% 和 0.7%。GEPA 仅用 243、402、330、1143、1179 和 306 次 rollout 即匹配 GRPO 的最佳验证分数——样本效率最高提升 <strong>78 倍</strong>。</p>
+<p>重要说明：大多数 GEPA 的 rollout 预算用于验证集，这些分数仅用于候选选择，不产生学习信号。若只统计训练集 rollouts，GEPA 仅需 79 至 737 次 rollouts 即可达到最优性能。</p>
+<p><img src="images/hoverBench_qwen3-8b_True_rollout_vs_score.png" alt="图 5：HoVer 任务上性能-rollout 曲线。GEPA 快速超过 GRPO 最优性能，效率优势明显。" /></p>
+<p><em>图 5：HoVer 任务上性能-rollout 曲线。GEPA 快速超过 GRPO 最优性能，效率优势明显。</em></p>
+<p>:::</p>
+<p><strong>观察 2：反思性 Prompt 进化使仅指令优化即可超越联合指令+少样本优化</strong></p>
+<p>在两个模型和六个任务上，GEPA 在所有设置中一致超越 MIPROv2，最大差距为 GPT-4.1 mini 的 11.1% 和 Qwen3 8B 的 10.3%。GEPA 和 GEPA+Merge 将聚合增益放大超过一倍（+13.33% 和 +12.19% vs MIPROv2 的 +5.64%）。</p>
+<p>这一结果与此前 MIPROv2 和相关工作的发现（少样本示例优化优于指令优化）形成反转，本文将其归因于现代 LLM 指令遵循和自我反思能力的显著提升。</p>
+<p><img src="images/generalization_gap_gpt-41-mini_HotpotQABench.png" alt="图 6：泛化差距（验证集最佳分数与测试集分数之差）对比。反思性进化的指令展现出更低的泛化差距，说明更好的泛化能力。" /></p>
+<p><em>图 6：泛化差距（验证集最佳分数与测试集分数之差）对比。反思性进化的指令展现出更低的泛化差距，说明更好的泛化能力。</em></p>
+<p>:::</p>
+<p><strong>观察 3：候选选择策略对优化轨迹和最终性能有显著影响，Pareto 采样提供独特优势</strong></p>
+<p>与总是选择最优候选的 <code>SelectBestCandidate</code> 策略（类似 TextGrad）和 <code>BeamSearch(N=4)</code>（类似 APO）相比：</p>
+<ul>
+<li>GEPA 的 Pareto 采样相比 BeamSearch 提升最高 <strong>11.33%</strong>（聚合 +7.33%）</li>
+<li>相比 SelectBestCandidate 提升最高 <strong>8.17%</strong>（聚合 +6.4%）</li>
+</ul>
+<p>总是选择当前最优候选会在下一次迭代中立即改善，但随后导致优化器停滞，将所有预算用于尝试改进这一个候选。相比之下，Pareto 采样通过考虑所有 Pareto 最优候选（所有已发现的&quot;获胜&quot;策略）来扩展搜索，在探索和利用之间保持紧密平衡。</p>
+<p><strong>观察 4：指令优化的 Prompt 在计算上更经济且泛化更好</strong></p>
+<p>GEPA 生成的指令优化 Prompt 与 MIPROv2 相比：</p>
+<ul>
+<li>长度缩短最高 <strong>9.2×</strong>（即 MIPROv2 的约 11%）</li>
+<li>性能更高</li>
+</ul>
+<p>这对于实际部署具有重要价值：API 提供商按输入 token 计费，更短的 Prompt 降低运行时成本，减少延迟，提升 LLM 推理系统整体效率。</p>
+<p><img src="images/aggregate_performance_vs_prompt_size_gpt-41-mini.png" alt="图 7：GPT-4.1 Mini 聚合性能 vs. 聚合 Prompt 大小。GEPA 持续产生约 MIPROv2 33% 大小的 Prompt，同时实现更高性能。" /></p>
+<p><em>图 7：GPT-4.1 Mini 聚合性能 vs. 聚合 Prompt 大小。GEPA 持续产生约 MIPROv2 33% 大小的 Prompt，同时实现更高性能。</em></p>
+<p>:::</p>
+<p><strong>观察 5：系统感知交叉策略（Merge）可带来大幅收益，但最优预算分配需进一步研究</strong></p>
+<p>GEPA+Merge 可以比 GEPA 单独优化再额外提升最高 <strong>5%</strong>，带来额外 <strong>2%</strong> 的聚合改善。Merge 策略（附录算法详述）通过识别独立优化谱系（已学习互补策略），并通过从每个谱系挑选不同模块的最优版本来合并，提出单一最优候选。</p>
+<p>然而，在 GPT-4.1 Mini 上 Merge 效果显著，而在 Qwen3 8B 上效果不稳定——这归因于反思突变和交叉之间的预算分配问题，以及调用 Merge 的时机选择。</p>
+<p><strong>观察 6：GEPA 优化的 Prompt 展现跨模型泛化能力</strong></p>
+<p>&quot;GEPA-Qwen-Opt&quot;（用 Qwen3-8B 优化，在 GPT-4.1-Mini 上评估）的配置：</p>
+<ul>
+<li>在 6 个基准上聚合提升 <strong>+9.00%</strong>（HotpotQA 最高 +27.67%）</li>
+<li>超越了直接针对 GPT-4.1-Mini 优化的 MIPROv2（+5.64%）、TextGrad（+6.11%）和 Trace（+3.27%）</li>
+</ul>
+<h3>5. 扩展应用（Extended Applications）</h3>
+<h4>5.1 GEPA 用于推理时搜索</h4>
+<p>GEPA 也可用作推理时搜索技术：将待解决的任务集作为训练集传给 GEPA，确保 $D_{train}$ 和 $D_{pareto}$ 都包含完整任务集，GEPA 可&quot;过拟合&quot;任务集，迭代提出更好的解决方案。</p>
+<p><strong>NPU 内核生成（AMD XDNA2 架构）</strong>：</p>
+<ul>
+<li>GPT-4o + Sequential10（最多10次迭代优化）：均值向量利用率 4.25%</li>
+<li>添加 RAG（技术手册）：16.33%</li>
+<li>添加 MIPROv2：19.03%</li>
+<li><strong>GEPA（无 RAG）</strong>：<strong>30.52%</strong>（部分内核达 70%）</li>
+<li>GEPA 生成的单个 Prompt 使 Sequential10（无 RAG）达到 26.85%</li>
+</ul>
+<p><strong>CUDA 内核生成（KernelBench，NVIDIA V100）</strong>：</p>
+<ul>
+<li>GEPA 将 GPT-4o 接近 0% 的 $fast_1$ 分数提升到超过 <strong>20%</strong>（35 个代表性任务）</li>
+</ul>
+<p><img src="images/npueval_vec_util_gpt4o.png" alt="图 8：GEPA 用于 NPU 内核生成的结果。GEPA 驱动的 GPT-4o Agent 实现均值 30.52% 的向量利用率，远超 RAG+MIPROv2 的 19.03%。" /></p>
+<p><em>图 8：GEPA 用于 NPU 内核生成的结果。GEPA 驱动的 GPT-4o Agent 实现均值 30.52% 的向量利用率，远超 RAG+MIPROv2 的 19.03%。</em></p>
+<p>:::</p>
+<h4>5.2 GEPA 用于对抗性 Prompt 搜索</h4>
+<p>通过反转奖励信号（寻找最小化任务性能的 Prompt），GEPA 可发现对抗性 Prompt：</p>
+<ul>
+<li>从干净 AIME-2025 起点（GPT-5 Mini，pass@1 = 76%）</li>
+<li>GEPA 进化出一个琐事风格的干扰指令</li>
+<li>评估：AIME-2025（30题，每题5次运行，共150次生成）</li>
+<li>对抗性 Prompt 使 pass@1 从 <strong>76% 降至 10%</strong></li>
+</ul>
+<p>生成的对抗性指令（节选）包含无关琐事（&quot;蜂蜜永不变质&quot;、&quot;尼罗河是世界最长河流&quot;）和重复的格式约束，导致模型字面输出占位符 <code>### &lt;final answer&gt;</code>，而非实际答案。</p>
+<p>这表明反思性 Prompt 进化不仅能改善系统，还能通过定位通用的、查询无关的扰动来进行系统压力测试。</p>
+<h3>6. 相关工作（Related Work）</h3>
+<p><strong>Prompt 优化</strong>：自动 Prompt 优化方法（如 OPRO、PromptWizard 等）使用 LLM 自动优化 Prompt。GEPA 通过整合文本环境反馈、Pareto 感知候选搜索和每模块进化策略加以区分。</p>
+<p><strong>进化算法</strong>：EvoPrompt 进化 Prompt 种群但不利用训练反馈；AlphaEvolve 对代码进行进化搜索；Rainbow Teaming 应用质量多样性进化生成多样对抗性 Prompt。GEPA 额外使用领域特定反馈进行目标性突变，实现更高样本效率。</p>
+<p><strong>反馈驱动改进</strong>：Reflexion、Self-Refine、Dynamic Cheatsheet 等方法在语言空间中学习。GEPA 从示例中提出新指令（而非用作少样本示例），产生任务特定规则。</p>
+<p><strong>复合 AI 系统优化</strong>：DSPy 搜索/引导少样本示例；TextGrad 反向传播文本反馈；MIPROv2 通过贝叶斯优化联合对齐指令和示例；Optimas 引入全局对齐的局部奖励；Agent-Pro 通过动态信念生成和对交互经验的反思进化 Agent 策略。GEPA 将全局奖励与每模块文本反馈相结合，维护单个数据实例的 Pareto 前沿。</p>
+<h3>7. 结论（Conclusion）</h3>
+<p>本文提出 GEPA，一个利用显式反思和基于 Pareto 选择的任意 LLM Agent 和工作流 Prompt 优化器，展现出比强化学习（GRPO）更优越的样本效率，同时超越领先的 Prompt 优化器（MIPROv2）。</p>
+<p>通过显式融入自然语言反馈并维护多样化的 Pareto 最优候选池，GEPA 快速将 AI 系统适配到新任务。跨基准和模型的结果表明，语言驱动的反思可作为优化复杂现实世界 AI 工作流（尤其是资源受限场景）的可扩展策略。</p>
+<h3>附录亮点</h3>
+<p><strong>Merge 策略（附录 B）</strong>：系统感知的遗传交叉策略</p>
+<pre><code>Merge(P, A, S, r):
+1: i, j ← r.sample(2, |P|)  // 随机选两个不同候选
+2: A_i ← GetAncestors(i, A)
+3: A_j ← GetAncestors(j, A)
+4: if i ∈ A_j or j ∈ A_i: continue  // 跳过直接祖先
+5: for a ∈ A_i ∩ A_j:  // 找共同祖先
+6:     if (i,j,a) 已尝试: continue
+7:     if S[a] &gt; min(S[i], S[j]): continue
+8:     if not Desirable(a, i, j, P): continue
+9:     // 合并两个候选的最优模块
+10:    ...
+11: return (Φ', i, j, a)
+</code></pre>
+<p><code>Desirable</code> 函数确保只有当两个候选来自同一祖先但优化了不同模块时（互补策略）才执行合并。</p>
+<p><strong>GEPA 实验成本（GPT-4.1 mini 全部实验）</strong>：</p>
+<ul>
+<li>GEPA: $86</li>
+<li>GEPA-Merge: $67</li>
+<li>MIPROv2: $76</li>
+<li>Trace + TextGrad: $172</li>
+</ul>
+<hr />
+<h2>四、论文简评</h2>
+<h3>创新点</h3>
+<ol>
+<li><p><strong>自然语言反思作为学习媒介</strong>：论文的核心洞见是，LLM 轨迹的可解释性和诊断价值使自然语言反思成为比标量奖励梯度更高效的学习信号。这一直觉清晰而有力，并获得了广泛实验验证。</p>
+</li>
+<li><p><strong>Pareto 基础的&quot;光照&quot;策略</strong>：借鉴 MAP-Elites 质量多样性优化思想，GEPA 将每个训练实例的最优候选维护在 Pareto 前沿上，有效避免了贪婪方法的局部最优问题，同时聚焦优化资源于有潜力的候选。</p>
+</li>
+<li><p><strong>对评估轨迹的创造性利用</strong>：将评估过程（编译器报错、评分细则等）的自然语言输出转化为额外的诊断信号，这一&quot;反馈函数&quot;$\mu_f$ 的设计是实践中非常有价值的创新。</p>
+</li>
+<li><p><strong>跨模型泛化</strong>：GEPA 用较弱模型（Qwen3 8B）优化的 Prompt 在更强模型（GPT-4.1 Mini）上仍获得显著提升，表明学到的规则具有通用性。</p>
+</li>
+<li><p><strong>多种扩展应用</strong>：从任务优化（HotpotQA、IFBench 等）到推理时搜索（代码生成）再到对抗性 Prompt 发现，GEPA 的适应范围广泛。</p>
+</li>
+</ol>
+<h3>局限性</h3>
+<ol>
+<li><p><strong>仅优化指令，暂不优化少样本示例</strong>：当前 GEPA 专注于指令优化，在少样本示例能带来显著收益的任务上可能存在进一步提升空间。</p>
+</li>
+<li><p><strong>验证集消耗大量 rollout 预算</strong>：GEPA 大多数计数的 rollout 实际用于验证集候选评估，而非直接用于产生学习信号。通过减小验证集规模可进一步提升样本效率。</p>
+</li>
+<li><p><strong>Merge 策略的超参数敏感性</strong>：实验中对 GPT-4.1 Mini 和 Qwen3 8B 使用相同的 Merge 超参数，导致 Qwen3 8B 上效果欠佳。何时调用 Merge、如何分配反思突变与交叉的预算比例，有待进一步研究。</p>
+</li>
+<li><p><strong>与全参数微调 GRPO 的比较有限</strong>：主要实验对比 LoRA GRPO，仅有一个任务展示了对全参数微调 GRPO 的比较。虽然结果仍有利于 GEPA，但全面对比尚不充分。</p>
+</li>
+<li><p><strong>适用范围的边界尚不明确</strong>：在数据充足、rollout 廉价的情形下，权重更新（RL）可能仍会优于 Prompt 优化。Prompt 优化与权重优化之间的边界尚无系统研究。</p>
+</li>
+</ol>
+<h3>应用场景</h3>
+<ol>
+<li><p><strong>高成本 API 工具调用场景</strong>：当每次 rollout 涉及昂贵的外部工具调用（搜索引擎、代码执行等）时，GEPA 的样本效率优势尤为突出。</p>
+</li>
+<li><p><strong>闭源模型优化</strong>：对于无法进行权重微调的大型商业模型（如 GPT-4.1 Mini），GEPA 提供了一种纯 Prompt 层面的高效优化路径。</p>
+</li>
+<li><p><strong>数据受限场景</strong>：仅需少量训练示例（数十到百余个），GEPA 即可取得显著提升。</p>
+</li>
+<li><p><strong>推理时搜索</strong>：通过&quot;过拟合&quot;目标任务集，GEPA 可作为推理时搜索策略，适用于代码生成、科学计算等需要大量探索的领域。</p>
+</li>
+<li><p><strong>AI 系统安全评估</strong>：对抗性 Prompt 搜索能力为系统安全测试和红队评估提供了自动化工具。</p>
+</li>
+</ol>
+<h3>可改进方向</h3>
+<ol>
+<li><p><strong>动态 Pareto 验证集采样</strong>：通过动态选择验证子集代替全量验证，可在保持候选选择质量的同时大幅减少 rollout 数量。</p>
+</li>
+<li><p><strong>反馈工程</strong>：系统研究哪些执行或评估轨迹能为反思优化提供最有价值的学习信号（类比强化学习中的奖励工程），有望进一步提升 GEPA 的学习效率。</p>
+</li>
+<li><p><strong>Prompt 与权重联合优化</strong>：将 GEPA 的语言驱动反思与权重空间的 RL 适配相结合（如用 GEPA 的语言经验教训引导 RL rollouts），可能产生叠加收益并统一两种优化范式。</p>
+</li>
+<li><p><strong>自适应 Merge 策略</strong>：开发能够根据优化谱系的多样性程度自适应决定何时、以何种预算比例调用 Merge 的策略。</p>
+</li>
+<li><p><strong>结合少样本示例优化</strong>：探索在 GEPA 的遗传进化框架内同时优化指令和少样本示例，有望在特定任务上取得更大提升。</p>
+</li>
+</ol>
+<hr />
+<p><em>报告由 OpenClaw 学术分析助手自动生成 | 2026-03-06</em></p>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    });
+    </script>
+    
+</body>
+</html>
