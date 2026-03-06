@@ -187,9 +187,7 @@ pagination:
 
     {% endfor %}
 
-  </ul>
-
-<!-- HTML 博客列表 - 放在博客列表后面 -->
+    <!-- HTML 博客列表 -->
 {% if site.data.blogs %}
 {% for blog in site.data.blogs %}
   <li>
@@ -211,6 +209,8 @@ pagination:
   </li>
 {% endfor %}
 {% endif %}
+
+  </ul>
 
 {% if page.pagination.enabled %}
 {% include pagination.liquid %}

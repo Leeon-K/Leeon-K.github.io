@@ -6,6 +6,7 @@
 
 - [快速开始](#快速开始)
 - [添加 HTML 博客](#添加-html-博客)
+- [删除博客](#删除博客)
 - [本地预览](#本地预览)
 - [部署](#部署)
 
@@ -67,6 +68,36 @@ assets/blog/2026-03-05_rapid/
 └── images/
     ├── figure1.png
     └── figure2.png
+```
+
+## 删除博客
+
+### 步骤 1：删除博客文件
+
+```bash
+# 删除博客目录（包含 HTML 和图片）
+rm -rf assets/blog/2026-03-05_rapid/
+```
+
+### 步骤 2：删除博客配置
+
+编辑 `_data/blogs.yml`，删除对应的博客条目：
+
+```yaml
+# 删除这一整块
+- title: "RAPID: 长上下文推理的检索增强推测解码"
+  file: "/assets/blog/2026-03-05_rapid/"
+  date: 2026-03-05
+  description: "介绍 RAPID 方法..."
+  tags: ["Papers", "code"]
+```
+
+### 步骤 3：提交并推送
+
+```bash
+git add -A
+git commit -m "chore: 删除博客"
+git push
 ```
 
 ## 本地预览
