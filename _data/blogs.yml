@@ -1,11 +1,24 @@
+# HTML 博客列表
+# 格式：
+# - title: "博客标题"
+#   file: "/assets/blog/日期_标题/"
+#   date: 2026-03-06
+#   description: "博客描述"
+#   tags: ["Papers", "code"]
 - title: "RAPID: 长上下文推理的检索增强推测解码"
-  file: "/assets/blog/2026-03-04_rapid/"
-  date: 2026-03-04
-
-- title: "论文报告：Gated Attention for Large Language Models"
-  file: "/assets/blog/2026-03-04_gated-attention/"
-  date: 2026-03-04
+  file: "/assets/blog/2026-03-05_rapid/"
+  date: 2026-03-05
+  description: "介绍 RAPID 方法，一种用于长上下文推理的检索增强推测解码技术"
+  tags: ["Papers", "code"]
 
 - title: "RAPID: Long-Context Inference with Retrieval-Augmented Speculative Decoding"
-  file: "/assets/blog/2026-03-05_RAPID/"
-  date: 2026-03-05
+  file: "/assets/blog/2026-03-04_rapid-long-context-inference-with-retrieval-augmented-speculative-decoding/"
+  date: 2026-03-04
+  description: "RAPID: Long-Context Inference with Retrieval-Augmented Speculative Decoding"
+  tags: ["Papers", "code"]
+
+- title: "论文报告：Gated Attention for Large Language Models"
+  file: "/assets/blog/2026-03-04_gated-attention-for-large-language-models/"
+  date: 2026-03-04
+  description: "Gated Attention 的架构设计与实现细节"
+  tags: ["Papers"]

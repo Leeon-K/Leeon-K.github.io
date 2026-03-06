@@ -193,8 +193,21 @@ pagination:
 {% if site.data.blogs %}
 {% for blog in site.data.blogs %}
   <li>
-    <h3><a class="post-title" href="{{ blog.file }}">{{ blog.title }}</a></h3>
-    <p class="post-meta">{{ blog.date | date: '%B %d, %Y' }}</p>
+    <h3><a class="post-title" href="{{ blog.file | relative_url }}">{{ blog.title }}</a></h3>
+    <p>{{ blog.description }}</p>
+    <p class="post-meta">
+      {{ blog.date | date: '%B %d, %Y' }}
+      {% if blog.tags %}
+      &nbsp; &middot; &nbsp;
+        {% for tag in blog.tags %}
+        <a href="{{ tag | slugify | prepend: '/blog/tag/' | prepend: site.baseurl}}">
+          <i class="fa-solid fa-hashtag fa-sm"></i> {{ tag }}</a>
+          {% unless forloop.last %}
+            &nbsp;
+          {% endunless %}
+        {% endfor %}
+      {% endif %}
+    </p>
   </li>
 {% endfor %}
 {% endif %}
