@@ -1,60 +1,12 @@
 ---
-layout: post
+layout: page
 title: "RAPID: 长上下文推理的检索增强推测解码"
-date: 2026-03-04 00:00:00
+date: 2026-03-04
 description: "论文笔记"
 ---
 
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAPID: 长上下文推理的检索增强推测解码</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fc; color: #1a1a2e; line-height: 1.85; }
-        .container { max-width: 850px; margin: 0 auto; padding: 30px 20px 60px; }
-        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 30px; }
-        .back-link:hover { color: #5a6fd6; }
-        .paper-content { background: white; border-radius: 20px; padding: 50px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
-        .paper-content h1 { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5em; line-height: 1.3; }
-        .paper-content h2 { font-size: 1.5em; font-weight: 600; color: #1a1a2e; margin: 1.5em 0 0.8em; padding-bottom: 0.3em; border-bottom: 2px solid #f0f0f5; }
-        .paper-content h3 { font-size: 1.25em; font-weight: 600; color: #2d2d44; margin: 1.3em 0 0.6em; }
-        .paper-content h4 { font-size: 1.1em; font-weight: 600; color: #3d3d5c; margin: 1.2em 0 0.5em; }
-        .paper-content p { margin: 1em 0; color: #4a4a6a; }
-        .paper-content strong { color: #1a1a2e; font-weight: 600; }
-        .paper-content a { color: #667eea; text-decoration: none; }
-        .paper-content ul, .paper-content ol { margin: 1em 0; padding-left: 1.5em; color: #4a4a6a; }
-        .paper-content li { margin: 0.5em 0; }
-        .paper-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #f5f5fa; padding: 0.2em 0.5em; border-radius: 4px; color: #e83e8c; }
-        .paper-content pre { background: #2d2d44; border-radius: 12px; padding: 20px; overflow-x: auto; margin: 1.5em 0; }
-        .paper-content pre code { background: transparent; padding: 0; color: #f8f8f2; }
-        .paper-content blockquote { border-left: 4px solid #667eea; padding: 1em 1.5em; margin: 1.5em 0; background: #f8f9fc; border-radius: 0 12px 12px 0; color: #5a5a7a; }
-        .paper-content table { width: 100%; border-collapse: collapse; margin: 1.5em 0; overflow-x: auto; display: block; }
-        
-        /* First table (metadata) - compact list style */
-        .paper-content > table:first-of-type { display: table; border: none; margin: 0.5em 0; }
-        .paper-content > table:first-of-type tr { border-bottom: 1px solid #eee; }
-        .paper-content > table:first-of-type td:first-child { 
-            background: transparent; 
-            font-weight: 600; 
-            width: 100px;
-            white-space: nowrap;
-            padding: 4px 12px 4px 0;
-        }
-        .paper-content > table:first-of-type td:last-child {
-            padding: 4px 0 4px 0;
-        }
-        
-        .paper-content th { background: #f5f5fa; padding: 12px 15px; text-align: left; font-weight: 600; border-bottom: 2px solid #e0e0e8; }
+<div class="container" style="max-width: 100%; padding: 20px;">
+<div class="paper-content">
         .paper-content td { padding: 12px 15px; border-bottom: 1px solid #f0f0f5; }
         .paper-content hr { border: none; height: 2px; background: #e0e0e8; margin: 2em 0; }
         .paper-content img { max-width: 100%; height: auto; border-radius: 12px; margin: 1.5em 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
@@ -247,23 +199,5 @@ description: "论文笔记"
 <hr />
 <p><em>报告生成日期：2026年3月4日</em></p>
 
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-    
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
-    <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        renderMathInElement(document.body, {
-            delimiters: [
-                {left: "$$", right: "$$", display: true},
-                {left: "$", right: "$", display: false}
-            ],
-            throwOnError: false
-        });
-    });
-    </script>
-    
-</body>
-</html>
+</div>
+</div>

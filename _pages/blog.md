@@ -18,22 +18,6 @@ pagination:
 
 <div class="post">
 
-<!-- HTML 博客列表 -->
-{% if site.data.blogs %}
-<div class="header-bar">
-  <h1>HTML 论文报告</h1>
-</div>
-<ul class="post-list">
-{% for blog in site.data.blogs %}
-  <li>
-    <h3><a class="post-title" href="{{ blog.file }}">{{ blog.title }}</a></h3>
-    <p class="post-meta">{{ blog.date | date: '%B %d, %Y' }}</p>
-  </li>
-{% endfor %}
-</ul>
-<hr>
-{% endif %}
-
 {% assign blog_name_size = site.blog_name | size %}
 {% assign blog_description_size = site.blog_description | size %}
 
@@ -204,6 +188,16 @@ pagination:
     {% endfor %}
 
   </ul>
+
+<!-- HTML 博客列表 - 放在博客列表后面 -->
+{% if site.data.blogs %}
+{% for blog in site.data.blogs %}
+  <li>
+    <h3><a class="post-title" href="{{ blog.file }}">{{ blog.title }}</a></h3>
+    <p class="post-meta">{{ blog.date | date: '%B %d, %Y' }}</p>
+  </li>
+{% endfor %}
+{% endif %}
 
 {% if page.pagination.enabled %}
 {% include pagination.liquid %}
