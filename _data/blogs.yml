@@ -22,3 +22,8 @@
   date: 2026-03-04
   description: "Gated Attention 的架构设计与实现细节"
   tags: ["Papers"]
+- title: "Stop Wasting Your Tokens: 高效运行时多智能体系统"
+  file: "/assets/blog/2026-03-06_stop-wasting-your-tokens/"
+  date: 2026-03-06
+  description: "ICLR 2026 论文，提出 SupervisorAgent 框架，在 GAIA 基准上将 token 消耗降低 29.68%"
+  tags: ["Papers", "AI", "Multi-Agent"]
