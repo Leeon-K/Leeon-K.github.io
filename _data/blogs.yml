@@ -33,4 +33,9 @@
   date: 20260306
   description: "GEPA: 用自然语言反思替代RL优化Prompt，35x样本效率提升，超越GRPO和MIPROv2"
   tags: ["AI", "LLM", "Prompt Engineering", "Reinforcement Learning", "论文"]
-  tags: []
+
+- title: "Reasoning Models Generate Societies of Thought"
+  file: "/assets/blog/2026-03-07_reasoning-models-generate-societies-of-thought/"
+  date: 2026-03-07
+  description: "Nature 投稿论文，揭示推理模型通过隐式模拟多智能体"思想社会"来提升推理能力"
+  tags: ["Papers", "AI", "LLM", "Reasoning", "Multi-Agent"]

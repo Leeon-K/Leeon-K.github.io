@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论文摘要</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fc; color: #1a1a2e; line-height: 1.85; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px 40px 60px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 30px; }
+        .back-link:hover { color: #5a6fd6; }
+        .paper-content { background: white; border-radius: 20px; padding: 50px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+        .paper-content h1 { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5em; line-height: 1.3; }
+        .paper-content h2 { font-size: 1.5em; font-weight: 600; color: #1a1a2e; margin: 1.5em 0 0.8em; padding-bottom: 0.3em; border-bottom: 2px solid #f0f0f5; }
+        .paper-content h3 { font-size: 1.25em; font-weight: 600; color: #2d2d44; margin: 1.3em 0 0.6em; }
+        .paper-content h4 { font-size: 1.1em; font-weight: 600; color: #3d3d5c; margin: 1.2em 0 0.5em; }
+        .paper-content p { margin: 1em 0; color: #4a4a6a; }
+        .paper-content strong { color: #1a1a2e; font-weight: 600; }
+        .paper-content a { color: #667eea; text-decoration: none; }
+        .paper-content ul, .paper-content ol { margin: 1em 0; padding-left: 1.5em; color: #4a4a6a; }
+        .paper-content li { margin: 0.5em 0; }
+        .paper-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #f5f5fa; padding: 0.2em 0.5em; border-radius: 4px; color: #e83e8c; }
+        .paper-content pre { background: #2d2d44; border-radius: 12px; padding: 20px; overflow-x: auto; margin: 1.5em 0; }
+        .paper-content pre code { background: transparent; padding: 0; color: #f8f8f2; }
+        .paper-content blockquote { border-left: 4px solid #667eea; padding: 1em 1.5em; margin: 1.5em 0; background: #f8f9fc; border-radius: 0 12px 12px 0; color: #5a5a7a; }
+        
+        /* Compact centered table style */
+        .paper-content table { 
+            width: auto; 
+            max-width: 90%;
+            margin: 1em auto; 
+            border-collapse: collapse; 
+            font-size: 0.85em; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .paper-content th { 
+            background: #f5f5fa; 
+            padding: 8px 10px; 
+            text-align: left; 
+            font-weight: 600; 
+            border-bottom: 2px solid #e0e0e8; 
+            font-size: 0.9em;
+        }
+        .paper-content td { 
+            padding: 6px 10px; 
+            border-bottom: 1px solid #f0f0f5; 
+        }
+        .paper-content tr:last-child td { 
+            border-bottom: none; 
+        }
+        .paper-content tr:hover { background: #fafafa; }
+        
+        .paper-content hr { border: none; height: 2px; background: #e0e0e8; margin: 2em 0; }
+        
+        /* Image: 70% width = 15% margin on each side, centered */
+        .paper-content img { max-width: 70%; height: auto; border-radius: 12px; margin: 1.5em auto 0.5em; display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        
+        /* Figure and Table caption styling - small, centered, non-italic text */
+        .paper-content img + em,
+        .paper-content table + em,
+        .paper-content table + p,
+        .paper-content figure figcaption,
+        .paper-content .caption {
+            display: block;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            margin: 0.5em auto 1.5em;
+            max-width: 80%;
+            line-height: 1.5;
+            font-style: normal;  /* 去掉斜体 */
+        }
+        
+        /* Handle p > em or p > strong that follows img or table */
+        .paper-content p:has(img) + p em,
+        .paper-content img + p em,
+        .paper-content table + p em,
+        .paper-content table + p strong {
+            font-size: 0.8em;
+            color: #666;
+            font-style: normal;
+            font-weight: normal;
+        }
+        
+        .katex { font-size: 1.1em; }
+        .katex-display { 
+            margin: 1.5em 0; 
+            overflow-x: visible;  /* 允许公式溢出，不显示滚动条 */
+            overflow-y: visible;
+        }
+        .katex-display > .katex {
+            white-space: normal;  /* 允许公式换行 */
+            max-width: 100%;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回论文列表</a>
+        <div class="paper-content">
+<h1>论文摘要</h1>
+<p>大型语言模型已在各个领域展现出卓越的能力，但复杂推理的底层机制仍然难以捉摸。最近的推理强化模型，包括OpenAI的o系列、DeepSeek-R1和QwQ-32B，通过更长的思维链进行扩展的测试时间计算，在复杂认知任务上优于同类指令调优模型。本研究表明，增强的推理能力不仅来自扩展的计算量，更来自复杂多智能体类交互的隐式模拟——即&quot;思想社会&quot;（Society of Thought）。这种机制使得内部认知观点能够进行审慎的多样化和辩论，呈现出不同人格特质和领域专业知识的特征。通过对推理轨迹的分类输出和机械可解释性方法进行定量分析，我们发现DeepSeek-R1和QwQ-32B等推理模型比基线和纯指令调优模型表现出更高的观点多样性，在推理过程中激活了更多与异质人格和专业知识相关的特征冲突。这种多智能体结构表现为对话行为，包括问答序列、观点转变和冲突观点的调和，以及体现激烈来回对话的社会情感角色，这些都通过直接和间接促进认知策略来提升推理任务的准确率。控制性强化学习实验进一步揭示，基础模型仅通过奖励推理准确率就会自发增加对话行为，使用对话式脚手架对模型进行微调比使用独白式推理能显著加速推理能力的提升。这些发现表明，思维的社会组织能够有效地探索解空间。我们提出，推理模型在人类群体的集体智能中建立了计算类比，其中多样性在系统化结构化时能够实现更优的问题解决，并为利用群体智慧的智能体组织提供了新的机会。</p>
+<hr />
+<h1>基本信息</h1>
+<p><strong>论文 ID</strong>: 2601.10825<br />
+<strong>标题</strong>: Reasoning Models Generate Societies of Thought<br />
+<strong>作者</strong>: Junsol Kim, Shiyang Lai, Nino Scherrer, Blaise Agüera y Arcas, James Evans<br />
+<strong>单位</strong>: Google, Paradigms of Intelligence Team; University of Chicago; Santa Fe Institute<br />
+<strong>会议/期刊</strong>: Nature (投稿中)<br />
+<strong>原文保存位置</strong>: ~/.openclaw/workspace/papers/20260307_SoT/source/<br />
+<strong>报告生成日期</strong>: 2026-03-07</p>
+<hr />
+<h1>论文主体分析</h1>
+<h2>1. 引言</h2>
+<p>人工智能系统近年来经历了显著的变革，大型语言模型在各个领域展现出越来越复杂的能力，从数学、代码到科学创意写作再到关键决策支持。然而，一个持续的挑战是开发 robust 的推理能力——即有条不紊地分析问题、考虑替代方案、检测错误并得出可靠结论的能力。</p>
+<p>最近的推理模型，如 DeepSeek-R1、QwQ 和 OpenAI 的 o 系列模型（o1、o3、o4），通过强化学习训练来在响应之前&quot;思考&quot;，生成冗长的&quot;思维链&quot;。这使得推理准确率相比现有指令调优语言模型有了显著提升。然而，驱动推理模型成功的&quot;思考&quot;特征仍未得到充分探索。</p>
+<p>本文提出，推理模型学习模拟多智能体类对话——即我们称之为&quot;思想社会&quot;——来提升推理能力。Mercier 和 Sperber 的&quot;理由之谜&quot;论点认为，人类推理主要作为一种社会过程进化而来，知识通过不同观点之间的对抗性推理和参与而产生。实证研究表明，群体在广泛的推理任务上优于个体，方法包括汇总信息、校准信心，以及通过多元化观点之间的平衡轮转展现集体智能。认知多样性——源于专业知识和人格特质的差异——能够增强问题解决能力，特别是当伴随着真实的分歧时。</p>
+<p>因此，无论人工智能系统是直接模拟多智能体对话，还是模拟能够进一步模拟多智能体对话的思维，我们都提出推理模型如 DeepSeek-R1 通过&quot;思想社会&quot;改进推理——即模拟不同观点之间的多智能体类交互的隐式模拟，这些观点由此产生。我们使用该术语来表示文本生成模拟多个观点之间的社交交换，通过将它们置于竞争中的对话角色来增加集体的想法多样性。</p>
+<h2>2. 结果</h2>
+<h3>2.1 对话行为和社会情感角色</h3>
+<p>我们首先研究构成来回对话的对话行为和社会情感角色是否在推理轨迹中普遍存在。我们使用 LLM-as-judge 来量化四种对话行为在每个推理轨迹中的发生：（1）问答，其中轨迹提出问题然后解决；（2）观点转变，探索替代观点；（3）观点冲突，尖锐对比竞争观点；（4）调和，将冲突观点整合并连贯地解决。</p>
+<p>我们还基于 Bales 的互动过程分析（IPA）检查社会情感角色。这识别了 12 种互动角色，分为四类：（1）寻求导向、意见和建议，（2）提供导向、意见和建议，（3）负面情感角色（不同意、对抗、紧张），和（4）正面情感角色（同意、团结、紧张释放）。</p>
+<p>在有机化学问题（多步 Diels-Alder 合成）中，DeepSeek-R1 表现出观点转变和冲突，通过不同意、提供意见和提供导向等社会情感角色表达。相比之下，DeepSeek-V3 在同一问题上的轨迹没有观点冲突、观点转变和不同意——只提供意见和导向，以单向顺序进行，没有自我纠正，最终得出错误答案&quot;8 是一个合理的估计&quot;。在创意句子重写任务中，DeepSeek-R1 通过观点冲突以及不同意和建议等社会情感角色来辩论竞争的风格提案。</p>
+<p>如图 1a 所示，我们量化了四种对话行为在每个推理轨迹中的发生，并报告了展示超过一种此类行为的轨迹比例。DeepSeek-R1 和 QwQ-32B 比指令调优模型更频繁地展示对话行为。DeepSeek-R1 相比 DeepSeek-V3 显著更多问答（β = 0.345，95% CI = [0.328, 0.361]，t(8261) = 41.64，p &lt; 1×10⁻³²³）、观点转变（β = 0.213，95% CI = [0.197, 0.230]，t(8261) = 25.55，p &lt; 1×10⁻¹³⁷）和调和（β = 0.191，95% CI = [0.176, 0.207]，t(8261) = 24.31，p &lt; 1×10⁻¹²⁵）。QwQ-32B 相比 Qwen-2.5-32B-IT 显示类似模式。</p>
+<h3>2.2 对话特征引导改善推理准确率</h3>
+<p>在观察到对话行为在推理轨迹中普遍存在之后，我们接下来研究引导与对话相关的行为是否有助于推理性能。我们使用机械可解释性方法识别和操作与对话行为相关的模型激活空间中的特征，并检查引导这些特征如何影响模型的推理能力。我们使用稀疏自编码器（SAE），将神经网络激活分解为大量线性、可解释的特征。具体来说，我们使用在 DeepSeek-R1-Llama-8B（第 15 层）残差流激活上训练的 SAE。</p>
+<p>为了识别与对话上下文相关的 SAE 特征，我们遵循标准的可解释性流程。我们首先在大型语料库（SlimPajama-3B）上运行 SAE，采样约 50 个上下文，其中每个 32,768 个特征中的每一个被激活以&quot;解释&quot;每个特征的作用。然后使用 LLM-as-judge 分类这些上下文（Gemini-2.5-flash-lite），计算每个特征的对话比率——即该特征激活发生在人际对话设置中的比例。我们专注于对话比率高于 50% 且倾向于在句子开头附近激活的特征。</p>
+<p>从候选特征中，我们选择特征 30939，被 Gemini-2.5-Pro 总结为&quot;对话语境中表示惊讶、认识或确认的话语标记&quot;。该特征在涉及轮转和社会交换的语境中的&quot;Oh!&quot;等标记上激活。此特征的对话比率为 65.7%——在所有特征中排名第 99 个百分点——同时保持高稀疏性（0.016% 的标记），表明它捕获了特定的对话现象而非一般语言模式。</p>
+<p>我们检查使用激活加法方法引导此特征是否因果性地诱导对话行为并改善推理准确率。具体来说，我们使用 Countdown 游戏，这是一个常用于评估 LLM 多步推理能力的基准。在 Countdown 任务中，模型必须使用给定的一组数字使用基本算术运算（+、−、×、÷）和括号来达到目标值。</p>
+<p>如图 2b 所示，使用正方向（+10）引导对话惊讶特征使 Countdown 任务中的准确率从 27.1% 翻倍至 54.8%，而负方向（−10）引导将准确率降至 23.8%。雷达图显示，正向引导（从 0 到 +10）同时增加了所有四种对话行为——更多问答、观点转变、观点冲突和调和。</p>
+<h3>2.3 隐含观点的多样性</h3>
+<p>除了任务准确率，我们还研究 DeepSeek-R1 是否增加了推理轨迹中表达的观点的多样性。在人类社会中，对话和社交情感角色承担扩展了问题解决中带入的视角和领域知识范围。观点差异产生冲突、辩论和解决。我们通过分析每个人推理轨迹中参与的不同推理&quot;观点&quot;的人格特质和领域专业知识变化来评估类似的多样性是否在 DeepSeek-R1 中出现。</p>
+<p>我们首先使用外部 LLM-as-judge（Gemini-2.5-Pro），提示它识别 DeepSeek-R1、QwQ-32B 和其他指令调优模型推理轨迹中隐含对话观点的多样性。具体来说，模型推断每个人推理轨迹中存在的基础观点数量、每个观点的人格特质和领域专业知识，以及按观点划分的完整推理轨迹的分段。</p>
+<p>使用 Intelligence Squared Debates 语料库验证 LLM-as-judge 识别对话中不同声音的准确性，我们发现 LLM-as-judge 可以准确预测underlying每个对话的不同个体的数量，即使 speaker 标签被隐藏并且对话被连接成单个文本块（Spearman ρ = 0.86，95% CI = [0.84, 0.87]）。</p>
+<p>如图 3a 所示，我们发现 DeepSeek-R1 和 QwQ-32B 产生显著更高的人格多样性，控制观点数量。DeepSeek-R1 在外向性、宜人性、神经质和开放性方面表现出特别高的多样性。</p>
+<p>我们接下来检查专业知识多样性，定义为在推断领域专业知识的嵌入空间中对话智能体的分散程度。DeepSeek-R1 表现出显著更高的专业知识多样性（β = 0.179，95% CI = [0.161, 0.196]，t = 20.11，p &lt; 1×10⁻⁸⁹）相比 DeepSeek-V3，QwQ-32B 相比 Qwen-2.5-32B-IT 显示更高的专业知识多样性（β = 0.250，95% CI = [0.231, 0.269]，t = 25.50，p &lt; 1×10⁻¹⁴²）。</p>
+<h3>2.4 强化学习实验</h3>
+<p>为了进一步检查 LLM 在因正确答案获得奖励时是否自我强化对话行为，我们实现了一个自学式强化学习（RL）实验。在这个设置中，模型为 Countdown 算术益智游戏探索解决策略，其中模型必须使用基本算术运算组合给定的一组数字以达到目标。我们还复制了政治虚假信息检测的发现，模型区分真实和伪造的政治标题。</p>
+<p>遵循 DeepSeek-R1 的奖励架构，我们奖励准确率和正确格式（即，将推理包裹在 <think> 和 </think> 标签之间，答案包裹在 <answer> 和 </answer> 标签之间），使用简单加权奖励：准确率 × 0.9 + 格式 × 0.1。关键是我们不直接奖励对话或认知行为。</p>
+<p>我们首先检查对话行为是否自发增加，尽管没有直接奖励。图 4a 显示结果，表明准确率在训练过程中显著提高，从基线的接近零提高到第 250 步的约 58%。图 4b 揭示对话行为的频率——特别是问答和观点冲突——在训练过程中上升，尽管没有直接奖励。观点转变也增加直到约第 160 步。</p>
+<p>为了验证对话行为在推理改进中的作用，我们比较三种条件下的 RL 训练：（1）基线（仅 RL，无 priming），（2）对话微调（RL 前在多智能体对话文本上进行监督微调），和（3）独白微调（RL 前在独白式、逐步推理轨迹上进行监督微调）。</p>
+<p>扩展数据图 8 显示，在对话数据上微调的模型比独白微调模型达到更快的准确率提升，特别是在训练早期。在第 40 步，对话微调的 Qwen-2.5-3B 模型达到约 38% 的准确率，而独白微调模型保持在 28%。这种模式跨架构复制：在 Llama-3.2-3B 中，对话微调模型在第 70 步达到 11% 的准确率，而独白微调模型仅为 5%。</p>
+<hr />
+<h2>3. 讨论</h2>
+<p>我们的发现表明，DeepSeek-R1 等推理模型不仅仅是生成更长或更详细的思维链。相反，它们展现出社会和对话过程生成&quot;思想社会&quot;的特征——提问、引入替代观点、生成和解决冲突，以及协调不同的社会情感角色。这些互动模式在跨不同模型大小（671B、70B、32B、8B）的非推理模型中很少发生，即使控制推理轨迹长度，这表明推理优化在推理过程本身中引入了固有的社会结构，而不是仅仅增加文本量。模型似乎通过模拟内部社会来推理，将思维建构为 interlocutors 之间的交换，而不是作为单一不间断的声音。这里的含义是，社会推理通过 RL 作为其持续产生正确答案的能力的函数自主出现，而不是通过明确的人类监督或微调。</p>
+<p>这种结构似乎不仅仅是风格化的。DeepSeek-R1 面对更困难的问题时，对话行为和社会情感角色更频繁地激活，它们解释了推理模型相比非推理模型的准确率优势的重要部分。引导实验提供了对话标记与推理性能相关的证据。当我们放大与对话惊讶相关的特征——表示观点转变和对比的话语标记——多步推理任务的准确率翻倍。结构方程模型表明，对话引导与准确率有直接效应和通过中介认知策略（验证、子目标设置和后向链接）的显著间接效应。这表明推理的社会结构可能不是附带现象，而是机械地参与模型如何探索解空间和部署有效的解决问题的策略。</p>
+<p>我们进一步发现，这种互动组织由推理轨迹内多个隐含&quot;声音&quot;的多样性支持。这些声音在人格特质和领域专业知识中有系统地变化，机械可解释性分析证实，当向对话标记引导时，模型激活更多样化的人格和专业相关特征。这种模式表明，人类团队研究的发现——其中社会导向特质（如外向性和神经质）的多样性增强集体表现，而任务导向特质（如尽责性）的多样性可能损害协调和效率）——可能为解释语言模型的集体推理行为提供有用的视角。</p>
+<p>强化学习实验进一步支持对话结构的功能作用。在多智能体对话上微调的模型比仅在正确、单智能体推理轨迹上微调的模型学习更有效的推理。因此，利益不在于初始推理的正确性，而在于对话组织提供的程序脚手架。尽管这些实验使用了相对较小的 3B 参数模型（Qwen-2.5-3B 和 Llama-3.2-3B）在简单算术任务和虚假信息检测任务上，结果表明即使推理轨迹中最小程度的社会结构也可以加速可泛化推理行为的出现。</p>
+<hr />
+<h2>4. 方法</h2>
+<h3>4.1 数据</h3>
+<p>我们为 8,262 个推理问题生成思维链和最终答案，涵盖符号逻辑、数学问题解决、科学推理、指令遵循和多智能体推理。基准套件包括需要多步逻辑推理、引用跟踪和组合推理的 BigBench Hard（BBH）任务；用于研究生水平 STEM 推理的 GPQA（研究生级物理问答）；用于代数、几何、概率和数论多步推导的 MATH（Hard）子集；用于高级概念知识的 MMLU-Pro；用于指令遵循一致性的 IFEval；以及用于符号操作和结构化数学推理的 MUSR。</p>
+<p>我们使用六个模型生成响应：两个推理模型——DeepSeek-R1-0528（671B 参数）和 QwQ-32B——以及四个指令调优模型——DeepSeek-V3-0324（671B 参数）、Qwen-2.5-32B-Instruct、Llama-3.3-70B-Instruct 和 Llama-3.1-8B-Instruct——在零样本设置下。</p>
+<h3>4.2 测量</h3>
+<h4>对话行为</h4>
+<p>我们使用 LLM-as-judge 方法（Gemini-2.5-Pro）识别推理轨迹中的四种对话行为：（1）问答定义为提出问题然后回答的序列；（2）观点转变定义为转换到不同的想法、观点、假设或方法；（3）观点冲突定义为不同意、纠正或与另一观点紧张的表现；（4）调和定义为冲突观点整合或解决为连贯综合的实例。</p>
+<h4>社会情感角色</h4>
+<p>我们使用 Bales 的互动过程分析（IPA）框架分析推理轨迹中社会情感角色的存在。IPA 将话语分类为 12 种互动角色，我们将这些计数聚合成四个更高级别进行分析：信息提供角色、信息寻求角色、正面情感角色和负面情感角色。</p>
+<h4>认知行为</h4>
+<p>我们使用 Gemini-2.5-Pro 作为 LLM-as-judge 识别之前确定的四个对语言模型推理准确率有贡献的认知行为：验证、回溯、子目标设置和后向链接。</p>
+<h3>4.3 统计分析</h3>
+<p>为了估计推理模型和指令调优基线之间观察到的差异是否来自对话行为或社会情感角色而不是任务异质性或推理轨迹长度，我们估计以下线性概率模型。</p>
+<h3>4.4 SAE 特征引导</h3>
+<p>为了研究对话行为在推理中的作用，我们使用稀疏自编码器（SAE）识别和操作模型激活空间中可解释的特征。我们使用在 DeepSeek-R1-Llama-8B（第 15 层）残差流激活上训练的 SAE。</p>
+<h3>4.5 隐含观点</h3>
+<p>为了量化每个人推理轨迹中推理观点的多样性，我们使用 LLM-as-judge 协议（Gemini-2.5-Pro）执行三个顺序任务：（1）推断推理轨迹中存在的确切观点数量，（2）表征每个观点的人格特质和领域专业知识，（3）通过将每个部分归因于特定观点来划分推理轨迹。</p>
+<h3>4.6 强化学习实验</h3>
+<p>为了测试对话脚手架是否加速强化学习期间推理的出现，我们比较三种条件：（1）基线（仅 RL，无 priming），（2）对话微调（RL 前在多智能体对话数据上进行监督微调），和（3）独白微调（RL 前在单智能体思维链轨迹上进行监督微调）。</p>
+<hr />
+<h1>论文简评</h1>
+<h2>创新点</h2>
+<ol>
+<li><p><strong>&quot;思想社会&quot;理论框架</strong>：本文提出了一个创新的理论视角——推理模型通过模拟&quot;思想社会&quot;来提升推理能力。这一框架将推理模型的内部思维过程类比为多智能体的社会互动，为理解大型语言模型的推理机制提供了全新的理论视角。</p>
+</li>
+<li><p><strong>多维度实证验证</strong>：研究从多个角度验证了&quot;思想社会&quot;假设，包括：</p>
+<ul>
+<li>对话行为的定量分析（问答、观点转变、冲突、调和）</li>
+<li>社会情感角色的分类（Bales IPA框架）</li>
+<li>人格特质和专业知识多样性测量</li>
+<li>机械可解释性分析（SAE特征引导实验）</li>
+<li>强化学习控制实验</li>
+</ul>
+</li>
+<li><p><strong>因果性验证</strong>：通过稀疏自编码器特征引导实验，提供了对话行为与推理性能之间因果关系的直接证据，而不仅仅是相关性。</p>
+</li>
+<li><p><strong>跨模型泛化</strong>：研究在多个推理模型（DeepSeek-R1、QwQ-32B）上验证了发现，并展示了跨架构的泛化能力。</p>
+</li>
+</ol>
+<h2>局限性</h2>
+<ol>
+<li><p><strong>模型规模限制</strong>：强化学习实验使用的3B参数模型相对较小，可能无法完全代表更大规模推理模型的所有特性。</p>
+</li>
+<li><p><strong>任务复杂度</strong>：实验主要在算术推理和虚假信息检测等相对简单的任务上进行，对更复杂推理任务的泛化性有待验证。</p>
+</li>
+<li><p><strong>黑箱性质</strong>：尽管使用了机械可解释性方法，推理模型内部&quot;多智能体模拟&quot;的确切实现机制仍然是黑箱。</p>
+</li>
+<li><p><strong>因果推断局限</strong>：虽然有引导实验，但对话行为与推理能力之间的因果方向仍可能存在混淆因素。</p>
+</li>
+</ol>
+<h2>应用场景</h2>
+<ol>
+<li><p><strong>推理模型优化</strong>：研究结果可以直接指导推理模型的训练策略——使用对话式脚手架进行微调可以加速推理能力的出现。</p>
+</li>
+<li><p><strong>模型评估</strong>：对话行为和社会情感角色可以成为评估推理模型能力的新指标。</p>
+</li>
+<li><p><strong>AI Agent设计</strong>：研究为多智能体AI系统设计提供了理论依据，表明多样性对集体智能的重要性。</p>
+</li>
+<li><p><strong>人机协作</strong>：理解推理模型的社会化推理机制有助于设计更好的人机协作范式。</p>
+</li>
+</ol>
+<h2>可改进方向</h2>
+<ol>
+<li><p>探索更大规模模型和更复杂推理任务上的&quot;思想社会&quot;机制</p>
+</li>
+<li><p>深入研究推理模型内部多智能体模拟的具体实现机制</p>
+</li>
+<li><p>开发更精细的干预方法来引导对话行为和观点多样性</p>
+</li>
+<li><p>探索&quot;思想社会&quot;框架在多模态推理中的应用</p>
+</li>
+<li><p>研究不同文化背景和专业领域对推理模型观点多样性的影响</p>
+</li>
+</ol>
+<hr />
+<h1>图片列表</h1>
+<p><img src="images/fig1.png" alt="图 1：思维链推理中的对话行为和 Bales 社会情感角色。(a) 包含每种对话行为（问答、观点转变、观点冲突和调和）的推理轨迹比例。(b) 推理轨迹中表达的 Bales 十二种社会情感角色的比例，分组为四个更高级别类别：询问与给予信息，以及正面与负面情感角色。(c) 测量每对社会情感角色平衡的 Jaccard 指数。(d) 推理轨迹中不同观点数量的分布。(e) DeepSeek-R1 中对话行为和社会情感角色存在与否的问题复杂性差异。(f) DeepSeek-R1 中对话行为和社会情感角色存在与否的问题复杂性差异，通过指令调优模型的错误率测量。" /></p>
+<p><em>图 1：思维链推理中的对话行为和 Bales 社会情感角色。(a) 包含每种对话行为（问答、观点转变、观点冲突和调和）的推理轨迹比例。(b) 推理轨迹中表达的 Bales 十二种社会情感角色的比例，分组为四个更高级别类别：询问与给予信息，以及正面与负面情感角色。(c) 测量每对社会情感角色平衡的 Jaccard 指数。(d) 推理轨迹中不同观点数量的分布。(e) DeepSeek-R1 中对话行为和社会情感角色存在与否的问题复杂性差异。(f) DeepSeek-R1 中对话行为和社会情感角色存在与否的问题复杂性差异，通过指令调优模型的错误率测量。</em></p>
+<p>:::</p>
+<p><img src="images/fig2.png" alt="图 2：引导对话特征改善推理。(a) DeepSeek-R1-Llama-8B 中稀疏自编码器特征 30939 的说明，该特征被总结为对话语境中表示惊讶、认识或确认的话语标记。(b) 使用激活加法方法的引导实验结果。在复杂计数任务中，将特征 30939 向量以强度 10 添加使准确率翻倍。插图显示由此特征引导引起的对话行为的因果变化。(c) 小提琴图显示引导特征 30939 与随机选择的对话 SAE 特征和随机选择的非对话 SAE 特征的准确率改善比较。(d) 认知行为——包括验证、回溯、子目标设置和后向链接——与引导特征 30939 的激活有因果关联。(e) 结构方程模型结果显示，将特征 30939 从 0 引导到 +10 对推理准确率既有直接效应，也有通过认知行为（验证、子目标设置和后向链接）中介的显著间接效应。" /></p>
+<p><em>图 2：引导对话特征改善推理。(a) DeepSeek-R1-Llama-8B 中稀疏自编码器特征 30939 的说明，该特征被总结为对话语境中表示惊讶、认识或确认的话语标记。(b) 使用激活加法方法的引导实验结果。在复杂计数任务中，将特征 30939 向量以强度 10 添加使准确率翻倍。插图显示由此特征引导引起的对话行为的因果变化。(c) 小提琴图显示引导特征 30939 与随机选择的对话 SAE 特征和随机选择的非对话 SAE 特征的准确率改善比较。(d) 认知行为——包括验证、回溯、子目标设置和后向链接——与引导特征 30939 的激活有因果关联。(e) 结构方程模型结果显示，将特征 30939 从 0 引导到 +10 对推理准确率既有直接效应，也有通过认知行为（验证、子目标设置和后向链接）中介的显著间接效应。</em></p>
+<p>:::</p>
+<p><img src="images/fig3.png" alt="图 3：推理轨迹中的人格和专业知识多样性。(a) 使用 LLM-as-judge 和 BFI-10（10 项大五人格量表）从每个推理轨迹推断的隐含推理观点的人格多样性。每个大五维度的多样性量化为跨推断人格的标准差。(b) LLM-as-judge 识别的专业知识嵌入空间，使用 UMAP 投影到二维并使用能量最小化布局渲染，揭示了一致且连贯的技能接近度。(c) 从每个推理轨迹推断的隐含推理观点的专业知识多样性，测量为每个专业知识相关嵌入与语义空间中所有嵌入质心之间的平均余弦距离。(d) 稀疏自编码器（SAE）模式和引导实验的基础特征识别。(e) 引导实验设计。特征 30939——捕获表示人物和观点转变的话语标记——以引导强度 10 增加或减少。(f, g) 在特征 3099 引导下，SAE 人格相关特征 (f) 和专业知识相关特征 (g) 的覆盖率和熵分布。" /></p>
+<p><em>图 3：推理轨迹中的人格和专业知识多样性。(a) 使用 LLM-as-judge 和 BFI-10（10 项大五人格量表）从每个推理轨迹推断的隐含推理观点的人格多样性。每个大五维度的多样性量化为跨推断人格的标准差。(b) LLM-as-judge 识别的专业知识嵌入空间，使用 UMAP 投影到二维并使用能量最小化布局渲染，揭示了一致且连贯的技能接近度。(c) 从每个推理轨迹推断的隐含推理观点的专业知识多样性，测量为每个专业知识相关嵌入与语义空间中所有嵌入质心之间的平均余弦距离。(d) 稀疏自编码器（SAE）模式和引导实验的基础特征识别。(e) 引导实验设计。特征 30939——捕获表示人物和观点转变的话语标记——以引导强度 10 增加或减少。(f, g) 在特征 3099 引导下，SAE 人格相关特征 (f) 和专业知识相关特征 (g) 的覆盖率和熵分布。</em></p>
+<p>:::</p>
+<p><img src="images/fig4.png" alt="图 4：准确率奖励强化学习中社会行为的出现以及对话脚手架微调的效果。(a) 基线 Qwen-2.5-3B 模型和使用 Qwen-2.5-32B 生成的多智能体对话进行对话脚手架初始化的相同模型准确率轨迹比较。社交初始化模型更快达到最大准确率，而基线模型通过采用对话行为（包括问答、观点转变和观点冲突）最终追赶并达到该水平。(b) 面板 a 中基线强化学习模型内各个对话行为的轨迹。问答行为首先出现，随后是观点转变和冲突，同步上升。调和行为几乎没有增加，表明个体方法竞争而非形成有效整体。(c-d) Qwen-2.5 基线模型在训练步骤 40 与 120 的比较。在步骤 40，模型主要进行线性思维链推理，而在步骤 120，两个不同的模拟人物已经出现，通过使用代词&amp;quot;我们&amp;quot;明确认识到他们的集体性。(e) LLM-as-judge 推断的人格档案。步骤 40 模型展现出全面的问题解决特征，包括高尽责性、适度高的开放性和宜人性、较低外向性和显著低神经质。相比之下，步骤 120 观察到的两个协作智能体显示出差异化的人格档案：一个强调试错问题解决，另一个专门研究跨替代方法的问题可解性的元认知推理。" /></p>
+<p><em>图 4：准确率奖励强化学习中社会行为的出现以及对话脚手架微调的效果。(a) 基线 Qwen-2.5-3B 模型和使用 Qwen-2.5-32B 生成的多智能体对话进行对话脚手架初始化的相同模型准确率轨迹比较。社交初始化模型更快达到最大准确率，而基线模型通过采用对话行为（包括问答、观点转变和观点冲突）最终追赶并达到该水平。(b) 面板 a 中基线强化学习模型内各个对话行为的轨迹。问答行为首先出现，随后是观点转变和冲突，同步上升。调和行为几乎没有增加，表明个体方法竞争而非形成有效整体。(c-d) Qwen-2.5 基线模型在训练步骤 40 与 120 的比较。在步骤 40，模型主要进行线性思维链推理，而在步骤 120，两个不同的模拟人物已经出现，通过使用代词&quot;我们&quot;明确认识到他们的集体性。(e) LLM-as-judge 推断的人格档案。步骤 40 模型展现出全面的问题解决特征，包括高尽责性、适度高的开放性和宜人性、较低外向性和显著低神经质。相比之下，步骤 120 观察到的两个协作智能体显示出差异化的人格档案：一个强调试错问题解决，另一个专门研究跨替代方法的问题可解性的元认知推理。</em></p>
+<p>:::</p>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    });
+    </script>
+    
+</body>
+</html>
