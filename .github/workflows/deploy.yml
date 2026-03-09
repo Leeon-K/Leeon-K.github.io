@@ -69,7 +69,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.2.2"
-          bundler-cache: false
+          bundler-cache: true
       - name: Update _config.yml ⚙️
         uses: fjogeleit/yaml-update-action@main
         with:
@@ -79,7 +79,7 @@ jobs:
           value: ${{ github.repository }}
       - name: Install and Build 🔧
         run: |
-          bundle install
+          pip3 install --upgrade jupyter
           export JEKYLL_ENV=production
           bundle exec jekyll build
       - name: Install and Build 🔧
