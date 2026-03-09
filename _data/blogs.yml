@@ -4,7 +4,7 @@
 #   file: "/assets/blog/日期_标题/"
 #   date: 2026-03-06
 #   description: "博客描述"
-#   tags: ["Papers", "code"]
+#   tags: ["Papers", "code"]  # 只使用 _config.yml 中 display_tags 定义的标签
 
 - title: "RAPID: 长上下文推理的检索增强推测解码"
   file: "/assets/blog/2026-03-05_rapid/"
@@ -28,13 +28,13 @@
   file: "/assets/blog/2026-03-06_stop-wasting-your-tokens/"
   date: 2026-03-06
   description: "ICLR 2026 论文，提出 SupervisorAgent 框架，在 GAIA 基准上将 token 消耗降低 29.68%"
-  tags: ["Papers", "AI", "Multi-Agent"]
+  tags: ["Papers"]
 
 - title: "GEPA: Reflective Prompt Evolution Can Outperform Reinforcement Learning"
   file: "/assets/blog/20260306_gepa-reflective-prompt-evolution-can-outperform-reinforcement-learning/"
   date: 2026-03-06
   description: "GEPA: 用自然语言反思替代RL优化Prompt，35x样本效率提升，超越GRPO和MIPROv2"
-  tags: ["AI", "LLM", "Prompt Engineering", "Reinforcement Learning", "论文"]
+  tags: ["Papers"]
 
 - title: "Reasoning Models Generate Societies of Thought"
   file: "/assets/blog/2026-03-07_reasoning-models-generate-societies-of-thought/"
