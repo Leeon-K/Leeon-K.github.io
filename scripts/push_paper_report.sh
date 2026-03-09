@@ -125,7 +125,9 @@ DATE=$(echo "$PAPER_DIR_NAME" | cut -d'_' -f1)
 DATE_FORMATTED="${DATE:0:4}-${DATE:4:2}-${DATE:6:2}"
 
 # 生成 slug
-SLUG=$(echo "$PAPER_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g' | sed 's/-$//')
+# 生成 slug，限制长度避免 GitHub Pages 404（路径太长会404）
+# 保留前40个字符，移除末尾被截断的单词
+SLUG=$(echo "$PAPER_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g' | sed 's/-$//' | cut -c1-40 | sed 's/-$//; s/-[^-]*$//')
 BLOG_DIR="assets/blog/${DATE_FORMATTED}_${SLUG}"
 
 # 创建目录
