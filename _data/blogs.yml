@@ -41,3 +41,8 @@
   date: 2026-03-07
   description: "Nature 投稿论文，揭示推理模型通过隐式模拟多智能体思想社会来提升推理能力"
   tags: ["Papers", "Multi-Agent"]
+- title: "Efficient Agent Training for Computer Use"
+  file: "/assets/blog/2026-03-09_efficient-agent-training-for-computer-use/"
+  date: 2026-03-09
+  description: "论文报告: Efficient Agent Training for Computer Use"
+  tags: ["Papers", "Papers"]
