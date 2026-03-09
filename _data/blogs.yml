@@ -48,13 +48,7 @@
   tags: ["Papers"]
 
 - title: "ARLArena: A Unified Framework for Stable Agentic Reinforcement Learning"
-  file: "/assets/blog/2026-03-09_arlarena/"
-  date: 2026-03-09
-  description: "论文报告: ARLArena: A Unified Framework for Stable Agentic Reinforcement Learning"
-  tags: ["Papers"]
-
-- title: "ARLArena: A Unified Framework for Stable Agentic Reinforcement Learning"
-  file: "/assets/blog/2026-03-09_arlarena-a-unified-framework-for/"
+  file: "/assets/blog/2026-03-09_arlarena-a-unified/"
   date: 2026-03-09
   description: "论文报告: ARLArena: A Unified Framework for Stable Agentic Reinforcement Learning"
   tags: ["Papers"]
