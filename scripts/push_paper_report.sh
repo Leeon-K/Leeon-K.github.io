@@ -125,9 +125,15 @@ DATE=$(echo "$PAPER_DIR_NAME" | cut -d'_' -f1)
 DATE_FORMATTED="${DATE:0:4}-${DATE:4:2}-${DATE:6:2}"
 
 # 生成 slug
-# 生成 slug，限制长度避免 GitHub Pages 404（路径太长会404）
-# 保留前40个字符，移除末尾被截断的单词
-SLUG=$(echo "$PAPER_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g' | sed 's/-$//' | cut -c1-40 | sed 's/-$//; s/-[^-]*$//')
+# 生成 slug，限制长度避免 GitHub Pages 404（总路径超过50字符会404）
+# 保留前25个字符，移除末尾被截断的单词
+SLUG=$(echo "$PAPER_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g' | sed 's/-$//' | cut -c1-25 | sed 's/-$//; s/-[^-]*$//')
+
+# 如果 slug 仍然太长（日期8字符 + _1字符 + slug > 40），则使用更短的版本
+TOTAL_LEN=$((8 + 1 + ${#SLUG}))
+if [ "$TOTAL_LEN" -gt 40 ]; then
+    SLUG=$(echo "$PAPER_TITLE" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9-]//g' | sed 's/-$//' | cut -c1-15 | sed 's/-$//; s/-[^-]*$//')
+fi
 BLOG_DIR="assets/blog/${DATE_FORMATTED}_${SLUG}"
 
 # 创建目录
