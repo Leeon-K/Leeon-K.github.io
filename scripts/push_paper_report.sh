@@ -52,17 +52,30 @@ if [ -d "$PAPERS_SOURCE_DIR/source/figures" ]; then
     cp "$PAPERS_SOURCE_DIR/source/figures"/*.png "$BLOG_DIR/images/" 2>/dev/null || true
 fi
 
-# 修复 HTML 中的图片路径
+# 修复 HTML 中的图片路径（处理各种可能的路径格式）
 echo "🔧 修复图片路径..."
+
+# 获取所有可能的路径模式
+PAPER_PATHS=(
+    "/${PAPER_DIR_NAME}/images/"
+    "/${PAPER_DIR_NAME}/source/figures/"
+    "source/figures/"
+    "figures/"
+    "/${PAPER_DIR_NAME}/"
+)
+
 for img in "$BLOG_DIR/images"/*.png; do
     if [ -f "$img" ]; then
         filename=$(basename "$img")
-        # 替换各种可能的路径格式
-        sed -i '' "s|source/figures/$filename|images/$filename|g" "$BLOG_DIR/index.html"
-        sed -i '' "s|figures/$filename|images/$filename|g" "$BLOG_DIR/index.html"
-        sed -i '' "s|/${PAPER_DIR_NAME}/source/figures/$filename|images/$filename|g" "$BLOG_DIR/index.html"
+        # 替换各种可能的路径格式 → images/
+        for pattern in "${PAPER_PATHS[@]}"; do
+            sed -i '' "s|${pattern}${filename}|images/${filename}|g" "$BLOG_DIR/index.html"
+        done
     fi
 done
+
+# 额外保险：把所有包含论文目录名的路径都替换掉
+sed -i '' "s|/${PAPER_DIR_NAME}/||g" "$BLOG_DIR/index.html"
 
 # 更新 blogs.yml
 echo "📝 更新 blogs.yml..."
