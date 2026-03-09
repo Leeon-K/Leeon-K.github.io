@@ -1,11 +1,13 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # 论文报告推送到 GitHub Pages 的脚本
 # 用法: ./push_paper_report.sh <论文目录日期> <论文标题> [额外标签...]
 # 示例: ./push_paper_report.sh 20260307_SoT "Reasoning Models Generate Societies of Thought"
 #
 # 注意: 只有 _config.yml 中 display_tags 定义的标签才能正确显示在标签页面上
-# 当前支持的标签: Papers, code, Multi-Agent, Infra, Algorithm
+# 当前支持的标签: Papers, Multi-Agent, Infra, Algorithm
 
 PAPER_DIR_NAME=$1
 PAPER_TITLE=$2
@@ -17,10 +19,10 @@ if [ -z "$PAPER_DIR_NAME" ] || [ -z "$PAPER_TITLE" ]; then
     echo ""
     echo "示例:"
     echo "  ./push_paper_report.sh 20260307_SoT 'Reasoning Models Generate Societies of Thought'"
-    echo "  ./push_paper_report.sh 20260307_SoT 'Reasoning Models Generate Societies of Thought' AI LLM"
+    echo "  ./push_paper_report.sh 20260307_SoT 'Reasoning Models Generate Societies of Thought' Multi-Agent"
     echo ""
     echo "⚠️  注意: 只有以下标签可以正确显示在标签页面:"
-    echo "   Papers, code, AI, LLM, Reasoning, Multi-Agent"
+    echo "   Papers, Multi-Agent, Infra, Algorithm"
     echo "   使用其他标签将无法点击进入标签页面"
     exit 1
 fi
@@ -29,7 +31,79 @@ PAPERS_SOURCE_DIR="$HOME/.openclaw/workspace/papers/${PAPER_DIR_NAME}"
 GITHUB_SITE_DIR="/Users/lichangkang/Desktop/coding/Leeon-K.github.io"
 
 # 支持的标签列表（必须与 _config.yml 中的 display_tags 一致）
-SUPPORTED_TAGS=("Papers" "code" "Multi-Agent" "Infra" "Algorithm")
+SUPPORTED_TAGS=("Papers" "Multi-Agent" "Infra" "Algorithm")
+
+extract_local_image_refs() {
+    python3 - "$1" <<'PY'
+import re
+import sys
+from pathlib import PurePosixPath
+
+html_path = sys.argv[1]
+html = open(html_path, encoding="utf-8").read()
+seen = set()
+
+for src in re.findall(r'<img[^>]+src="([^"]+)"', html, flags=re.IGNORECASE):
+    clean = src.split('?', 1)[0].split('#', 1)[0].strip()
+    if not clean:
+        continue
+    if clean.startswith(('http://', 'https://', '//', 'data:')):
+        continue
+    suffix = PurePosixPath(clean).suffix.lower()
+    if suffix not in {'.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'}:
+        continue
+    if src not in seen:
+        seen.add(src)
+        print(src)
+PY
+}
+
+resolve_image_source() {
+    local img_ref="$1"
+    local clean_ref rel_path candidate found_file
+    clean_ref="${img_ref%%\?*}"
+    clean_ref="${clean_ref%%\#*}"
+    rel_path="${clean_ref#/}"
+
+    if [[ "$rel_path" == "${PAPER_DIR_NAME}/"* ]]; then
+        rel_path="${rel_path#${PAPER_DIR_NAME}/}"
+    fi
+
+    candidate="$PAPERS_SOURCE_DIR/$rel_path"
+    if [ -f "$candidate" ]; then
+        printf '%s\n' "$candidate"
+        return 0
+    fi
+
+    if [[ "$rel_path" != source/* ]]; then
+        candidate="$PAPERS_SOURCE_DIR/source/$rel_path"
+        if [ -f "$candidate" ]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    fi
+
+    found_file=$(find "$PAPERS_SOURCE_DIR" -type f -name "$(basename "$clean_ref")" 2>/dev/null | head -1 || true)
+    if [ -n "$found_file" ]; then
+        printf '%s\n' "$found_file"
+        return 0
+    fi
+
+    return 1
+}
+
+destination_rel_path() {
+    local source_file="$1"
+    local rel_path
+
+    rel_path="${source_file#"$PAPERS_SOURCE_DIR"/}"
+    rel_path="${rel_path#/}"
+    if [[ "$rel_path" == source/* ]]; then
+        rel_path="${rel_path#source/}"
+    fi
+
+    printf 'images/%s\n' "$rel_path"
+}
 
 if [ ! -d "$PAPERS_SOURCE_DIR" ]; then
     echo "错误: 论文目录不存在: $PAPERS_SOURCE_DIR"
@@ -60,51 +134,77 @@ mkdir -p "$BLOG_DIR/images"
 echo "📄 复制 HTML 文件..."
 cp "$PAPERS_SOURCE_DIR/report.html" "$BLOG_DIR/index.html"
 
-# 复制图片（支持 figures/ 和 assets/ 两个目录）
-echo "📷 复制图片..."
-if [ -d "$PAPERS_SOURCE_DIR/source/figures" ]; then
-    cp "$PAPERS_SOURCE_DIR/source/figures"/*.png "$BLOG_DIR/images/" 2>/dev/null || true
-fi
-if [ -d "$PAPERS_SOURCE_DIR/source/assets" ]; then
-    cp "$PAPERS_SOURCE_DIR/source/assets"/*.png "$BLOG_DIR/images/" 2>/dev/null || true
-fi
-# 同时检查 source/ 根目录下的图片
-if [ -d "$PAPERS_SOURCE_DIR/source" ]; then
-    cp "$PAPERS_SOURCE_DIR/source"/*.png "$BLOG_DIR/images/" 2>/dev/null || true
-fi
+echo "📷 复制并修复 HTML 中实际引用的图片..."
+IMAGE_REFS=$(extract_local_image_refs "$PAPERS_SOURCE_DIR/report.html")
+COPIED_COUNT=0
+MISSING_IMAGES=0
 
-# 验证图片复制成功
-IMAGE_COUNT=$(ls -1 "$BLOG_DIR/images"/*.png 2>/dev/null | wc -l)
-if [ "$IMAGE_COUNT" -eq 0 ]; then
-    echo "⚠️  警告: 没有找到任何图片！请检查图片目录是否正确"
+if [ -z "$IMAGE_REFS" ]; then
+    echo "  ⚠️  HTML 中没有本地图片引用"
 else
-    echo "  ✓ 已复制 $IMAGE_COUNT 张图片"
+    while IFS= read -r img_ref; do
+        [ -n "$img_ref" ] || continue
+
+        if ! source_file=$(resolve_image_source "$img_ref"); then
+            echo "  ✗ 未找到源图片: $img_ref"
+            MISSING_IMAGES=$((MISSING_IMAGES + 1))
+            continue
+        fi
+
+        dest_rel=$(destination_rel_path "$source_file")
+        dest_path="$BLOG_DIR/$dest_rel"
+        mkdir -p "$(dirname "$dest_path")"
+        cp "$source_file" "$dest_path"
+        COPIED_COUNT=$((COPIED_COUNT + 1))
+
+        python3 - "$BLOG_DIR/index.html" "$img_ref" "$dest_rel" <<'PY'
+import sys
+
+html_path, original, replacement = sys.argv[1:4]
+with open(html_path, encoding="utf-8") as f:
+    html = f.read()
+html = html.replace(f'src="{original}"', f'src="{replacement}"')
+with open(html_path, "w", encoding="utf-8") as f:
+    f.write(html)
+PY
+        echo "  ✓ $img_ref -> $dest_rel"
+    done <<< "$IMAGE_REFS"
 fi
 
-# 修复 HTML 中的图片路径
-echo "🔧 修复图片路径..."
+if [ "$MISSING_IMAGES" -gt 0 ]; then
+    echo "错误: 有 $MISSING_IMAGES 张图片未找到，已停止提交"
+    exit 1
+fi
 
-PAPER_PATHS=(
-    "/${PAPER_DIR_NAME}/images/"
-    "/${PAPER_DIR_NAME}/source/assets/"
-    "/${PAPER_DIR_NAME}/source/figures/"
-    "source/assets/"
-    "source/figures/"
-    "figures/"
-    "/${PAPER_DIR_NAME}/"
-)
+echo "  ✓ 已处理 $COPIED_COUNT 张图片"
 
-for img in "$BLOG_DIR/images"/*.png; do
-    if [ -f "$img" ]; then
-        filename=$(basename "$img")
-        for pattern in "${PAPER_PATHS[@]}"; do
-            sed -i '' "s|${pattern}${filename}|images/${filename}|g" "$BLOG_DIR/index.html"
-        done
-    fi
-done
+echo "🔎 校验最终 HTML 图片路径..."
+VALIDATION_ERRORS=0
+FINAL_REFS=$(extract_local_image_refs "$BLOG_DIR/index.html")
 
-# 额外保险：把所有包含论文目录名的路径都替换掉
-sed -i '' "s|/${PAPER_DIR_NAME}/||g" "$BLOG_DIR/index.html"
+if [ -n "$FINAL_REFS" ]; then
+    while IFS= read -r img_ref; do
+        [ -n "$img_ref" ] || continue
+
+        if [[ "$img_ref" == /${PAPER_DIR_NAME}/* ]] || [[ "$img_ref" == "${PAPER_DIR_NAME}/"* ]] || [[ "$img_ref" == source/* ]]; then
+            echo "  ✗ 仍存在未改写路径: $img_ref"
+            VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+            continue
+        fi
+
+        if [ ! -f "$BLOG_DIR/${img_ref%%\?*}" ]; then
+            echo "  ✗ HTML 引用的图片不存在: $img_ref"
+            VALIDATION_ERRORS=$((VALIDATION_ERRORS + 1))
+        fi
+    done <<< "$FINAL_REFS"
+fi
+
+if [ "$VALIDATION_ERRORS" -gt 0 ]; then
+    echo "错误: 图片校验失败，共 $VALIDATION_ERRORS 项"
+    exit 1
+fi
+
+echo "  ✓ 图片路径和文件校验通过"
 
 # 验证并过滤标签
 echo "🏷️ 处理标签..."
