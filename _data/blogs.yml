@@ -4,19 +4,19 @@
 #   file: "/assets/blog/日期_标题/"
 #   date: 2026-03-06
 #   description: "博客描述"
-#   tags: ["Papers", "code", "Multi-Agent", "Infra", "Algorithm"]  # 只使用这些标签
+#   tags: ["Papers", "Multi-Agent", "Infra", "Algorithm"]  # 只使用这些标签
 
 - title: "RAPID: 长上下文推理的检索增强推测解码"
   file: "/assets/blog/2026-03-05_rapid/"
   date: 2026-03-05
   description: "介绍 RAPID 方法，一种用于长上下文推理的检索增强推测解码技术"
-  tags: ["Papers", "code"]
+  tags: ["Papers"]
 
 - title: "RAPID: Long-Context Inference with Retrieval-Augmented Speculative Decoding"
   file: "/assets/blog/2026-03-04_rapid-long-context-inference-with-retrieval-augmented-speculative-decoding/"
   date: 2026-03-04
   description: "RAPID: Long-Context Inference with Retrieval-Augmented Speculative Decoding"
-  tags: ["Papers", "code"]
+  tags: ["Papers"]
 
 - title: "论文报告：Gated Attention for Large Language Models"
   file: "/assets/blog/2026-03-04_gated-attention-for-large-language-models/"
@@ -45,4 +45,4 @@
   file: "/assets/blog/2026-03-09_efficient-agent-training-for-computer-use/"
   date: 2026-03-09
   description: "论文报告: Efficient Agent Training for Computer Use"
-  tags: ["Papers", "Papers"]
+  tags: ["Papers"]

@@ -286,7 +286,8 @@ jekyll-archives:
     tag: "/blog/tag/:name/"
     category: "/blog/category/:name/"
 
-display_tags: ["Papers", "code", "Multi-Agent", "Infra", "Algorithm"]  # 显示在博客页面的标签
+display_tags: ["Papers", "Multi-Agent", "Infra", "Algorithm"]  # 显示在博客页面的标签
+display_categories: []
 
 # -----------------------------------------------------------------------------
 # Jekyll Scholar
