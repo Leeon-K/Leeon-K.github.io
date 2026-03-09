@@ -60,10 +60,25 @@ mkdir -p "$BLOG_DIR/images"
 echo "📄 复制 HTML 文件..."
 cp "$PAPERS_SOURCE_DIR/report.html" "$BLOG_DIR/index.html"
 
-# 复制图片
+# 复制图片（支持 figures/ 和 assets/ 两个目录）
+echo "📷 复制图片..."
 if [ -d "$PAPERS_SOURCE_DIR/source/figures" ]; then
-    echo "📷 复制图片..."
     cp "$PAPERS_SOURCE_DIR/source/figures"/*.png "$BLOG_DIR/images/" 2>/dev/null || true
+fi
+if [ -d "$PAPERS_SOURCE_DIR/source/assets" ]; then
+    cp "$PAPERS_SOURCE_DIR/source/assets"/*.png "$BLOG_DIR/images/" 2>/dev/null || true
+fi
+# 同时检查 source/ 根目录下的图片
+if [ -d "$PAPERS_SOURCE_DIR/source" ]; then
+    cp "$PAPERS_SOURCE_DIR/source"/*.png "$BLOG_DIR/images/" 2>/dev/null || true
+fi
+
+# 验证图片复制成功
+IMAGE_COUNT=$(ls -1 "$BLOG_DIR/images"/*.png 2>/dev/null | wc -l)
+if [ "$IMAGE_COUNT" -eq 0 ]; then
+    echo "⚠️  警告: 没有找到任何图片！请检查图片目录是否正确"
+else
+    echo "  ✓ 已复制 $IMAGE_COUNT 张图片"
 fi
 
 # 修复 HTML 中的图片路径
@@ -71,7 +86,9 @@ echo "🔧 修复图片路径..."
 
 PAPER_PATHS=(
     "/${PAPER_DIR_NAME}/images/"
+    "/${PAPER_DIR_NAME}/source/assets/"
     "/${PAPER_DIR_NAME}/source/figures/"
+    "source/assets/"
     "source/figures/"
     "figures/"
     "/${PAPER_DIR_NAME}/"
