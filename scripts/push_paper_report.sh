@@ -5,7 +5,7 @@
 # 示例: ./push_paper_report.sh 20260307_SoT "Reasoning Models Generate Societies of Thought"
 #
 # 注意: 只有 _config.yml 中 display_tags 定义的标签才能正确显示在标签页面上
-# 当前支持的标签: Papers, code, AI, LLM, Reasoning, Multi-Agent
+# 当前支持的标签: Papers, code, Multi-Agent, Infra, Algorithm
 
 PAPER_DIR_NAME=$1
 PAPER_TITLE=$2
@@ -29,7 +29,7 @@ PAPERS_SOURCE_DIR="$HOME/.openclaw/workspace/papers/${PAPER_DIR_NAME}"
 GITHUB_SITE_DIR="/Users/lichangkang/Desktop/coding/Leeon-K.github.io"
 
 # 支持的标签列表（必须与 _config.yml 中的 display_tags 一致）
-SUPPORTED_TAGS=("Papers" "code" "AI" "LLM" "Reasoning" "Multi-Agent")
+SUPPORTED_TAGS=("Papers" "code" "Multi-Agent" "Infra" "Algorithm")
 
 if [ ! -d "$PAPERS_SOURCE_DIR" ]; then
     echo "错误: 论文目录不存在: $PAPERS_SOURCE_DIR"
