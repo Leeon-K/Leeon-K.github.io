@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DualSpec: Accelerating Deep Research Agents via Dual-Process</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fc; color: #1a1a2e; line-height: 1.85; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px 40px 60px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 30px; }
+        .back-link:hover { color: #5a6fd6; }
+        .paper-content { background: white; border-radius: 20px; padding: 50px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+        .paper-content h1 { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5em; line-height: 1.3; }
+        .paper-content h2 { font-size: 1.5em; font-weight: 600; color: #1a1a2e; margin: 1.5em 0 0.8em; padding-bottom: 0.3em; border-bottom: 2px solid #f0f0f5; }
+        .paper-content h3 { font-size: 1.25em; font-weight: 600; color: #2d2d44; margin: 1.3em 0 0.6em; }
+        .paper-content h4 { font-size: 1.1em; font-weight: 600; color: #3d3d5c; margin: 1.2em 0 0.5em; }
+        .paper-content p { margin: 1em 0; color: #4a4a6a; }
+        .paper-content strong { color: #1a1a2e; font-weight: 600; }
+        .paper-content a { color: #667eea; text-decoration: none; }
+        .paper-content ul, .paper-content ol { margin: 1em 0; padding-left: 1.5em; color: #4a4a6a; }
+        .paper-content li { margin: 0.5em 0; }
+        .paper-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #f5f5fa; padding: 0.2em 0.5em; border-radius: 4px; color: #e83e8c; }
+        .paper-content pre { background: #2d2d44; border-radius: 12px; padding: 20px; overflow-x: auto; margin: 1.5em 0; }
+        .paper-content pre code { background: transparent; padding: 0; color: #f8f8f2; }
+        .paper-content blockquote { border-left: 4px solid #667eea; padding: 1em 1.5em; margin: 1.5em 0; background: #f8f9fc; border-radius: 0 12px 12px 0; color: #5a5a7a; }
+        
+        /* Compact centered table style */
+        .paper-content table { 
+            width: auto; 
+            max-width: 90%;
+            margin: 1em auto; 
+            border-collapse: collapse; 
+            font-size: 0.85em; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .paper-content th { 
+            background: #f5f5fa; 
+            padding: 8px 10px; 
+            text-align: left; 
+            font-weight: 600; 
+            border-bottom: 2px solid #e0e0e8; 
+            font-size: 0.9em;
+        }
+        .paper-content td { 
+            padding: 6px 10px; 
+            border-bottom: 1px solid #f0f0f5; 
+        }
+        .paper-content tr:last-child td { 
+            border-bottom: none; 
+        }
+        .paper-content tr:hover { background: #fafafa; }
+        
+        .paper-content hr { border: none; height: 2px; background: #e0e0e8; margin: 2em 0; }
+        
+        /* Image: 70% width = 15% margin on each side, centered */
+        .paper-content img { max-width: 70%; height: auto; border-radius: 12px; margin: 1.5em auto 0.5em; display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        
+        /* Figure and Table caption styling - force the whole caption block to center */
+        .paper-content p:has(> em):has(img),
+        .paper-content p:has(> em):has(table) {
+            text-align: center;
+        }
+
+        .paper-content p:has(img) + p,
+        .paper-content p:has(table) + p {
+            text-align: center;
+            margin: 0.5em auto 1.5em;
+            max-width: 80%;
+        }
+
+        /* Figure and Table caption styling - small, centered, non-italic text */
+        .paper-content img + em,
+        .paper-content table + em,
+        .paper-content table + p,
+        .paper-content figure figcaption,
+        .paper-content .caption {
+            display: block;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            margin: 0.5em auto 1.5em;
+            max-width: 80%;
+            line-height: 1.5;
+            font-style: normal;  /* 去掉斜体 */
+        }
+        
+        /* Handle p > em or p > strong that follows img or table */
+        .paper-content p:has(img) + p em,
+        .paper-content img + p em,
+        .paper-content table + p em,
+        .paper-content table + p strong {
+            display: inline-block;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            font-style: normal;
+            font-weight: normal;
+        }
+        
+        .katex { font-size: 1.1em; }
+        .katex-display { 
+            margin: 1.5em 0; 
+            overflow-x: visible;  /* 允许公式溢出，不显示滚动条 */
+            overflow-y: visible;
+        }
+        .katex-display > .katex {
+            white-space: normal;  /* 允许公式换行 */
+            max-width: 100%;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回论文列表</a>
+        <div class="paper-content">
+<h1>DualSpec: Accelerating Deep Research Agents via Dual-Process Action Speculation</h1>
+<h2>一、论文摘要</h2>
+<p>大型语言模型（LLM）驱动的深度研究智能体在解决长周期信息寻求任务方面越来越受欢迎，但由于需要大量推理和频繁的工具调用，往往会产生较高的端到端延迟。推测-验证（speculate-verify）框架旨在通过将动作执行与推理重叠来减少延迟；然而，现有方法通常依赖统一的推测策略和严格的动作匹配，这限制了推理加速和鲁棒性。</p>
+<p>在本文中，我们从动作异质性的角度重新审视深度研究智能体的推测-验证范式。研究表明，<strong>Search</strong> 和 <strong>Visit</strong> 动作表现出根本不同的推理和模型容量需求：基于熵的分析表明，Search 具有更高的决策不确定性，更能从推理中受益，而 Visit 具有较低的不确定性，更依赖于模型容量。受这一双重过程特性的启发，我们提出了 <strong>DualSpec</strong>，这是一个异构推测框架，配备了一个轻量级的基于置信度的语义验证器。在多个模型和基准测试上的实验表明，DualSpec 在保持与全推理智能体相当准确性的同时，实现了高达 <strong>3.28倍</strong> 的端到端加速。</p>
+<hr />
+<h2>二、基本信息</h2>
+<table>
+<thead>
+<tr>
+  <th>项目</th>
+  <th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>论文 ID</strong></td>
+  <td>2603.07416</td>
+</tr>
+<tr>
+  <td><strong>标题</strong></td>
+  <td>DualSpec: Accelerating Deep Research Agents via Dual-Process Action Speculation</td>
+</tr>
+<tr>
+  <td><strong>作者</strong></td>
+  <td>Shuzhang Zhong, Baotong Lu, Qi Chen, Chuanjie Liu, Fan Yang, Meng Li</td>
+</tr>
+<tr>
+  <td><strong>单位</strong></td>
+  <td>Peking University, Microsoft Research, Microsoft</td>
+</tr>
+<tr>
+  <td><strong>会议/期刊</strong></td>
+  <td>ICML 2026</td>
+</tr>
+<tr>
+  <td><strong>原文保存位置</strong></td>
+  <td>~/.openclaw/workspace/papers/20260309_DualSpec/source/</td>
+</tr>
+<tr>
+  <td><strong>报告生成日期</strong></td>
+  <td>2025-03-09</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>三、论文主体分析</h2>
+<h3>1. Introduction（引言）</h3>
+<p>大型语言模型（LLM）日益增强的推理能力使其能够与外部工具和环境交互，从而推动了智能体的发展。其中，深度研究智能体已成为解决开放性、长周期研究任务的重要应用，这些任务具有很高的信息寻求和推理需求。通过迭代推理和调用搜索引擎等外部工具，这些智能体积累证据并迭代完善假设，超越了静态问答，走向复杂研究问题。</p>
+<h4>1.1 深度研究智能体的高延迟问题</h4>
+<p>尽管深度研究智能体非常有效，但它们通常会产生较高的推理延迟。如图1所示，智能体通常遵循 ReAct 范式，具有严格的顺序依赖关系：模型必须完成推理轨迹，然后才能执行动作并等待观察结果。推理和动作执行都可能非常耗时，特别是当使用具有长推理轨迹的大型模型和响应时间可变的外部工具时。这种推理-动作-观察循环会重复多次，直到产生最终答案，通常需要数分钟甚至更长的时间来回答单个查询。</p>
+<p><img src="images/figs/deep_research.png" alt="图 1：深度研究智能体工作流程。深度研究智能体遵循 Reason-Action-Observation 循环，智能体在生成推理轨迹和执行动作（Search 或 Visit）之间交替，以收集信息。" /></p>
+<p><em>图 1：深度研究智能体工作流程。深度研究智能体遵循 Reason-Action-Observation 循环，智能体在生成推理轨迹和执行动作（Search 或 Visit）之间交替，以收集信息。</em></p>
+<p>:::</p>
+<h4>1.2 推测-验证范式</h4>
+<p>减少延迟的一个有前景的方法是推测-验证范式，其中轻量级模型或策略推测下一个动作并立即执行，而基础模型同时执行其推理。如果基础模型的动作与推测的动作一致，则直接接受推测的工具调用响应（观察），从而节省执行时间；否则，基础模型按常规执行动作。与推测解码不同，这种方法在动作级别而不是token级别操作，使得推理和工具使用之间的并行成为可能。然而，设计有效的推测和验证仍然具有挑战性：不准确的推测或保守的验证会导致频繁回退，限制加速；而过于宽松的验证可能会降低智能体性能。</p>
+<h4>1.3 动作异质性的发现</h4>
+<p>在本文中，我们从动作异质性和验证权衡的原则性分析重新审视深度研究智能体的推测-验证。现有的轻量级推测方法通常采用（i）带显式推理的小模型，或（ii）不带推理直接发出动作的大模型。我们观察到不同的动作类型表现出不同的不确定性特征，因此需要不同的推测策略。深度研究智能体主要使用两种动作：<strong>Search</strong>，制定查询以检索相关网页；<strong>Visit</strong>，从候选集中选择并访问特定URL。Search 在查询制定过程中涉及高不确定性，需要强推理；而 Visit 在受约束的动作空间中操作，主要依赖参数知识。</p>
+<h4>1.4 理论分析验证</h4>
+<p>我们通过端到端实证评估以及基于熵的推理和动作决策分析来验证这一区别。研究结果表明，在各种设置下，Search 动作比 Visit 动作表现出更高的不确定性；显式推理有助于减少 Search 的不确定性，但对 Visit 的收益微乎。这种模式与认知科学中 System 2（审慎）和 System 1（直觉）推理的区别相一致，Search 对应前者，Visit 对应后者。在这些洞察的指导下，我们证明将推测策略与动作特征相匹配——对 Search 使用小推理模型，对 Visit 使用不带推理的大模型——显著提高了推测准确性。</p>
+<h4>1.5 DualSpec 方法</h4>
+<p>验证对于在不影响性能的情况下实现高效率也很重要。精确的动作匹配通常过于严格，因为语义等价的动作（尤其是查询）可能在token级别有所不同。此外，基于动作的验证通常需要基础模型在验证之前完成推理，将推理放在关键路径上，限制延迟减少。基于这些观察，我们提出了 <strong>DualSpec</strong>，这是一种针对深度研究智能体的异构动作推测框架，根据动作特定属性定制推测和验证。DualSpec 使用小推理模型来推测动作，同时允许基础模型通过跳过推理来并行生成 Visit 动作。它根据推理状态动态选择适当的草稿。对于验证，DualSpec 利用基础模型的内部置信度而不是显式动作匹配，将基础模型推理从关键路径中移除，同时保持智能体性能。</p>
+<h4>1.6 实验结果</h4>
+<p>我们实现了 DualSpec，并在两个代表性推理模型（MiroThinker 和 Qwen-3）上使用流行的深度研究基准测试（包括 GAIA-Text-103、XBench_DeepSearch 和 Seal-0）对其进行了评估。DualSpec 在保持与全推理基础模型相当的性能的同时，实现了高达 <strong>3.28倍</strong> 的端到端延迟加速。</p>
+<hr />
+<h3>2. Background and Related Work</h3>
+<h4>2.1 Deep Research Agents（深度研究智能体）</h4>
+<p>给定输入问题，深度研究智能体在多步循环中运行，在推理生成动作、执行工具调用并将其响应纳入上下文之间交替，直到产生最终答案。</p>
+<p>大多数深度研究智能体依赖两种核心动作：Search 和 Visit。Search 包括用于检索带有简短摘要的候选网页的查询，而 Visit 选择 URL 并指定从中提取相关信息的指令。在执行过程中，Search 直接查询搜索引擎，而 Visit 访问网页，通常调用 LLM 根据指令总结任务相关的内容。这种设计有助于过滤无关信息，并限制不必要的上下文增长。如图2所示，这些动作的使用频率相当，由于查询重构，Search 的使用略多。其他工具调用（例如代码执行）只占很小一部分步骤。</p>
+<p><img src="images/figs/draw_basics.png" alt="图 2：使用不同模型的深度研究推理特征。&amp;quot;Miro&amp;quot; 表示 &amp;quot;MiroThinker&amp;quot;，&amp;quot;Qwen&amp;quot; 表示 &amp;quot;Qwen-3&amp;quot;。(a) GAIA 基准测试上的工具使用比率。(b) 每步推理和工具执行的时间分解。模型推理占总体延迟的很大比例。" /></p>
+<p><em>图 2：使用不同模型的深度研究推理特征。&quot;Miro&quot; 表示 &quot;MiroThinker&quot;，&quot;Qwen&quot; 表示 &quot;Qwen-3&quot;。(a) GAIA 基准测试上的工具使用比率。(b) 每步推理和工具执行的时间分解。模型推理占总体延迟的很大比例。</em></p>
+<p>:::</p>
+<p>尽管具有强大的问题解决能力，但由于其多步推理和工具使用工作流程，深度研究智能体通常会产生高延迟。图2(b) 报告了在 A100 GPU 上测量的每步时间分解。模型推理主导了总体延迟，而工具执行引入了额外但更小的开销。累积多次迭代后，这些成本导致很长的端到端响应时间，限制了可用性和部署。</p>
+<h4>2.2 Agent Optimization（智能体优化）</h4>
+<p>更强的骨干模型和更丰富的外部工具交互可以提高智能体在挑战性任务上的性能，但由于更长的推理轨迹和更频繁的工具使用，往往会降低时间效率。最近的研究观察到并非所有智能体步骤都同等困难，这促使人们研究优化技术，将简单步骤卸载给轻量级模型，同时为更强的模型保留复杂的推理。</p>
+<p>在此背景下，推测-验证范式已成为减少智能体延迟的有前景的方向。动态推测规划引入了一个轻量级推测器（例如一个小型推理模型）来起草动作并获取其结果，而一个更强的基础模型同时执行完整推理。推测动作使用最小编辑距离等标准针对基础模型动作进行验证，当一致时重用推测的工具调用响应。SPAgent 在早期阶段跳过显式推理来生成动作，然后过渡到推测-验证阶段以保持智能体性能。</p>
+<p>在更细的粒度上，推测解码通过使用较小的模型预测未来token并用较大的模型验证来加速token级别的推理。这种方法与智能体级别的推测互补，可以结合使用以进一步提高效率。SpecReason 通过动态将更简单的推理步骤卸载给较小的模型来减少推理开销；然而，它并非为具有迭代工具使用的智能体设置而设计。</p>
+<h4>2.3 Dual-Process Theory in LLMs（LLM 中的双重过程理论）</h4>
+<p>来自认知科学的双重过程理论区分了两种决策模式：System 1（快速且直觉）和 System 2（较慢且支持审慎推理）。该框架最近已被采用来解释和指导 LLM 的推理行为。System-1.x Planner 提出了一种可控的规划框架，将任务分解为更简单和更复杂的子步骤，为前者分配 System 1 策略，为后者分配 System 2 策略以提高效率。然而，这种方法仅限于特定规划设置，需要大量训练。如何在具有工具使用的基于 LLM 的智能体（如深度研究智能体）中系统地利用双重过程原则仍然 largely unexplored。</p>
+<p>在 LLM 中，System 2 行为通常与显式推理轨迹相关联，引入中间结构，减少不确定性，并指导复杂决策，而 System 1 行为对应于由强参数先验驱动的直接生成。重要的是，显式推理是否有益取决于任务的性质：对于歧义较大或局部线索较弱的决策，推理可以显著提高可靠性；而对于基于具体上下文的决策，推理可能提供有限的边际收益。</p>
+<p>我们认为这种区别自然延伸到深度研究智能体中的动作生成。不同的动作需要不同的认知需求：有些需要推理来解决未指定的目标，而有些涉及对观察到的信息进行相对直接的操作。识别和利用这种异质性为理解为什么统一的推测策略是次优的提供了一个有用的视角，并促使我们提出跨动作类型不对称分配推理资源的方法。</p>
+<hr />
+<h3>3. Rethinking Speculate--Verify for Deep Research Agents</h3>
+<p>现有的智能体推测-验证框架通常对所有动作应用<strong>统一</strong>的推测策略，要么（i）减少推理深度（例如跳过显式推理），要么（ii）减少模型容量（例如使用较小的推测器）。虽然在某些设置中有效，但这种方法忽略了一个关键属性：深度研究智能体中<strong>动作的推理需求是异质的</strong>。在本节中，我们提供了经验证据，表明 Search 和 Visit 动作在推理深度和模型容量的敏感性方面存在根本差异。这些发现促使我们设计<strong>动作感知的推测</strong>。我们还分析了验证策略的权衡，突出了超越动作匹配的必要性。</p>
+<h4>3.1 Speculation Under Action Heterogeneity（动作异质性下的推测）</h4>
+<p>我们首先检查不同动作的推理需求，然后研究各种推测策略如何影响起草 Search 和 Visit 动作的准确性。</p>
+<p><img src="images/figs/token_count.png" alt="图 3：跨模型和基准测试生成 Search 和 Visit 动作的平均推理长度。Search 需要明显比 Visit 更长的推理。" /></p>
+<p><em>图 3：跨模型和基准测试生成 Search 和 Visit 动作的平均推理长度。Search 需要明显比 Visit 更长的推理。</em></p>
+<p>:::</p>
+<p><strong>观察 1：Search 动作包含比 Visit 更长的推理轨迹。</strong> 图3显示了发出动作前的平均推理长度。在所有模型中，Search 一致地比 Visit 多需要 1.65-2.95 倍的token，表明查询制定本质上比网页选择需要更多思考。因此，Search 动作承载着更强的推理需求。</p>
+<p><strong>观察 2：有效的推测策略因动作而异。</strong> 我们使用两种代表性策略衡量推测动作与 Oracle 智能体（具有全推理的大型模型）的对齐程度：带显式推理的小语言模型（SLM）和不带推理的大型语言模型（LLM）。如图4(a)所示，对于 Search 动作，带推理的 SLM 一致地产生比不带推理的 LLM 更与 Oracle 对齐的查询，通过基于嵌入的余弦相似度衡量。这表明即使在降低模型容量的情况下，显式推理对查询质量也至关重要。相比之下，图4(b-c) 表明，对于 Visit 动作，不带推理的 LLM 在 URL 选择和提取指令方面都与 Oracle 更紧密对齐，表明审慎推理对 Visit 并不那么重要，在那里快速的基于模式的 selection 更受益于模型容量。</p>
+<p><img src="images/figs/motivation_similarity.png" alt="图 4：两种推测方法相对于 Oracle（带推理的大型模型）在起草 Search 和 Visit 时的动作对齐比较。(a) 小推理模型产生的查询比不带推理的大型模型更与 Oracle 对齐。(b-c) 对于 Visit，不带推理的大型模型在 URL 选择和提取指令方面都实现了更高的准确性。" /></p>
+<p><em>图 4：两种推测方法相对于 Oracle（带推理的大型模型）在起草 Search 和 Visit 时的动作对齐比较。(a) 小推理模型产生的查询比不带推理的大型模型更与 Oracle 对齐。(b-c) 对于 Visit，不带推理的大型模型在 URL 选择和提取指令方面都实现了更高的准确性。</em></p>
+<p>:::</p>
+<table>
+<thead>
+<tr>
+  <th>配置</th>
+  <th>MiroThinker</th>
+  <th>Qwen3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>LLM with Reasoning</td>
+  <td><strong>63.11</strong></td>
+  <td><strong>29.13</strong></td>
+</tr>
+<tr>
+  <td>SLM with Reasoning for Search</td>
+  <td><strong>63.11</strong></td>
+  <td><strong>29.13</strong></td>
+</tr>
+<tr>
+  <td>LLM without Reasoning for Search</td>
+  <td>57.28</td>
+  <td>23.30</td>
+</tr>
+<tr>
+  <td>SLM without Reasoning for Search</td>
+  <td>55.34</td>
+  <td>22.33</td>
+</tr>
+<tr>
+  <td>SLM with Reasoning for Visit</td>
+  <td>56.31</td>
+  <td>22.33</td>
+</tr>
+<tr>
+  <td>LLM without Reasoning for Visit</td>
+  <td><strong>64.08</strong></td>
+  <td><strong>28.16</strong></td>
+</tr>
+<tr>
+  <td>SLM without Reasoning for Visit</td>
+  <td>54.37</td>
+  <td>24.27</td>
+</tr>
+</tbody>
+</table>
+<p>为了评估不同的轻量级起草方法如何影响端到端智能体性能，我们执行动作级干预，选择性地使用轻量级方法替换 Search 或 Visit 的生成，同时保持智能体管道的其余部分不变。我们还考虑了结合降低模型容量和推理深度的第三种推测选项。结果表明，为 Search 分配带推理的 SLM 保持整体准确性，而使用不带推理的 LLM 会降低性能。相反，使用不带推理的 LLM 生成 Visit 产生最佳结果，而其他选择会导致显著准确度下降。尽管推测动作在动作级别不能完美对齐 Oracle，但只要为不同动作选择适当的推理路径，端到端准确度仍然很高。</p>
+<p><strong>关键洞察：Search 作为 System 2，Visit 作为 System 1。</strong> 这些结果揭示了清晰的动作级二分法。通过双重过程理论的视角来看，Search 表现出 System 2 行为，需要审慎推理来将未指定的研究目标转化为有效的查询。Visit 对应 System 1 行为，其中选择和提取主要依赖于模型参数中编码的快速基于模式的识别。这种区别为动作感知推测提供了原则性基础。</p>
+<h4>3.2 Verification Beyond Action Matching（超越动作匹配的验证）</h4>
+<p>仅靠推测不足以实现可靠的加速；验证对于防止错误传播至关重要。大多数现有方法通过与基础模型输出的精确或近似匹配来验证推测动作，但这有两个局限性。</p>
+<p>首先，动作等价难以定义。精确匹配过于严格，因为语义等价的 Search 查询可能在token级别不同，导致不必要的拒绝，而近似匹配通常需要额外的模块（例如嵌入模型）和阈值调优。其次，验证通常将基础模型的完整推理轨迹放在关键路径上，限制延迟减少。更激进的设计允许多步推测与并行验证，但中间失败需要回滚所有后续推测步骤，浪费计算。因此，实现更好的准确率-效率权衡需要超越简单动作匹配的验证策略。</p>
+<hr />
+<h3>4. Theoretical Analysis</h3>
+<p>本节为 Section 3 中的经验发现提供了理论解释。我们分析了为什么深度研究智能体中的不同动作对显式推理表现出根本不同的敏感性，以及为什么这会导致不同的最优推测策略。</p>
+<p>我们的核心论点是 Search 和 Visit 动作在内在决策不确定性方面有所不同。虽然显式推理通过引入中间结构来减少不确定性，但其效果取决于动作类型。我们通过动作策略的基于熵的分析来形式化这一直觉，并表明 Search 动作从推理引起的不确定性减少中获益明显更多，这解释了经验观察到的 System 2 与 System 1 的二分法。</p>
+<h4>4.1 Preliminaries: Action Policies and Entropy（前置知识：动作策略和熵）</h4>
+<p>在每一步，智能体从累积的上下文中观察状态 $s$，然后从策略 $\pi(\cdot \mid s)$ 中采样动作 $a$。我们分别用 $\mathcal{A}_{\text{search}}$ 和 $\mathcal{A}_{\text{visit}}$ 表示 Search 和 Visit 对应的动作空间。</p>
+<p>决策不确定性的自然度量是动作策略的条件熵：</p>
+$$H(\pi(\cdot \mid s)) \;=\; -\sum_{a \in \mathcal{A}} \pi(a \mid s)\log \pi(a \mid s).$$
+<p>较低的熵表示更自信和更集中的决策，而较高的熵表示在许多合理的动作之间存在歧义。</p>
+<p>在深度研究智能体中，动作表示为开放式语言字符串（例如搜索查询或提取指令），使得精确计算上述熵变得不可行。因此，我们采用基于token级别的代理，基于实现动作的负对数似然。具体地，对于表示为token序列 $a=(t_1,\ldots,t_n)$ 的动作，我们定义平均token级别熵代理：</p>
+$$\bar{H}(a \mid s) \;=\; \frac{1}{n}\sum_{i=1}^n \left(-\log p(t_i \mid s, t_{&lt;i})\right),$$
+<p>其中较小的 $\bar{H}(a \mid s)$（即较高的平均token对数概率）表示较低的不确定性。</p>
+<h4>4.2 Intrinsic Entropy Gap Between Search and Visit（Search 和 Visit 之间的内在熵差距）</h4>
+<p>我们首先检查在<strong>不进行</strong>显式推理的情况下不同动作的基线不确定性。直观上，Search 动作将宽泛且模糊的意图映射到具体的查询，对此许多表述可能是合理的。相比之下，Visit 对检索到的候选和本地化内容进行操作，显著约束了决策空间。</p>
+<p>这种直觉反映在以下不等式中：</p>
+$$\mathbb{E}[\bar H(a\mid s)\mid a\in\mathcal{A}_{\text{search}}] \;&gt;\; \mathbb{E}[\bar H(a\mid s)\mid a\in\mathcal{A}_{\text{visit}}].$$
+<p>也就是说，在相同的推理设置下，Search 动作比 Visit 动作表现出更高的平均不确定性。图5可视化了这种差距。</p>
+<p><img src="images/figs/logprob.png" alt="图 5：有推理和无推理的动作对数概率分布。较高的对数概率表示较低的不确定性。在没有推理的情况下（深蓝色），Search 动作表现出比 Visit 动作更低的对数概率，表明更高的基线决策不确定性。当加入推理时（带阴影的浅蓝色），两种动作类型的对数概率都增加，但对 Search 动作的 increase 明显更大，反映出推理对不确定性的减少更大。" /></p>
+<p><em>图 5：有推理和无推理的动作对数概率分布。较高的对数概率表示较低的不确定性。在没有推理的情况下（深蓝色），Search 动作表现出比 Visit 动作更低的对数概率，表明更高的基线决策不确定性。当加入推理时（带阴影的浅蓝色），两种动作类型的对数概率都增加，但对 Search 动作的 increase 明显更大，反映出推理对不确定性的减少更大。</em></p>
+<p>:::</p>
+<p>每个箱线图显示了 Search 和 Visit 动作的平均token对数概率分布。在没有推理的情况下，Search 一致地表现出更低的对数概率（更高的 $\bar{H}$），表明不太自信的动作分布。</p>
+<h4>4.3 Why Reasoning Helps: Entropy Reduction via Intermediate Structure（推理如何帮助：通过中间结构减少熵）</h4>
+<p>我们将显式推理建模为引入中间潜在变量 $z$，对应于在生成最终动作之前细化决策上下文的推理轨迹。这将直接映射 $\pi(a \mid s)$ 转换为两阶段生成过程：</p>
+$$\pi(a \mid s) \;=\; \sum_{z} \pi(z \mid s)\,\pi(a \mid s, z),$$
+<p>其中最终动作不仅以原始状态 $s$ 为条件，还以中间推理状态 $z$ 为条件。通过标准信息论性质，条件不会增加熵。形式上，</p>
+$$\mathbb{E}_{z\sim \pi(\cdot\mid s)}\!\left[ H(\pi(\cdot \mid s, z)) \right] \;\le\; H(\pi(\cdot \mid s)).$$
+<p>因此，访问推理轨迹会减少动作不确定性并增加实现动作的可能性。</p>
+<p>如图5所示，加入推理一致地增加动作对数概率，对应于动作级不确定性的减少。当目标决策依赖于非局部关联时，这种减少最为显著，这些关联在直接输入中并未直接指定。因此，对于 Search，推理将全局未指定的映射分解为更本地化的子决策，产生较大的不确定性减少。相比之下，Visit 动作由于在检索内容中的强接地，已经表现出较低的基线熵。因此，以推理轨迹为条件只会带来边际额外的不确定性减少。</p>
+<p>综合来看，这个分析解释了为什么 Search 更紧密地对齐 System 2 行为，而 Visit 在深度研究智能体中更接近 System 1 行为。</p>
+<hr />
+<h3>5. DualSpec Design</h3>
+<h4>5.1 Overview（概述）</h4>
+<p><img src="images/figs/overview.png" alt="图 6：DualSpec 概览。作为具有异构起草和语义验证的动作级推测框架。" /></p>
+<p><em>图 6：DualSpec 概览。作为具有异构起草和语义验证的动作级推测框架。</em></p>
+<p>:::</p>
+<p>我们提出了 <strong>DualSpec</strong>，这是一种用于深度研究智能体的双重过程推测框架。DualSpec 的核心设计原则是<strong>异构</strong>分配推理资源以实现高推测准确性，同时通过轻量级逐步语义验证保持端到端智能体性能。</p>
+<p>如图6所示，DualSpec 遵循草稿-验证工作流程。在每个决策步骤，DualSpec 并行生成两个候选动作：（i）由小模型带显式推理产生的 <strong>System 2</strong> 草稿，以及（ii）由大模型跳过推理产生的 <strong>System 1</strong> 草稿。然后框架根据动作类型和小模型输出的推理足迹选择临时草稿。最后，使用全容量基础模型通过语义验证器评估选定的草稿。被判定为与当前推理轨迹语义一致的草稿被直接接受并执行；否则，DualSpec 回退到全容量推理来重新生成动作。</p>
+<h4>5.2 Heterogeneous Draft（异构起草）</h4>
+<p>DualSpec 通过在每个步骤生成两个候选动作并自适应选择与当前决策推理需求最匹配的候选动作来实现异构起草。形式上，给定当前状态 $s_t$，我们使用 SLM 生成 System 2 草稿 $(z_s, a_s)$ 并使用 LLM 生成 System 1 草稿 $a_l$。关键问题是如何选择最终起草的动作，同时保留对长期规划有价值的有用推理信息。</p>
+<p><strong>动作感知选择。</strong> 我们使用小模型草稿预测的动作类型作为主要路由信号。如果小模型生成 Search 动作，我们保留 $a_s$ 作为草稿动作，因为 Search 通常受益于显式推理，并且当与推理轨迹配对时，小模型就足够了。如果小模型提出 Visit 动作，我们通常用大模型草稿 $a_l$ 替换它，因为 Visit 动作更依赖大模型的参数容量来对具体输入做出直接决策。</p>
+<p><strong>保留长期推理。</strong> 一个微妙但重要的情况出现在小模型草稿在发出动作之前生成长推理轨迹时。在实践中，这种长推理通常包含对后续步骤仍有用的全局分析或中间摘要，无论最终动作是 Search 还是 Visit。为了保留这些信息，当小模型推理长度超过阈值 $\tau_{\text{think}}$ 时，我们即使在动作类型为 Visit 时也选择完整草稿 $(z_s, a_s)$。这种机制确保了高级推理在可能有益于后续决策时不会被丢弃。</p>
+<h4>5.3 Semantic Verification（语义验证）</h4>
+<p>为了保持端到端准确性，DualSpec 在每一步执行轻量级语义验证。与强制动作级匹配不同，验证器评估起草的推理和动作是否可能产生有意义的进展。这一设计基于这样的观察：中间智能体决策通常对近似有容错力，如表1所示。此外，这种方法避免了基础模型生成动作的推理延迟，实现更快的验证。</p>
+<p>给定当前状态 $s_t$ 和由可选推理轨迹 $z_t$ 和候选动作 $a_t$ 组成的草稿，我们查询大模型作为评判者，让它回答 <strong>Yes</strong> 或 <strong>No</strong>。提示指示评判者共同评估（i）推理是否连贯（如果存在），以及（ii）建议的动作是否有助于取得进展。确切的提示模板见附录。</p>
+<p>虽然评判者产生离散判断，但<strong>连续</strong>信号对于权衡速度和可靠性是必要的。因此，我们将评判者的输出分布转换为实值置信度分数。</p>
+<p>令 $p_{\mathrm{acc}}(s_t,z_t,a_t)$ 和 $p_{\mathrm{rej}}(s_t,z_t,a_t)$ 分别表示评判者回答 <strong>Yes</strong> 和 <strong>No</strong> 的概率。我们将验证分数定义为对数概率边际：</p>
+$$\mathrm{score}(s_t, z_t, a_t) = \log p_{\mathrm{acc}}(s_t, z_t, a_t) - \log p_{\mathrm{rej}}(s_t, z_t, a_t),$$
+<p>这对应于接受的log-odds，并提供了验证器置信度的稳定单调度量。</p>
+<p>如果其分数超过阈值 $\tau$，我们接受草稿：</p>
+$$\text{Accept}(z_t, a_t) \quad \text{if} \quad \mathrm{score}(s_t, z_t, a_t) \ge \tau,$$
+<p>否则触发回退。回退使用带显式推理的全容量模型重新生成步骤，并使用重新生成的动作继续执行。这个验证-回退程序遵循标准推测模式：提出快速近似步骤，用更强的评判者验证它，并且仅在草稿不太可靠时才支付完整推理的成本。</p>
+<p>由于分数尺度取决于评判器模型，我们在离线时在保留的开发集上选择 $\tau$。我们扫描候选阈值并选择保留端到端准确性同时最大化接受率的固定 $\tau$，并在运行时保持固定。这允许 DualSpec 仅将昂贵的全容量推理分配给少数不可靠的步骤，从而改善整体解决时间。验证器分数有效性的额外实证证据见附录。</p>
+<hr />
+<h3>6. Experiments</h3>
+<h4>6.1 Experimental Setup（实验设置）</h4>
+<p><strong>模型。</strong> 我们在三种双模型配置下评估 DualSpec：MiroThinker-v1.0-72B + MiroThinker-v1.0-8B、MiroThinker-v1.0-72B + MiroThinker-v1.0-30B-A3B，以及 Qwen3-32B + Qwen3-4B。所有模型单租户部署，每个模型一块 NVIDIA A100 GPU，batch_size=4。MiroThinker 模型量化为 4 位进行推理，而 Qwen 模型使用原生 FP8 量化，以避免 GPU 内存不足。</p>
+<p><strong>数据集。</strong> 实验在三个代表性深度研究基准测试上进行：GAIA-Text-103、XBench_DeepSearch 和 Seal-0。</p>
+<p><strong>框架。</strong> 我们在 MiroMind 深度研究框架上构建智能体。工具调用遵循 MCP（模型上下文协议）接口，以标准化工具签名和 I/O，确保跨模型和数据集的一致参数格式和结果解析。在此设置中，Search 调用通过 Bing API 执行，Visit 操作（页面获取和可读内容提取）由 Jina 提供，为整个实验提供固定的 Web 查询和页面处理后端。模型在 SGLang 下提供服务。</p>
+<p><strong>基线。</strong> 我们与两种推测智能体框架进行比较：DSP 和 SPAgent。DSP 针对规划任务，只有当草稿与基础动作匹配时才接受，而 SPAgent 专门针对 Web 搜索，早期跳过验证并在后期强制严格动作匹配。与它们的统一起草和动作对齐验证不同，DualSpec 对 System 1/System 2 动作使用异构起草和语义验证，接受轨迹一致的草稿而不要求精确动作等价。</p>
+<p><strong>验证器阈值。</strong> 我们在 GAIA 的保留分割上调整验证器阈值 $\tau$，目标是干预率约 20%，并在实验中使用相同的 $\tau$。</p>
+<h4>6.2 Main Results（主要结果）</h4>
+<p>图7报告了三个模型对和三个深度研究基准测试的端到端延迟与 pass@1 准确率。总体而言，DualSpec 实现了 <strong>1.33-3.28倍</strong> 的加速，平均约 <strong>2倍</strong>，同时保持相当的 pass@1。在数据集和模型组合中，DualSpec 的点一致地向左移动（延迟更低），准确率损失可忽略不计，表明比统一的推测基线具有更好的准确率-延迟权衡点。</p>
+<p><img src="images/figs/main_exp_results.png" alt="图 7：不同方案在模型组合上的准确率（pass@1）和延迟比较。DualSpec 在保持相当准确率的同时，始终将端到端延迟降低 1.33-3.28 倍（约 2 倍平均）。与 DSP 和 SPAgent 相比，DualSpec 在所有数据集和模型对上实现了更好的准确率-延迟权衡。" /></p>
+<p><em>图 7：不同方案在模型组合上的准确率（pass@1）和延迟比较。DualSpec 在保持相当准确率的同时，始终将端到端延迟降低 1.33-3.28 倍（约 2 倍平均）。与 DSP 和 SPAgent 相比，DualSpec 在所有数据集和模型对上实现了更好的准确率-延迟权衡。</em></p>
+<p>:::</p>
+<p>通过分析每个模型对，我们观察到 MiroThinker-72B + 8B 上 1.8倍加速，MiroThinker-72B + 30B 上 2.6倍加速，Qwen3-32B + 4B 上 1.5倍加速。30B 配置的更大收益来自其 MoE 设计，每次前向激活约 3B 参数；同时，其更强的基线能力减少了基础模型干预的次数，进一步减少了端到端时间。因此，使用 30B-A3B 作为基础模型在评估的配对中实现了最高的整体加速。</p>
+<h4>6.3 Ablation Studies（消融研究）</h4>
+<p><strong>推测方法。</strong> 为了分析异构推测对性能的影响，我们固定验证设置，仅改变推测策略，将我们的异构方法与仅小模型方法和跳过推理方法进行比较。如表2所示，异构推测始终比 LLMs w/o Reason 或 SLMs w/ Reason 实现更好的准确率-延迟平衡，在模型对和数据集上保持准确率同时减少端到端延迟。</p>
+<table>
+<thead>
+<tr>
+  <th>模型</th>
+  <th>数据集</th>
+  <th>推测方法</th>
+  <th>准确率</th>
+  <th>延迟</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Miro 72B+8B</td>
+  <td>GAIA</td>
+  <td>Origin</td>
+  <td>63.1</td>
+  <td>1041</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>LLM w/o Reason</td>
+  <td>59.2</td>
+  <td>575</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>SLM w/ Reason</td>
+  <td>56.3</td>
+  <td>651</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>Heterogeneous</td>
+  <td>63.1</td>
+  <td>605</td>
+</tr>
+<tr>
+  <td></td>
+  <td>Xbench</td>
+  <td>Origin</td>
+  <td>66</td>
+  <td>1007</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>LLM w/o Reason</td>
+  <td>65</td>
+  <td>492</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>SLM w/ Reason</td>
+  <td>65</td>
+  <td>501</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>Heterogeneous</td>
+  <td>66</td>
+  <td>480</td>
+</tr>
+<tr>
+  <td>Qwen 32B+4B</td>
+  <td>GAIA</td>
+  <td>Origin</td>
+  <td>29.1</td>
+  <td>80</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>LLM w/o Reason</td>
+  <td>27.1</td>
+  <td>67</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>SLM w/ Reason</td>
+  <td>25.2</td>
+  <td>32</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>Heterogeneous</td>
+  <td>30.1</td>
+  <td>46</td>
+</tr>
+<tr>
+  <td></td>
+  <td>Xbench</td>
+  <td>Origin</td>
+  <td>27</td>
+  <td>69</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>LLM w/o Reason</td>
+  <td>25</td>
+  <td>46</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>SLM w/ Reason</td>
+  <td>26</td>
+  <td>49</td>
+</tr>
+<tr>
+  <td></td>
+  <td></td>
+  <td>Heterogeneous</td>
+  <td>27</td>
+  <td>41</td>
+</tr>
+</tbody>
+</table>
+<p><img src="images/figs/threshold.png" alt="图 8：在固定起草策略下，准确率（pass@1）作为推理干预率的函数。" /></p>
+<p><em>图 8：在固定起草策略下，准确率（pass@1）作为推理干预率的函数。</em></p>
+<p>:::</p>
+<p><strong>干预率。</strong> 我们研究准确率如何随大模型干预频率变化。在固定推测器的情况下，我们改变验证器阈值，这间接控制干预率。准确率随着干预率增加而增加，然后趋于饱和。在实践中，我们观察到 <strong>20% 到 30%</strong> 的干预率已经达到与基础模型相当的准确率，同时保留了异构推测的大部分延迟收益。</p>
+<p>这种趋势在模型家族和数据集中一致，饱和点有轻微偏移。虽然更严格的阈值进一步提高准确率，但一旦比率达到二十出头，收益就递减。因此，我们将阈值调整到目标干预率接近 20%，恢复接近基线的准确率，而不牺牲稀疏大模型推理的效率收益。</p>
+<hr />
+<h3>7. Conclusion（结论）</h3>
+<p>我们提出了 <strong>DualSpec</strong>，这是一个通过<strong>异构动作推测</strong>加速深度研究智能体的高效框架。我们的关键洞察是动作表现出不同的不确定性水平：Search 通常需要审慎推理，而 Visit 通常更具确定性，可以在没有推理的情况下执行。利用这种不对称性，DualSpec 将动作特定的草稿策略与语义验证相结合，实现可靠的推测执行，同时将大模型推理从关键路径中移除。跨多个基准测试的实验表明，DualSpec 在保持强劲任务成功率的同时显著降低延迟，突出了可扩展智能体系统中动作感知推测的重要性。</p>
+<hr />
+<h2>四、论文简评</h2>
+<h3>创新点</h3>
+<ol>
+<li><p><strong>动作异质性分析</strong>：论文首次系统性地分析了深度研究智能体中 Search 和 Visit 动作的本质差异，通过熵分析揭示了两种动作在决策不确定性和推理需求上的根本区别。</p>
+</li>
+<li><p><strong>异构推测框架 DualSpec</strong>：提出了一种新颖的推测框架，针对不同动作类型采用不同的推测策略——对 Search 使用带推理的小模型，对 Visit 使用不带推理的大模型。这种设计符合认知科学中的双重过程理论（System 1 和 System 2）。</p>
+</li>
+<li><p><strong>语义验证机制</strong>：摒弃了传统的精确动作匹配验证方法，引入了基于大模型置信度的轻量级语义验证器，能够在保持性能的同时进一步减少延迟。</p>
+</li>
+<li><p><strong>显著的性能提升</strong>：在多个基准测试和模型组合上实现了 1.33-3.28 倍的端到端延迟加速，平均约 2 倍，同时保持与全推理智能体相当的准确性。</p>
+</li>
+</ol>
+<h3>局限性</h3>
+<ol>
+<li><p><strong>特定场景限制</strong>：该方法主要针对深度研究智能体中的 Search 和 Visit 动作，对于其他类型的工具调用（如代码执行）的适用性未充分验证。</p>
+</li>
+<li><p><strong>阈值调优依赖</strong>：验证器阈值 $\tau$ 需要在保留开发集上离线调优，可能需要针对不同的模型对进行重新调整。</p>
+</li>
+<li><p><strong>模型组合限制</strong>：实验仅在特定的模型组合（MiroThinker 和 Qwen3 系列）上验证，其他模型系列的有效性未知。</p>
+</li>
+</ol>
+<h3>应用场景</h3>
+<ol>
+<li><p><strong>大规模信息检索系统</strong>：需要处理大量长周期研究查询的智能系统。</p>
+</li>
+<li><p><strong>自动化研究助手</strong>：辅助学术研究的 AI 助手，需要进行多步文献调研和信息收集。</p>
+</li>
+<li><p><strong>企业知识管理系统</strong>：需要从大量文档中提取和综合信息的场景。</p>
+</li>
+</ol>
+<h3>可改进方向</h3>
+<ol>
+<li><p><strong>扩展动作类型</strong>：将异构推测策略扩展到更多类型的工具调用，如代码执行、文件操作等。</p>
+</li>
+<li><p><strong>自动化阈值学习</strong>：研究自动学习最优验证器阈值的方法，减少人工调参负担。</p>
+</li>
+<li><p><strong>多智能体协作</strong>：探索将 DualSpec 应用于多智能体协作场景的可能性。</p>
+</li>
+<li><p><strong>理论保证</strong>：进一步提供方法有效性的理论分析，如收敛性、最优性等。</p>
+</li>
+</ol>
+<hr />
+<h2>图片索引</h2>
+<p>本文中使用的所有图片位于 <code>~/.openclaw/workspace/papers/20260309_DualSpec/source/figs/</code> 目录：</p>
+<ul>
+<li>deep_research.pdf - 深度研究智能体工作流程</li>
+<li>draw_basics.pdf - 推理特征和时间分解</li>
+<li>logprob.pdf - 动作对数概率分布</li>
+<li>main_exp_results.pdf - 主实验结果</li>
+<li>motivation_similarity.pdf - 动作对齐比较</li>
+<li>overview.pdf - DualSpec 概览</li>
+<li>score.pdf - 验证器分数分布</li>
+<li>threshold.pdf - 阈值与干预率分析</li>
+<li>token_count.pdf - 推理长度比较</li>
+</ul>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    });
+    </script>
+    
+</body>
+</html>
