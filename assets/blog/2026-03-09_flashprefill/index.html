@@ -181,18 +181,18 @@
 <li>提出了一种基于最大值的动态阈值化方法，有效消除了Top-$k$中局部排序和Top-$p$中累积求和的时间开销。同时，它减轻了长尾分布对稀疏注意力的影响。</li>
 <li>利用上述策略，我们引入了FlashPrefill，这是一种高效的长上下文预填充阶段加速方法。其有效性通过在多种模型和基准测试上的严格评估得到验证。</li>
 </ol>
-<p><img src="/20260309_FlashPrefill/source/figs/niah_qwen3.pdf" alt="图 1：使用FlashPrefill对Qwen3-30B-A3B-Instruct-2507进行&amp;quot;大海捞针&amp;quot;测试，上下文长度从2K到256K不等。" /></p>
-<p><em>图 1：使用FlashPrefill对Qwen3-30B-A3B-Instruct-2507进行&quot;大海捞针&quot;测试，上下文长度从2K到256K不等。</em></p>
-<p>:::</p>
-<p><img src="/20260309_FlashPrefill/source/figs/end_to_end_speedup.pdf" alt="图 2：在vLLM框架内，相对于全注意力在Qwen3-30B-A3B-Instruct-2507上的端到端Time-to-First-Token (TTFT)加速。" /></p>
-<p><em>图 2：在vLLM框架内，相对于全注意力在Qwen3-30B-A3B-Instruct-2507上的端到端Time-to-First-Token (TTFT)加速。</em></p>
-<p>:::</p>
-<p><img src="/20260309_FlashPrefill/source/figs/attention_speedup.pdf" alt="图 3：各种算子相对于Flash Attention在Qwen3-30B-A3B-Instruct-2507上的比较加速。FlashPrefill展现出主导优势，特别是在长上下文场景中。" /></p>
-<p><em>图 3：各种算子相对于Flash Attention在Qwen3-30B-A3B-Instruct-2507上的比较加速。FlashPrefill展现出主导优势，特别是在长上下文场景中。</em></p>
-<p>:::</p>
-<p><img src="/20260309_FlashPrefill/source/figs/part_time.pdf" alt="图 4：不同方法各部分的执行时间。所有结果均在Qwen3-30B-A3B-Instruct-2507上测量。" /></p>
-<p><em>图 4：不同方法各部分的执行时间。所有结果均在Qwen3-30B-A3B-Instruct-2507上测量。</em></p>
-<p>:::</p>
+<p><img src="images/figs/niah_qwen3.png" alt="" />
+图 1：使用FlashPrefill对Qwen3-30B-A3B-Instruct-2507进行&quot;大海捞针&quot;测试，上下文长度从2K到256K不等。
+:::</p>
+<p><img src="images/figs/end_to_end_speedup.png" alt="" />
+图 2：在vLLM框架内，相对于全注意力在Qwen3-30B-A3B-Instruct-2507上的端到端Time-to-First-Token (TTFT)加速。
+:::</p>
+<p><img src="images/figs/attention_speedup.png" alt="" />
+图 3：各种算子相对于Flash Attention在Qwen3-30B-A3B-Instruct-2507上的比较加速。FlashPrefill展现出主导优势，特别是在长上下文场景中。
+:::</p>
+<p><img src="images/figs/part_time.png" alt="" />
+图 4：不同方法各部分的执行时间。所有结果均在Qwen3-30B-A3B-Instruct-2507上测量。
+:::</p>
 <h3>2. 相关工作（Related Works）</h3>
 <p><strong>大型语言模型</strong>：近年来，大量大型语言模型（LLM）的出现推动了学术界和工业界的快速进步。此外，LLM中固有的丰富先验知识可用于增强视觉语言模型（VLM），促进智能多模态智能体的构建。除了基于全注意力的经典Transformer架构外，现代LLM中还涌现出许多新架构，以减轻处理长上下文时全注意力产生的高昂计算开销，如稀疏注意力和线性注意力。</p>
 <p><strong>稀疏注意力</strong>：作为Transformer架构的关键组成部分，注意力机制在捕获依赖关系方面起着至关重要的作用。然而，其二次复杂度导致显著的计算开销，特别是在长上下文场景中。为此，人们提出了大量稀疏注意力机制来降低注意力层的计算成本。虽然其中一部分方法需要显式的模型训练或微调，但其他方法则作为无需训练的方法，可以无缝集成到现有LLM中。</p>
@@ -212,9 +212,9 @@ $$\Psi_{\text{sum}} = \sum_{i=1}^n e^{x_i} = n \cdot \text{AM}(e^{x_1}, \dots, e
 <p>其中 $\text{GM}(\cdot)$ 和 $\text{AM}(\cdot)$ 分别表示几何平均和算术平均。根据AM-GM不等式：</p>
 $$\frac{1}{n} \Psi_{\text{sum}} \geq \Psi_{\text{pool}}$$
 <p>虽然 $\Psi_{\text{pool}}$ 作为下界，但由于注意力分布的低块内方差（$\sigma^2 \to 0$），块之间的排名顺序不变。在这种情况下，GM作为AM的严格单调代理，确保块的相对顺序保持不变，排名失真可以忽略不计。在计算单个查询的注意力分数后，我们对每个块内的所有查询进行第二次平均操作，以得出聚合的块级重要性。</p>
-<p><img src="/20260309_FlashPrefill/source/figs/patterns.pdf" alt="图 5：模式发现示意图。红色虚线表示均匀分布的查询。" /></p>
-<p><em>图 5：模式发现示意图。红色虚线表示均匀分布的查询。</em></p>
-<p>:::</p>
+<p><img src="images/figs/patterns.png" alt="" />
+图 5：模式发现示意图。红色虚线表示均匀分布的查询。
+:::</p>
 <h4>3.2 内核优化的块近似（Block Approximation for Kernel Optimization）</h4>
 <p>然而，上述方法在计算块内注意力平均值时仍然需要存储和计算一个巨大的 $L \times (L/B)$ 中间矩阵，其中 $B$ 是块大小。为了解决这个问题，我们再次利用同一块内token的语义相似性。鉴于局部块中的token表现出显著的一致性，它们产生的注意力分布高度冗余。基于这一考虑，我们不再进行计算昂贵的严格注意力计算，而是采用块级注意力分数近似。具体来说，我们实现了一个融合的2D归约内核，将计算从显式的&quot;先计算后池化&quot;序列转变为单次传递的融合内核，显著减少了全局内存流量。</p>
 <p><strong>融合块级注意力近似</strong>：为了避免严格的token级计算的高昂成本，我们放弃精确注意力，转而采用块级近似。通过将查询块大小设置为与块大小相等（$B$），内核计算查询块与池化key块之间的交互（其中块中的每个key由单个向量 $k_J$ 表示）。我们对查询维度执行1D归约，将细粒度分数压缩为GPU SRAM中每个块对的一个近似标量：</p>
@@ -235,9 +235,9 @@ $$\mathcal{S}'_{I,J} = \mathcal{S}_{I,J} \times \exp(m_{I,J} - \mathcal{M}_I)$$
 </ul>
 $$\text{Score}_{I,J} = \frac{\mathcal{S}'_{I,J}}{\sum_K \mathcal{S}'_{I,K} + \epsilon}$$
 <p>这个融合过程确保了生成的块级图准确地反映了相对注意力分布，同时将内存占用从 $O(L \cdot L/B)$ 减少到 $O((L/B)^2)$。通过丢弃严格计算来换取这种高保真近似，即使对于超长序列也能实现近乎即时的模式发现。</p>
-<p><img src="/20260309_FlashPrefill/source/figs/score_kernel.pdf" alt="图 6：块评分方法比较。（左）具有显式注意力分数实现的standard kernel。（右）我们使用块级注意力近似的优化内核。与标准实现相比，我们提出的块级注意力分数近似通过绕过 $O(L^2/B)$ 的中间内存流量显著减少了内存访问开销。这里 $L$ 表示序列长度，$B$ 表示块大小，$d$ 表示token维度。" /></p>
-<p><em>图 6：块评分方法比较。（左）具有显式注意力分数实现的standard kernel。（右）我们使用块级注意力近似的优化内核。与标准实现相比，我们提出的块级注意力分数近似通过绕过 $O(L^2/B)$ 的中间内存流量显著减少了内存访问开销。这里 $L$ 表示序列长度，$B$ 表示块大小，$d$ 表示token维度。</em></p>
-<p>:::</p>
+<p><img src="images/figs/score_kernel.png" alt="" />
+图 6：块评分方法比较。（左）具有显式注意力分数实现的standard kernel。（右）我们使用块级注意力近似的优化内核。与标准实现相比，我们提出的块级注意力分数近似通过绕过 $O(L^2/B)$ 的中间内存流量显著减少了内存访问开销。这里 $L$ 表示序列长度，$B$ 表示块大小，$d$ 表示token维度。
+:::</p>
 <h4>3.3 与先前方法的比较（Comparison with Previous Methods）</h4>
 <p>与我们先前方法相比，我们提出的方法既更快又更准确。基于Llama-3.1-8B-Instruct，我们比较了三种不同的模式发现方法：1) 对query和key块都应用平均池化，然后计算块间注意力分数；2) 使用第3.1节中描述的原始方法，不含第3.2节中描述的任何块近似；3) 我们提出的基于块近似的的方法。</p>
 <p>结果如下表所示。我们在RULER基准上进行了评估；为了确保不同模式发现方法之间的公平比较，我们一致地选择得分最高的8个块。方法1）由于其过于激进的估计策略而遭受显著的性能下降。相比之下，方法2）由于过多的内存访问成本而产生大量时间开销。我们提出的方法3）在效率和有效性之间取得了最佳平衡。</p>
@@ -287,9 +287,9 @@ $$\text{Score}_{I,J} = \frac{\mathcal{S}'_{I,J}}{\sum_K \mathcal{S}'_{I,K} + \ep
 <h4>3.4 基于最大值的动态阈值化（Max-based Dynamic Thresholding）</h4>
 <p>先前的方法依赖Top-$k$或Top-$p$启发式来选择显著的token或块。然而，这些方法需要相对昂贵的排序和累积计算，在效率方面并不是最优的。</p>
 <p>此外，Top-$p$和Top-$k$机制由于对长尾分布的高度敏感性而遭受稀疏性不足的问题。如图所示，当注意力分数分布遵循长尾分布（在大多数场景中很常见）时，这些方法经常需要包含大量不显著的块来满足固定的$k$或$p$约束，从而无法实现最佳的剪枝效率。</p>
-<p><img src="/20260309_FlashPrefill/source/figs/thresh.pdf" alt="图 7：不同阈值化方法的比较。（左）Top-$k$和Top-$p$选择策略。（右）我们提出的基于最大值的阈值化。Top-$k$和Top-$p$方法往往容易受到长尾分布的影响，因为它们可能包含许多低显著性块只是为了满足固定的$k$或$p$约束。相比之下，我们的动态阈值化有效地减轻了长尾的影响，通过更精确地选择显著块来实现更高的稀疏性。" /></p>
-<p><em>图 7：不同阈值化方法的比较。（左）Top-$k$和Top-$p$选择策略。（右）我们提出的基于最大值的阈值化。Top-$k$和Top-$p$方法往往容易受到长尾分布的影响，因为它们可能包含许多低显著性块只是为了满足固定的$k$或$p$约束。相比之下，我们的动态阈值化有效地减轻了长尾的影响，通过更精确地选择显著块来实现更高的稀疏性。</em></p>
-<p>:::</p>
+<p><img src="images/figs/thresh.png" alt="" />
+图 7：不同阈值化方法的比较。（左）Top-$k$和Top-$p$选择策略。（右）我们提出的基于最大值的阈值化。Top-$k$和Top-$p$方法往往容易受到长尾分布的影响，因为它们可能包含许多低显著性块只是为了满足固定的$k$或$p$约束。相比之下，我们的动态阈值化有效地减轻了长尾的影响，通过更精确地选择显著块来实现更高的稀疏性。
+:::</p>
 <p>为了克服这些限制，我们引入了一种基于最大值的动态阈值化机制。具体来说，对于第$I$个查询块，我们识别所有候选key块中的峰值注意力分数，并直接从该最大值导出剪枝阈值：</p>
 $$\text{thresh}_I = \alpha \cdot \max_{J \le I}(\text{Score}_{I, J})$$
 <p>其中 $\alpha$ 是一个可调的比例因子。对于查询块 $I$，任何分数低于 $\text{thresh}_I$ 的key块 $J$ 将从计算中丢弃。关键的是，这种方法只需要一次传递的最大归约，而不是计算昂贵的全局排序，显著提高了执行效率。此外，如图所示，这种动态阈值化有效地减轻了长尾分布的干扰，通过仅关注真正显著的块来实现优于传统启发式的稀疏性。</p>
