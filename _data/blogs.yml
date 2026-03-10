@@ -64,3 +64,9 @@
   date: 2026-03-09
   description: "论文报告: FlashPrefill: Instantaneous Pattern Discovery and Thresholding for Ultra-Fast Long-Context Prefilling"
   tags: ["Papers"]
+
+- title: "XAttention: Block Sparse Attention with Antidiagonal Scoring"
+  file: "/assets/blog/2026-03-09_xattention-block-sparse/"
+  date: 2026-03-09
+  description: "论文报告: XAttention: Block Sparse Attention with Antidiagonal Scoring"
+  tags: ["Papers"]
