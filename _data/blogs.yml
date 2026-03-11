@@ -76,3 +76,9 @@
   date: 2026-03-10
   description: "论文报告: FlashAttention-4: Algorithm and Kernel Pipelining Co-Design for Asymmetric Hardware Scaling"
   tags: ["Papers"]
+
+- title: "ReAct: Synergizing Reasoning and Acting in Language Models"
+  file: "/assets/blog/2026-03-11_react-synergizing/"
+  date: 2026-03-11
+  description: "论文报告: ReAct: Synergizing Reasoning and Acting in Language Models"
+  tags: ["Papers"]
