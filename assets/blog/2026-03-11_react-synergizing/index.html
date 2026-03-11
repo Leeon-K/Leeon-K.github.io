@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ReAct: 在语言模型中协同推理与行动</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fc; color: #1a1a2e; line-height: 1.85; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px 40px 60px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 30px; }
+        .back-link:hover { color: #5a6fd6; }
+        .paper-content { background: white; border-radius: 20px; padding: 50px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+        .paper-content h1 { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5em; line-height: 1.3; }
+        .paper-content h2 { font-size: 1.5em; font-weight: 600; color: #1a1a2e; margin: 1.5em 0 0.8em; padding-bottom: 0.3em; border-bottom: 2px solid #f0f0f5; }
+        .paper-content h3 { font-size: 1.25em; font-weight: 600; color: #2d2d44; margin: 1.3em 0 0.6em; }
+        .paper-content h4 { font-size: 1.1em; font-weight: 600; color: #3d3d5c; margin: 1.2em 0 0.5em; }
+        .paper-content p { margin: 1em 0; color: #4a4a6a; }
+        .paper-content strong { color: #1a1a2e; font-weight: 600; }
+        .paper-content a { color: #667eea; text-decoration: none; }
+        .paper-content ul, .paper-content ol { margin: 1em 0; padding-left: 1.5em; color: #4a4a6a; }
+        .paper-content li { margin: 0.5em 0; }
+        .paper-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #f5f5fa; padding: 0.2em 0.5em; border-radius: 4px; color: #e83e8c; }
+        .paper-content pre { background: #2d2d44; border-radius: 12px; padding: 20px; overflow-x: auto; margin: 1.5em 0; }
+        .paper-content pre code { background: transparent; padding: 0; color: #f8f8f2; }
+        .paper-content blockquote { border-left: 4px solid #667eea; padding: 1em 1.5em; margin: 1.5em 0; background: #f8f9fc; border-radius: 0 12px 12px 0; color: #5a5a7a; }
+        
+        /* Compact centered table style */
+        .paper-content table { 
+            width: auto; 
+            max-width: 90%;
+            margin: 1em auto; 
+            border-collapse: collapse; 
+            font-size: 0.85em; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .paper-content th { 
+            background: #f5f5fa; 
+            padding: 8px 10px; 
+            text-align: left; 
+            font-weight: 600; 
+            border-bottom: 2px solid #e0e0e8; 
+            font-size: 0.9em;
+        }
+        .paper-content td { 
+            padding: 6px 10px; 
+            border-bottom: 1px solid #f0f0f5; 
+        }
+        .paper-content tr:last-child td { 
+            border-bottom: none; 
+        }
+        .paper-content tr:hover { background: #fafafa; }
+        
+        .paper-content hr { border: none; height: 2px; background: #e0e0e8; margin: 2em 0; }
+        
+        /* Image: 70% width = 15% margin on each side, centered */
+        .paper-content img { max-width: 70%; height: auto; border-radius: 12px; margin: 1.5em auto 0.5em; display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        
+        /* Figure and Table caption styling - force the whole caption block to center */
+        .paper-content p:has(> em):has(img),
+        .paper-content p:has(> em):has(table) {
+            text-align: center;
+        }
+
+        .paper-content p:has(img) + p,
+        .paper-content p:has(table) + p {
+            text-align: center;
+            margin: 0.5em auto 1.5em;
+            max-width: 80%;
+        }
+
+        /* Figure and Table caption styling - small, centered, non-italic text */
+        .paper-content img + em,
+        .paper-content table + em,
+        .paper-content table + p,
+        .paper-content figure figcaption,
+        .paper-content .caption {
+            display: block;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            margin: 0.5em auto 1.5em;
+            max-width: 80%;
+            line-height: 1.5;
+            font-style: normal;  /* 去掉斜体 */
+        }
+        
+        /* Handle p > em or p > strong that follows img or table */
+        .paper-content p:has(img) + p em,
+        .paper-content img + p em,
+        .paper-content table + p em,
+        .paper-content table + p strong {
+            display: inline-block;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            font-style: normal;
+            font-weight: normal;
+        }
+        
+        .katex { font-size: 1.1em; }
+        .katex-display { 
+            margin: 1.5em 0; 
+            overflow-x: visible;  /* 允许公式溢出，不显示滚动条 */
+            overflow-y: visible;
+        }
+        .katex-display > .katex {
+            white-space: normal;  /* 允许公式换行 */
+            max-width: 100%;
+        }
+        
+        /* ==================== Responsive Design ==================== */
+        /* Mobile phones */
+        @media screen and (max-width: 480px) {
+            body { font-size: 14px; line-height: 1.7; }
+            .container { padding: 15px 12px 30px; }
+            .paper-content { padding: 20px 15px; border-radius: 12px; }
+            .paper-content h1 { font-size: 1.4em; }
+            .paper-content h2 { font-size: 1.2em; }
+            .paper-content h3 { font-size: 1.05em; }
+            .paper-content h4 { font-size: 0.95em; }
+            
+            /* Tables - allow horizontal scroll */
+            .paper-content table {
+                font-size: 0.7em;
+                max-width: 100%;
+                width: 100%;
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .paper-content th, .paper-content td { padding: 5px 6px; }
+            
+            /* Images - full width on mobile */
+            .paper-content img {
+                max-width: 100%;
+                width: 100%;
+                margin: 1em auto;
+            }
+            .paper-content p:has(img) + p,
+            .paper-content p:has(table) + p,
+            .paper-content img + em,
+            .paper-content table + em,
+            .paper-content table + p,
+            .paper-content .caption {
+                max-width: 100%;
+                font-size: 0.75em;
+            }
+            
+            /* Code blocks */
+            .paper-content pre { padding: 12px; font-size: 0.8em; }
+            .paper-content code { font-size: 0.8em; }
+            
+            /* Blockquotes */
+            .paper-content blockquote { padding: 0.8em 1em; }
+        }
+        
+        /* Tablets */
+        @media screen and (min-width: 481px) and (max-width: 768px) {
+            body { font-size: 15px; }
+            .container { padding: 20px 20px 40px; }
+            .paper-content { padding: 30px 25px; }
+            .paper-content h1 { font-size: 1.6em; }
+            .paper-content h2 { font-size: 1.3em; }
+            
+            .paper-content table { font-size: 0.8em; }
+            .paper-content img { max-width: 85%; }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回论文列表</a>
+        <div class="paper-content">
+<h1>ReAct: 在语言模型中协同推理与行动</h1>
+<h2>一、论文摘要</h2>
+<p>本文提出了一种名为 <strong>ReAct</strong> 的新方法，旨在将大型语言模型（LLMs）的推理能力与行动能力进行协同。传统的LLMs在语言理解和交互式决策任务中表现出色，但其推理能力（如思维链提示）和行动能力（如动作计划生成）主要被作为独立主题进行研究。本文探索了让LLMs以交替方式生成推理轨迹和任务特定动作的方法，从而实现两者之间的更强协同：推理轨迹帮助模型推导、跟踪和更新动作计划，同时处理异常；而动作则使模型能够与外部来源（如知识库或环境）进行交互并收集额外信息。</p>
+<p>作者将ReAct应用于多种语言和决策任务，展示了其相对于最先进基线方法的有效性，同时提高了人类可解释性和可信度。具体而言，在问答（HotpotQA）和事实验证（FEVER）任务中，ReAct通过与简单Wikipedia API交互，克服了思维链推理中普遍存在的幻觉和错误传播问题，并生成了比没有推理轨迹的基线方法更易于理解的任务解决轨迹。此外，在两个交互式决策基准测试（ALFWorld和WebShop）中，ReAct分别以仅1-2个上下文示例的提示，分别取得了34%和10%的绝对成功率提升，优于模仿学习和强化学习方法。</p>
+<hr />
+<h2>二、基本信息</h2>
+<table>
+<thead>
+<tr>
+  <th>项目</th>
+  <th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>论文 ID</strong></td>
+  <td>2210.03629</td>
+</tr>
+<tr>
+  <td><strong>标题</strong></td>
+  <td>ReAct: Synergizing Reasoning and Acting in Language Models</td>
+</tr>
+<tr>
+  <td><strong>作者</strong></td>
+  <td>Shunyu Yao, Jeffrey Zhao, Dian Yu, Nan Du, Izhak Shafran, Karthik Narasimhan, Yuan Cao</td>
+</tr>
+<tr>
+  <td><strong>单位</strong></td>
+  <td>Princeton University, Google Research Brain team</td>
+</tr>
+<tr>
+  <td><strong>会议/期刊</strong></td>
+  <td>ICLR 2023</td>
+</tr>
+<tr>
+  <td><strong>原文保存位置</strong></td>
+  <td>~/.openclaw/workspace/papers/20260311_ReAct/source/</td>
+</tr>
+<tr>
+  <td><strong>报告生成日期</strong></td>
+  <td>2026-03-11</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>三、论文主体分析</h2>
+<h3>1. 引言 (Introduction)</h3>
+<p>人类智能的一个独特特征是能够将面向任务的动作与语言推理（或内心独白）无缝结合。这种能力被理论化在人类认知中发挥重要作用，实现自我调节或策略化，并维持工作记忆。例如，在厨房做菜时，我们可以在任何两个具体动作之间用语言推理来跟踪进度、处理异常或调整计划，以及意识到何时需要外部信息。这种&quot;行动&quot;与&quot;推理&quot;之间的紧密协同使人类能够快速学习新任务并在面对新情况或信息不确定性时做出稳健的决策。</p>
+<p>最近的研究暗示了将语言推理与自主系统中的交互式决策相结合的可能性。一方面，经过适当提示的大型语言模型已经展现出执行多步推理轨迹的能力，从问题中推导答案。然而，这种&quot;思维链&quot;推理是一个静态的黑箱，模型使用其内部表示来生成想法，并未与外部世界结合，这限制了它主动推理或更新知识的能力，可能导致事实幻觉和推理过程中的错误传播。</p>
+<p>另一方面，最近的工作探索了预训练语言模型在交互环境中的规划和行动能力。这些方法通常将多模态观察转换为文本，使用语言模型生成领域特定的动作或计划，然后使用控制器来选择或执行它们。然而，它们没有使用语言模型对高级目标进行抽象推理或维持支持行动的工作记忆。</p>
+<p>在本文中，我们提出了 <strong>ReAct</strong>，这是一个将推理和行动与语言模型结合用于解决各种语言推理和决策任务的通用范式。ReAct提示LLMs以交替方式生成语言推理轨迹和与任务相关的动作，允许模型执行动态推理来创建、维护和调整高级行动计划（推理以指导行动），同时与外部环境（例如Wikipedia）交互，将额外信息纳入推理（行动以促进推理）。</p>
+<p>我们在四个不同的基准测试上对ReAct和最先进的基线方法进行了实证评估：问答（HotpotQA）、事实验证（FEVER）、基于文本的游戏（ALFWorld）和网页导航（WebShop）。对于HotpotQA和FEVER，通过访问模型可以交互的Wikipedia API，ReAct优于纯动作生成模型，同时与思维链推理（CoT）具有竞争力。总体最佳方法是ReAct和CoT的组合，允许在推理过程中同时利用内部知识和外部获取的信息。在ALFWorld和WebShop上，一到两个样本的ReAct提示就能够优于使用10³到10⁵个任务实例训练的模仿或强化学习方法，成功率分别提高了34%和10%。</p>
+<p><strong>主要贡献：</strong></p>
+<ol>
+<li>引入ReAct——一种新的基于提示的范式，在语言模型中协同推理和行动以解决通用任务；</li>
+<li>在各种基准测试上进行了广泛实验，展示了在少样本学习设置下ReAct相对于单独执行推理或动作生成的先前方法的优势；</li>
+<li>展示了在决策任务中稀疏、多功能推理的重要性；</li>
+<li>分析了ReAct在提示设置下的局限性，并进行了初步的微调实验，展示了ReAct通过额外训练数据改进的潜力。</li>
+</ol>
+<hr />
+<h3>2. ReAct方法 (ReAct: Synergizing Reasoning + Acting)</h3>
+<p>考虑一个智能体与环境交互以解决任务的通用设置。在时间步$t$，智能体从环境接收观察$o_t \in \mathcal{O}$，并根据某个策略$\pi(a_t | c_t)$采取动作$a_t \in \mathcal{A}$，其中$c_t = (o_1, a_1, \cdots, o_{t-1}, a_{t-1}, o_t)$是给智能体的<strong>上下文</strong>。当映射$c_t \mapsto a_t$是高度隐式的且需要大量计算时，学习策略是具有挑战性的。</p>
+<p><strong>ReAct的核心思想</strong>是：将智能体的动作空间扩展为$\mathcal{\hat{A}} = \mathcal{A} \cup \mathcal{L}$，其中$\mathcal{L}$是语言空间。语言空间中的动作$\hat{a}_t \in \mathcal{L}$，我们称之为<strong>思考</strong>或<strong>推理轨迹</strong>，不影响外部环境，因此不会导致观察反馈。相反，思考$\hat{a}_t$旨在通过对当前上下文$c_t$进行推理来整合有用信息，并更新上下文$c_{t_t} = (c_t, \hat{a}_t)$以支持未来的推理或行动。</p>
+<p>由于决策和推理能力集成在大型语言模型中，ReAct具有几个独特的特点：</p>
+<ol>
+<li><strong>直观且易于设计</strong>：设计ReAct提示很简单，因为人类注释者只需在他们采取的动作上用语言写下他们的想法。</li>
+<li><strong>通用且灵活</strong>：由于灵活的想法空间和交替的出现格式，ReAct适用于具有不同动作空间和推理需求的各种任务。</li>
+<li><strong>高性能且鲁棒</strong>：ReAct仅从一两个上下文示例学习就表现出强大的泛化能力，始终优于仅具有推理或行动的基线方法。</li>
+<li><strong>与人类对齐且可控</strong>：ReAct提供了一个可解释的顺序决策和推理过程，人类可以轻松检查推理的事实正确性。</li>
+</ol>
+<hr />
+<h3>3. 知识密集型推理任务 (Knowledge-Intensive Reasoning Tasks)</h3>
+<p>我们从知识密集型推理任务开始，如多跳问答和事实验证。</p>
+<h4>3.1 设置</h4>
+<p><strong>领域</strong>：我们考虑两个具有挑战性的知识检索和推理数据集：</p>
+<ol>
+<li><strong>HotpotQA</strong>：一个多跳问答基准，需要对两个或更多Wikipedia段落进行推理</li>
+<li><strong>FEVER</strong>：一个事实验证基准，每个声明被标注为SUPPORTS、REFUTES或NOT ENOUGH INFO</li>
+</ol>
+<p><strong>动作空间</strong>：我们设计了一个简单的Wikipedia Web API，包含三种类型的动作来支持交互式信息检索：</p>
+<ol>
+<li><strong>search[entity]</strong>：返回相应entity的Wikipedia页面前5句，或建议top-5相似实体</li>
+<li><strong>lookup[string]</strong>：返回页面中包含string的下一句，模拟浏览器Ctrl+F功能</li>
+<li><strong>finish[answer]</strong>：用answer结束当前任务</li>
+</ol>
+<h4>3.2 方法</h4>
+<p><strong>ReAct提示</strong>：对于HotpotQA和FEVER，我们从训练集中随机选择6个和3个案例，并手动编写ReAct格式的轨迹作为少样本示例。每个轨迹包含多个思考-动作-观察步骤。</p>
+<p><strong>基线方法</strong>：</p>
+<ul>
+<li><strong>Standard prompting (Standard)</strong>：移除所有思考、动作、观察</li>
+<li><strong>Chain-of-thought (CoT)</strong>：移除动作和观察，作为纯推理基线</li>
+<li><strong>Act-only</strong>：移除ReAct轨迹中的思考</li>
+<li><strong>CoT-SC</strong>：自一致性方法，通过多数投票选择答案</li>
+</ul>
+<p><strong>结合内部和外部知识</strong>：</p>
+<ul>
+<li><strong>ReAct → CoT-SC</strong>：当ReAct在给定步骤内未能返回答案时，回退到CoT-SC</li>
+<li><strong>CoT-SC → ReAct</strong>：当CoT-SC样本中的多数答案出现少于n/2次时，回退到ReAct</li>
+</ul>
+<h4>3.3 结果与观察</h4>
+<p><strong>ReAct始终优于Act-only</strong>：表1显示了在PaLM-540B上使用不同提示方法的HotpotQA和FEVER结果。ReAct在两个任务上都优于Act-only，展示了推理指导行动的价值。</p>
+<p><strong>ReAct与CoT对比</strong>：ReAct在FEVER上优于CoT（60.9 vs 56.3），但在HotpotQA上略逊于CoT（27.4 vs 29.4）。对于FEVER，SUPPORTS/REFUTES声明可能只有微小差异，因此通过搜索获取准确和最新知识至关重要。</p>
+<p><strong>人类研究的主要发现</strong>：</p>
+<ul>
+<li>A) <strong>幻觉是CoT的严重问题</strong>：CoT的误报率远高于ReAct（14% vs 6%），幻觉占其失败模式的主要部分（56%）</li>
+<li>B) <strong>ReAct的结构约束降低了灵活性</strong>：虽然交替推理、动作和观察步骤提高了ReAct的真实性和可信度，但也导致比CoT更高的推理错误率</li>
+<li>C) <strong>对于ReAct，通过搜索成功检索信息至关重要</strong>：非信息性搜索占错误案例的23%，使模型难以恢复和重新制定思考</li>
+</ul>
+<p><strong>ReAct + CoT-SC在提示LLM中表现最佳</strong>：表1显示，HotpotQA的最佳提示方法是ReAct → CoT-SC，FEVER的最佳提示方法是CoT-SC → ReAct。这两种方法都显著且始终优于CoT-SC。</p>
+<p><strong>微调表现最佳</strong>：图3显示了在HotpotQA上提示/微调四种方法的扩展效果。使用仅3000个示例微调后，ReAct成为四种方法中最好的，PaLM-8B微调的ReAct优于所有PaLM-62B提示方法。</p>
+<hr />
+<h3>4. 决策任务 (Decision Making Tasks)</h3>
+<p>我们还在两个基于语言的交互式决策任务上测试了ReAct：ALFWorld和WebShop。</p>
+<h4>4.1 ALFWorld</h4>
+<p>ALFWorld是一个基于文本的游戏，设计用于与具身ALFRED基准对齐。它包括6种类型的任务，智能体需要通过文本动作导航和交互模拟家庭环境来实现高级目标。一个任务实例可能有多于50个位置，需要专家策略超过50步解决，因此挑战智能体规划和跟踪子目标。</p>
+<p><strong>结果</strong>：表2（ALFWorld）显示，ReAct最佳试验达到71%的平均成功率，显著优于最佳Act（45%）和BUTLER（37%）。实际上，即使较差的ReAct试验（48%）也优于两种方法的最佳试验。ReAct相对于Act的优势在六个受控试验中是一致的，性能提升从33%到90%，平均62%。</p>
+<h4>4.2 WebShop</h4>
+<p>WebShop是一个在线购物网站环境，包含118万真实产品和12k人类指令。与ALFWorld不同，WebShop包含高度多样的结构化和非结构化文本，需要智能体根据用户指令购买产品。</p>
+<p><strong>结果</strong>：表2（WebShop）显示，单样本Act提示已经与IL和IL+RL方法表现相当。通过额外的稀疏推理，ReAct取得了显著更好的性能，在成功率上比之前的最佳方法提高10%。</p>
+<h4>4.3 内部推理vs外部反馈的价值</h4>
+<p>ReAct是第一个在闭环系统中将LLM的推理和动作结合应用于交互环境的演示。最接近先前的工作是Inner Monologue（IM），但IM的&quot;内心独白&quot;仅限于环境状态的观察。与之对比，ReAct在决策中的推理轨迹是灵活和稀疏的，允许为不同任务引入多样化的推理类型。</p>
+<p>实验表明，ReAct显著优于IM风格的提示（71 vs 53总体成功率），在六个任务中的五个具有一致的优势。</p>
+<hr />
+<h3>5. 相关工作 (Related Work)</h3>
+<p><strong>语言模型推理</strong>：最著名的LLM推理工作是Chain-of-Thought（CoT），它揭示了LLM制定自己&quot;思考程序&quot;的能力。后续工作包括least-to-most提示、zero-shot-CoT和自一致性推理。</p>
+<p><strong>语言模型决策</strong>：LLMs在决策方面的能力使其能够执行语言生成之外的任务。WebGPT使用LM与Web浏览器交互。SayCan和Inner Monologue将LLMs用于机器人动作规划和决策。</p>
+<hr />
+<h3>6. 结论 (Conclusion)</h3>
+<p>我们提出了ReAct——一种简单但有效的方法，用于在大型语言模型中协同推理和行动。通过在多跳问答、事实检查和交互式决策任务上的多样化实验，我们表明ReAct导致了具有可解释决策轨迹的卓越性能。尽管我们的方法简单，但具有大动作空间的复杂任务需要更多演示才能学好，这很容易超过上下文学习的输入长度限制。我们在HotpotQA上探索了微调方法，初始结果很有前景，但从更多高质量人工标注中学习将是进一步提高性能的需求。将ReAct扩展到多任务训练并将其与强化学习等互补范式结合，可能会产生更强的智能体，进一步释放LLMs在更多应用中的潜力。</p>
+<hr />
+<h2>四、论文简评</h2>
+<h3>创新点</h3>
+<ol>
+<li><strong>提出ReAct范式</strong>：创新性地将推理（thoughts）和动作（actions）结合在同一框架中，通过交替生成的方式实现两者的协同</li>
+<li><strong>扩展动作空间</strong>：将语言空间纳入智能体的动作空间，使模型能够进行内部推理而不影响外部环境</li>
+<li><strong>通用性强</strong>：该方法适用于多种任务类型，包括知识密集型推理（QA、事实验证）和交互式决策（ALFWorld、WebShop）</li>
+<li><strong>可解释性强</strong>：推理轨迹使决策过程更加透明和可解释，人类可以轻松区分模型内部知识和外部来源的信息</li>
+</ol>
+<h3>局限性</h3>
+<ol>
+<li><strong>输入长度限制</strong>：复杂任务需要更多演示示例，但容易超过上下文学习的输入长度限制</li>
+<li><strong>幻觉问题仍存在</strong>：虽然在一定程度上减少了幻觉，但推理错误率仍有一定比例</li>
+<li><strong>搜索质量依赖</strong>：ReAct的表现高度依赖于外部知识检索的质量，非信息性搜索会导致推理失败</li>
+</ol>
+<h3>应用场景</h3>
+<ol>
+<li><strong>知识问答系统</strong>：结合外部知识库提供更准确的答案</li>
+<li><strong>智能助手</strong>：在需要多步推理和交互的任务中提供决策支持</li>
+<li><strong>具身智能体</strong>：在模拟或真实环境中进行任务规划和执行</li>
+<li><strong>网页导航与自动化</strong>：在WebShop等网页交互任务中表现优异</li>
+</ol>
+<h3>可改进方向</h3>
+<ol>
+<li><strong>多任务训练</strong>：扩大ReAct训练规模，进行多任务学习</li>
+<li><strong>强化学习结合</strong>：将ReAct与强化学习结合，进一步提升性能</li>
+<li><strong>更好的检索机制</strong>：改进外部知识检索的质量，减少非信息性搜索</li>
+<li><strong>更长上下文支持</strong>：解决输入长度限制问题，支持更复杂的任务</li>
+<li><strong>混合方法优化</strong>：更智能地结合内部知识和外部获取的信息</li>
+</ol>
+<hr />
+<h2>参考图片</h2>
+<p><img src="images/iclr2023/figure/teaser-new.png" alt="图1：四种提示方法的比较。(1a) Standard (1b) Chain-of-thought (1c) Act-only (1d) ReAct。展示了在HotpotQA和ALFWorld任务上的任务解决轨迹。" /></p>
+<p><em>图1：四种提示方法的比较。(1a) Standard (1b) Chain-of-thought (1c) Act-only (1d) ReAct。展示了在HotpotQA和ALFWorld任务上的任务解决轨迹。</em></p>
+<p>:::</p>
+<p><img src="images/iclr2023/figure/hotpot_finetune.png" alt="图3：HotpotQA上四种方法的提示/微调扩展效果" /></p>
+<p><em>图3：HotpotQA上四种方法的提示/微调扩展效果</em></p>
+<p>:::</p>
+<p><img src="images/iclr2023/figure/cots_scale.png" alt="图4：PaLM-540B提示结果与使用的CoT-SC样本数量的关系（HotpotQA）" /></p>
+<p><em>图4：PaLM-540B提示结果与使用的CoT-SC样本数量的关系（HotpotQA）</em></p>
+<p>:::</p>
+<p><img src="images/iclr2023/figure/fever_cots_scale.png" alt="图5：PaLM-540B提示结果与使用的CoT-SC样本数量的关系（FEVER）" /></p>
+<p><em>图5：PaLM-540B提示结果与使用的CoT-SC样本数量的关系（FEVER）</em></p>
+<p>:::</p>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    });
+    </script>
+    
+</body>
+</html>
