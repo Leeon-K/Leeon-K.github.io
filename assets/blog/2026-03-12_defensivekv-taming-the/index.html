@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论文摘要</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fc; color: #1a1a2e; line-height: 1.85; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px 40px 60px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 30px; }
+        .back-link:hover { color: #5a6fd6; }
+        .paper-content { background: white; border-radius: 20px; padding: 50px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+        .paper-content h1 { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5em; line-height: 1.3; }
+        .paper-content h2 { font-size: 1.5em; font-weight: 600; color: #1a1a2e; margin: 1.5em 0 0.8em; padding-bottom: 0.3em; border-bottom: 2px solid #f0f0f5; }
+        .paper-content h3 { font-size: 1.25em; font-weight: 600; color: #2d2d44; margin: 1.3em 0 0.6em; }
+        .paper-content h4 { font-size: 1.1em; font-weight: 600; color: #3d3d5c; margin: 1.2em 0 0.5em; }
+        .paper-content p { margin: 1em 0; color: #4a4a6a; }
+        .paper-content strong { color: #1a1a2e; font-weight: 600; }
+        .paper-content a { color: #667eea; text-decoration: none; }
+        .paper-content ul, .paper-content ol { margin: 1em 0; padding-left: 1.5em; color: #4a4a6a; }
+        .paper-content li { margin: 0.5em 0; }
+        .paper-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #f5f5fa; padding: 0.2em 0.5em; border-radius: 4px; color: #e83e8c; }
+        .paper-content pre { background: #2d2d44; border-radius: 12px; padding: 20px; overflow-x: auto; margin: 1.5em 0; }
+        .paper-content pre code { background: transparent; padding: 0; color: #f8f8f2; }
+        .paper-content blockquote { border-left: 4px solid #667eea; padding: 1em 1.5em; margin: 1.5em 0; background: #f8f9fc; border-radius: 0 12px 12px 0; color: #5a5a7a; }
+        
+        /* Compact centered table style */
+        .paper-content table { 
+            width: auto; 
+            max-width: 90%;
+            margin: 1em auto; 
+            border-collapse: collapse; 
+            font-size: 0.85em; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .paper-content th { 
+            background: #f5f5fa; 
+            padding: 8px 10px; 
+            text-align: left; 
+            font-weight: 600; 
+            border-bottom: 2px solid #e0e0e8; 
+            font-size: 0.9em;
+        }
+        .paper-content td { 
+            padding: 6px 10px; 
+            border-bottom: 1px solid #f0f0f5; 
+        }
+        .paper-content tr:last-child td { 
+            border-bottom: none; 
+        }
+        .paper-content tr:hover { background: #fafafa; }
+        
+        .paper-content hr { border: none; height: 2px; background: #e0e0e8; margin: 2em 0; }
+        
+        /* Image: 70% width = 15% margin on each side, centered */
+        .paper-content img { max-width: 70%; height: auto; border-radius: 12px; margin: 1.5em auto 0.5em; display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        
+        /* Figure and Table caption styling - force the whole caption block to center */
+        .paper-content p:has(> em):has(img),
+        .paper-content p:has(> em):has(table) {
+            text-align: center;
+        }
+
+        .paper-content p:has(img) + p,
+        .paper-content p:has(table) + p {
+            text-align: center;
+            margin: 0.5em auto 1.5em;
+            max-width: 80%;
+        }
+
+        /* Figure and Table caption styling - small, centered, non-italic text */
+        .paper-content img + em,
+        .paper-content table + em,
+        .paper-content table + p,
+        .paper-content figure figcaption,
+        .paper-content .caption {
+            display: block;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            margin: 0.5em auto 1.5em;
+            max-width: 80%;
+            line-height: 1.5;
+            font-style: normal;  /* 去掉斜体 */
+        }
+        
+        /* Handle p > em or p > strong that follows img or table */
+        .paper-content p:has(img) + p em,
+        .paper-content img + p em,
+        .paper-content table + p em,
+        .paper-content table + p strong {
+            display: inline-block;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            font-style: normal;
+            font-weight: normal;
+        }
+        
+        .katex { font-size: 1.1em; }
+        .katex-display { 
+            margin: 1.5em 0; 
+            overflow-x: visible;  /* 允许公式溢出，不显示滚动条 */
+            overflow-y: visible;
+        }
+        .katex-display > .katex {
+            white-space: normal;  /* 允许公式换行 */
+            max-width: 100%;
+        }
+        
+        /* ==================== Responsive Design ==================== */
+        /* Mobile phones */
+        @media screen and (max-width: 480px) {
+            body { font-size: 14px; line-height: 1.7; }
+            .container { padding: 15px 12px 30px; }
+            .paper-content { padding: 20px 15px; border-radius: 12px; }
+            .paper-content h1 { font-size: 1.4em; }
+            .paper-content h2 { font-size: 1.2em; }
+            .paper-content h3 { font-size: 1.05em; }
+            .paper-content h4 { font-size: 0.95em; }
+            
+            /* Tables - allow horizontal scroll */
+            .paper-content table {
+                font-size: 0.7em;
+                max-width: 100%;
+                width: 100%;
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .paper-content th, .paper-content td { padding: 5px 6px; }
+            
+            /* Images - full width on mobile */
+            .paper-content img {
+                max-width: 100%;
+                width: 100%;
+                margin: 1em auto;
+            }
+            .paper-content p:has(img) + p,
+            .paper-content p:has(table) + p,
+            .paper-content img + em,
+            .paper-content table + em,
+            .paper-content table + p,
+            .paper-content .caption {
+                max-width: 100%;
+                font-size: 0.75em;
+            }
+            
+            /* Code blocks */
+            .paper-content pre { padding: 12px; font-size: 0.8em; }
+            .paper-content code { font-size: 0.8em; }
+            
+            /* Blockquotes */
+            .paper-content blockquote { padding: 0.8em 1em; }
+        }
+        
+        /* Tablets */
+        @media screen and (min-width: 481px) and (max-width: 768px) {
+            body { font-size: 15px; }
+            .container { padding: 20px 20px 40px; }
+            .paper-content { padding: 30px 25px; }
+            .paper-content h1 { font-size: 1.6em; }
+            .paper-content h2 { font-size: 1.3em; }
+            
+            .paper-content table { font-size: 0.8em; }
+            .paper-content img { max-width: 85%; }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回论文列表</a>
+        <div class="paper-content">
+<h1>论文摘要</h1>
+<p>大型语言模型（LLM）已经革新了自然语言处理领域，但其部署仍然受到transformer键值（KV）缓存带来的巨大内存和运行时开销的阻碍。为了缓解这一问题，最近的方法采用评分-聚合框架来淘汰不重要的缓存条目，基于&quot;稳定性假设&quot;——即一组固定的条目在生成过程中始终保持重要。然而，现有工作主要专注于改进评分的重要性指标，而由于对稳定性假设的盲目信任，默认使用均值聚合。在本文中，我们认为这一底层假设本质上是脆弱的，使得均值聚合在极端情况下极其脆弱。为了应对这一问题，我们提出了一种简单而优雅的防御性聚合策略：一种两步、线性时间的方法，用于控制最坏情况风险，从而以可忽略的计算开销抵御极端情况。基于这一策略，我们提出了一种新的缓存淘汰方法DefensiveKV及其扩展Layer-DefensiveKV，后者结合了逐层预算分配。在七个任务领域（18个数据集）上，我们的方法在20%缓存大小下相比最强基线分别将生成质量损失降低了2.3倍和4.3倍。这些结果设定了新的性能基准，并开创了一个有前景的研究方向——通过最坏情况风险管理优化缓存淘汰以应对底层脆弱性。</p>
+<hr />
+<h1>一、基本信息</h1>
+<table>
+<thead>
+<tr>
+  <th>项目</th>
+  <th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>论文 ID</strong></td>
+  <td>2510.13334</td>
+</tr>
+<tr>
+  <td><strong>标题</strong></td>
+  <td>Taming the Fragility of KV Cache Eviction in LLM Inference</td>
+</tr>
+<tr>
+  <td><strong>作者</strong></td>
+  <td>Yuan Feng, Haoyu Guo, Junlin Lv, S. Kevin Zhou, Xike Xie</td>
+</tr>
+<tr>
+  <td><strong>单位</strong></td>
+  <td>中国科学技术大学（USTC）计算机科学学院、生物医学工程学院；数据暗室实验室（Data Darkness Lab），MIRACLE中心，苏州先进研究院</td>
+</tr>
+<tr>
+  <td><strong>会议/期刊</strong></td>
+  <td>ICLR 2026 / arXiv</td>
+</tr>
+<tr>
+  <td><strong>原文保存位置</strong></td>
+  <td>~/.openclaw/workspace/papers/20260312_DefensiveKV/source/</td>
+</tr>
+<tr>
+  <td><strong>报告生成日期</strong></td>
+  <td>2026-03-12</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1>二、论文主体分析</h1>
+<h2>1. Introduction（引言）</h2>
+<h3>1.1 背景与问题</h3>
+<p>Transformer-based Large Language Models (LLMs)已经催生了广泛的应用。由于自回归特性，LLM维护一个键值（KV）缓存来存储先前token的中间表示，以支持未来生成的高效计算。然而，随着输入序列长度增加，KV缓存线性增长，导致巨大的开销。例如，一个70B参数的模型，batch size为8，序列长度为128k，仅缓存就需要330GB内存。这对LLM部署的存储成本和I/O瓶颈构成了重大挑战。</p>
+<p>早期解决方案如StreamingLLM通过仅保留最近的缓存条目来减少缓存大小，但这牺牲了长程上下文。最近的选择性缓存淘汰解决方案在一个关键假设下运作：<strong>一组固定的缓存条目保持持续重要并贡献于未来生成</strong>。因此，通过保留选定的子集，可以用更小的内存占用近似完整KV缓存。</p>
+<h3>1.2 现有方法的两步框架</h3>
+<p>基于此，现有方法通常遵循两步<strong>评分-聚合</strong>框架：</p>
+<ol>
+<li><strong>评分步骤（Scoring）</strong>：使用不同的历史token查询来观察每个过去KV缓存条目的多个重要性分数。</li>
+<li><strong>聚合步骤（Aggregation）</strong>：将这些多个观察到的分数聚合——通常通过平均——来估计其预期重要性并指导淘汰策略。</li>
+</ol>
+<p>现有研究主要关注改进评分步骤，探索各种重要性指标：</p>
+<ul>
+<li>早期研究依赖于简单的注意力权重</li>
+<li>SnapKV通过引入池化机制进行了改进</li>
+<li>CriticalKV使用投影值状态的范数来提供更有原则的重要性衡量</li>
+</ul>
+<p>然而，聚合步骤基本未被探索。大多数现有方法默认使用简单的平均策略。</p>
+<h3>1.3 稳定性假设的脆弱性</h3>
+<p><strong>关键问题</strong>：如果稳定性假设不可靠，平均是否仍然是最好的聚合策略？</p>
+<p>在本文中，我们表明即使假设通常成立，它仍然本质上是脆弱的，因为重要性分数在生成过程中会突然变化。如图1所示，基于单个历史token的观察重要性分数进行缓存压缩通常会产生有前景的结果，大多数步骤保持超过0.8的相关性。然而，在某些间隔（如steps 150-230），稳定性假设破裂——因此基于单个token的结果失败，导致急剧下降，有些异常值低至0.5。在这种情况下，当前标准实践——简单平均这些单个token预测的均值聚合——不可避免地导致类似的异常表现。</p>
+<p>这反映了一个经典陷阱，一个与金融基础课程直接类比的缺陷：仅优化平均情况（预期收益）的策略基本上是有缺陷的，因为它们忽略了罕见但极端负面案例的风险（最坏情况风险）。</p>
+<h3>1.4 防御性聚合策略</h3>
+<p>受此洞察启发，我们放弃了平均情况优化，转而采用KV缓存淘汰的最坏情况风险管理框架，我们称之为<strong>防御性聚合</strong>。我们的策略通过一个优雅的两步过程实现：最坏情况估计和自适应先验风险修正。值得注意的是，这种方法只需要两个线性时间操作，与标准均值聚合的计算效率相匹配。</p>
+<p><strong>DefensiveKV</strong>和<strong>Layer-DefensiveKV</strong>在七个任务领域显著优于之前的方法，在LongBench和Needle-in-a-Haystack基准的18个数据集上进行了评估。在20%的缓存预算下，DefensiveKV和Layer-DefensiveKV仅产生4.8%和2.6%的生成质量损失，相比最强基线CriticalKV（11.1%）分别实现了2.3倍和4.3倍的降低。</p>
+<p><img src="images/figures/intro_contrast_plots/fixbudgetFalse_frac0.5_poolingTrue_gov_report_contrast_plots/sample_19/layer_14_plot.png" alt="图1：防御性聚合展示了对脆弱稳定性假设的鲁棒性（Llama-3.1-8B，50%缓存大小，第14层，摘要任务）" /></p>
+<p><em>图1：防御性聚合展示了对脆弱稳定性假设的鲁棒性（Llama-3.1-8B，50%缓存大小，第14层，摘要任务）</em></p>
+<p>:::</p>
+<p><img src="images/figures/intro_figure/Meta-Llama-3.1-8B-Instruct_20cachescore.png" alt="图2：DefensiveKV和Layer-DefensiveKV在各种领域和模型上实现了显著更低的生成质量损失" /></p>
+<p><em>图2：DefensiveKV和Layer-DefensiveKV在各种领域和模型上实现了显著更低的生成质量损失</em></p>
+<p>:::
+（a）Llama-3.1-8B，20%缓存</p>
+<p><img src="images/figures/intro_figure/Mistral-7B-Instruct-v0.3_20cachescore.png" alt="（b）Mistral-7B，20%缓存" /></p>
+<p><em>（b）Mistral-7B，20%缓存</em></p>
+<p>:::</p>
+<p><img src="images/figures/intro_figure/Qwen2.5-32B-Instruct_20cachescore.png" alt="（c）Qwen-32B，20%缓存" /></p>
+<p><em>（c）Qwen-32B，20%缓存</em></p>
+<p>:::</p>
+<hr />
+<h2>2. Related Work（相关工作）</h2>
+<p>（本文中相关工作部分较短，主要与前文方法描述合并）</p>
+<hr />
+<h2>3. Methods（方法）</h2>
+<h3>3.1 Preliminary（预备知识）</h3>
+<p>LLM生成包括两个阶段：<strong>预填充（prefilling）</strong>和<strong>解码（decoding）</strong>。在预填充期间，所有输入token的KV状态被计算并缓存为：
+$$K = H W_K, \quad V = H W_V$$
+其中 $H \in \mathbb{R}^{n \times d}$ 表示 $n$ 个token的隐藏状态，$W_K, W_V \in \mathbb{R}^{d \times d_h}$ 是学习到的矩阵。</p>
+<p>在解码期间，LLM取最新的token，计算其查询向量 $q_j = H_{j=-1,:} W_Q$，并使用注意力从缓存的KV条目中检索信息以产生输出 $o_j$ 并预测下一个token：
+$$o_j = A_j V W_O \quad \text{其中} \quad A_j = \mathrm{softmax}(q_j K^\top / \sqrt{d_h})$$</p>
+<p>为了减少维护完整KV缓存的内存开销，开发了缓存淘汰方法。这些方法在很大程度上基于稳定性假设操作：<strong>一组固定的KV缓存条目</strong>，记为 $(\hat{K}, \hat{V})$，<strong>在生成过程中保持一致的重要性</strong>。</p>
+<p>基于此假设，缓存淘汰的目标是使用历史查询（即早期生成过程中的token）识别这个关键子集 $(\hat{K}, \hat{V})$，并用它替换后续步骤中的完整KV缓存 $(K, V)$。</p>
+<p>这个过程通常遵循两步<strong>评分-聚合</strong>框架，其中每个KV条目的重要性首先被估计（或评分），然后被聚合：</p>
+<ol>
+<li><p><strong>评分（Scoring）</strong>：给定 $m$ 个历史token，表示为查询 $Q = [q_1, \ldots, q_m]$，每个 $n$ 个KV缓存条目 $K, V \in \mathbb{R}^{n \times d_h}$ 被评分。这产生了一个重要性矩阵 $I \in \mathbb{R}^{m \times n}$，其中每个元素 $I_{j,i}$ 测量第 $i$ 个KV缓存条目 $(k_i, v_i)$ 对第 $j$ 个历史查询 $q_j$ 的相关性。在实践中，注意力权重 $A_{j,i}$ 作为重要性的直接度量 $I_{j,i}$，因为注意力机制本质上是加权和形式。</p>
+</li>
+<li><p><strong>聚合（Aggregation）</strong>：后续聚合步骤将观察到的重要性矩阵 $I \in \mathbb{R}^{m \times n}$ 转换为向量 $S \in \mathbb{R}^n$，其中每个 $S_i$ 表示第 $i$ 个KV缓存条目的重要性。现有工作采用均值聚合，$S_i = \frac{1}{m}\sum_{j=1}^{m} I_{j,i}$，以突出具有持续高重要性的条目，与稳定性假设一致。</p>
+</li>
+</ol>
+<p>虽然后续研究改进了评分步骤——SnapKV使用池化机制，CriticalKV使用投影值状态 $v_i W_O$ 的范数进行更有原则的评分——但聚合步骤受到的关注很少。这主要是因为均值聚合似乎与底层重要性稳定性假设紧密一致。然而，在本文中，我们展示了该假设的脆弱性，并揭示了在此前提下均值聚合的脆弱性。</p>
+<p><img src="images/figures/method_figure/method_section_fixed_budgetFalse_frac0.5_poolingTrue_gov_report_plots/sample_19/token_15.png" alt="图3：单个历史token（第16个）：脆弱；重要性下降到0.34（最坏情况）" /></p>
+<p><em>图3：单个历史token（第16个）：脆弱；重要性下降到0.34（最坏情况）</em></p>
+<p>:::</p>
+<p><img src="images/figures/method_figure/method_section_fixed_budgetFalse_frac0.5_poolingTrue_gov_report_plots/mean_sample_19/all_layer.png" alt="图4：均值聚合：脆弱；重要性下降到0.33（最坏情况）" /></p>
+<p><em>图4：均值聚合：脆弱；重要性下降到0.33（最坏情况）</em></p>
+<p>:::</p>
+<p><img src="images/figures/method_figure/method_section_fixed_budgetFalse_frac0.5_poolingTrue_gov_report_plots/max_sample_19/all_layer.png" alt="图5：防御性聚合：鲁棒；保持0.61重要性（最坏情况）" /></p>
+<p><em>图5：防御性聚合：鲁棒；保持0.61重要性（最坏情况）</em></p>
+<p>:::</p>
+<h3>3.2 稳定性假设的脆弱性和均值聚合的脆弱性</h3>
+<p>我们使用Llama3.1-8B在政府报告摘要任务上进行了检验。采用SOTA重要性指标，$I_{j,i} = A_{j,i} \times \text{norm}(v_i W_O)$，我们用32个最近的历史token $q_j$ 观察每个缓存条目的重要性。然后我们模拟使用两种不同标准进行50%缓存淘汰。第一种标准使用单个历史token观察的重要性分数，第二种使用跨所有32个历史token的平均分数（均值聚合）。对于每个结果，我们跟踪它在后续生成中相对于完整缓存保留的总重要性的比例。</p>
+<p><strong>稳定性假设的脆弱性</strong>：图3呈现了第16个历史token的结果（其他token的结果见附录）。结果揭示了普遍但脆弱的稳定性。平均而言，50%保留的缓存子集在生成过程中占据了完整缓存总重要性的0.92。然而，这种高平均值掩盖了底层脆弱性：保留的重要性可以急剧下降，正如在步骤150到320之间的区间所看到的。在这些不稳定时刻，最坏情况保留的重要性低至0.34。此外，异常值——即保留的50%缓存捕获不到总重要性的一半（值&lt;0.5）——很频繁，在此试验中出现了89次。</p>
+<p><strong>均值聚合的脆弱性</strong>：当前的淘汰方法通常采用均值聚合跨多个重要性观察。理由是获得预期重要性来指导淘汰。然而，通过未能考虑最坏情况，这种策略在脆弱假设下变得脆弱，导致与使用单个不可靠token类似的异常表现。如图4所示，在图3中观察到的相同问题步骤持续存在，最坏情况重要性值达到0.33，导致65个异常值。这个结果是可以预测的。基于单个历史token的观察分数本质上对稳定性假设的脆弱性视而不见；因此它无法防范最坏情况风险。虽然简单平均是这些个体观察之间的一种&quot;调和&quot;形式，产生中庸结果，但它不包含任何控制这种底层风险的机制。因此，它不能聚合一个始终优于每个单个token观察的预测。当大多数单个token观察失败时，均值聚合的结果不可避免地与它们一起下滑，因此不能提供有意义的改进，并产生类似的破坏性异常值。</p>
+<p>这强调了一个关键点：与其仅仅专注于设计更准确的重要性指标，开发明确为最坏情况风险控制设计的新聚合方法同样——如果不是更重要的话——可以提供即使大多数单个token观察失败时也能保持可靠的估计。</p>
+<table>
+<thead>
+<tr>
+  <th>任务类型</th>
+  <th>单文档QA</th>
+  <th>多文档QA</th>
+  <th>摘要</th>
+  <th>Few-shot</th>
+  <th>合成</th>
+  <th>代码</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>数据集</td>
+  <td>NrtvQA</td>
+  <td>HotpotQA</td>
+  <td>GovReport</td>
+  <td>TREC</td>
+  <td>PCount</td>
+  <td>Lcc</td>
+</tr>
+<tr>
+  <td>均值聚合</td>
+  <td>0.44</td>
+  <td>0.39</td>
+  <td>0.28</td>
+  <td>0.47</td>
+  <td>0.47</td>
+  <td>0.30</td>
+</tr>
+<tr>
+  <td>防御性聚合</td>
+  <td><strong>0.62</strong></td>
+  <td><strong>0.60</strong></td>
+  <td><strong>0.52</strong></td>
+  <td><strong>0.61</strong></td>
+  <td><strong>0.61</strong></td>
+  <td><strong>0.50</strong></td>
+</tr>
+</tbody>
+</table>
+<p>表1：防御性聚合在所有任务类型上持续改善最坏情况值</p>
+<h3>3.3 通过最坏情况风险控制实现防御性聚合</h3>
+<p>考虑一个缓存条目可能由于脆弱的稳定性仅在少数单个token观察中表现出高重要性，而在大多数其他时候保持低重要性。均值聚合不会认为这很重要，会错误地淘汰它。当这个条目在未来生成中再次变得关键时，之前的淘汰会导致巨大的重要性损失。因此，依赖均值聚合无法防范这些极端情况。</p>
+<p>为了解决这个问题，我们引入了一种新颖的<strong>防御性聚合</strong>，一种放弃简单平均而支持最坏情况风险控制视角的新策略，如算法1所示。</p>
+<p><strong>最坏情况风险估计</strong>：从风险控制角度来看，淘汰KV缓存条目的惩罚相当于它在未来时刻将拥有的重要性分数。因此，&quot;最坏情况风险&quot; $R_i^*$ 是条目在整个未来生成过程中可以达到的峰值重要性分数。如果我们表示未来生成的序列为 $L$，则 $R_i^* = \max_{t \in L} I_{t,i}$。由于这个未来的最大值在淘汰时是不可知的，我们改用跨所有 $j$ 历史token观察到的最大重要性分数来近似它，例如 $\tilde{R_i} = \max_{1 \leq j \leq m} I_{j,i} \:,\: \forall i = 1, \ldots, n$。这个 $O(n)$ 过程与均值聚合的运行时间相匹配，但产生了明显更好的实证性能，因为它更好地捕捉了如果条目被删除的潜在最坏情况风险。</p>
+<p><strong>自适应先验风险修正</strong>：虽然上述估计器采用了跨观察历史的最大值，但它仍可能低估最坏情况风险，因为淘汰方法通常限制观察窗口（例如，32个token）以限制开销。灵感来自贝叶斯估计中的拉普拉斯平滑，我们引入了一种自适应先验风险修正。对于每个头，定义一个头级先验风险 $\bar{R} = \frac{1}{n}\sum_{i=1}^n \tilde{R}_{i}$，即该头跨条目的平均观察最坏情况风险。如果观察到的风险 $R_i$ 低于先验风险 $\bar{R}$，我们将 shortfall 视为观察不足并进行替换：$R_i = \max(\tilde{R}_{i}, \bar{R})$。因此，具有更高整体风险的头接收更大的先验，减少对有限历史观察的依赖。修正的有效性及其自适应设计在第4.3节中得到验证。</p>
+<p>通过防范脆弱稳定性假设的风险，我们的防御性聚合显著改善了最坏情况性能，相比均值聚合。如图5所示，它将最坏情况保留重要性从0.33提升到0.63，并完全消除了均值聚合产生的65个异常值。表1进一步确认这一优势在六个不同任务类型的数据集上是一致的。因此，这个简单的两操作方法提供了针对重要性稳定性假设脆弱性的关键防御。</p>
+<pre><code>算法1：防御性聚合
+输入：重要性分数 I ∈ ℝ^(m×n)，其中 I_{j,i} 是基于历史token j的条目i的重要性
+输出：聚合风险分数 R ∈ ℝ^n
+1: for i = 1 to n do
+2:    \tilde{R}_i = max_{1≤j≤m} I_{j,i}  // 最坏情况风险估计
+3: end for
+4: for i = 1 to n do
+5:    R_i = max(\tilde{R}_i, \bar{R}) 其中 \bar{R} = (1/n)∑_{i=1}^n \tilde{R}_i  // 自适应先验风险修正
+6: end for
+7: return R
+</code></pre>
+<h3>3.4 使用防御性聚合实现DefensiveKV淘汰方法</h3>
+<p>基于我们提出的防御性聚合策略，我们引入了两种新颖的缓存淘汰方法：<strong>DefensiveKV</strong>和<strong>Layer-DefensiveKV</strong>。</p>
+<p><strong>DefensiveKV</strong>作为基础变体。它通过用防御性聚合替换传统均值聚合直接集成到传统缓存淘汰工作流中。尽管其简单性，这一修改本身就导致了实质性的性能改进。</p>
+<p><strong>Layer-DefensiveKV</strong>进一步改进了这一点，结合了逐层预算分配，灵感来自现有策略。它执行跨层的风险条目的联合选择，使得更多预算可以分配给具有更多风险缓存条目的层。</p>
+<pre><code>算法2：(Layer)-DefensiveKV
+输入：缓存条目 K, V，参数 W_O，m个最近历史token的查询 Q = [q_1,...,q_m]
+输出：保留的KV缓存 \hat{K}, \hat{V}
+1: 将最近历史token的KV缓存 K[-m:,:],V[-m:,:] 追加到 \hat{K},\hat{V}
+2: A ← softmax(QK^T/√d)
+3: A ∈ ℝ^(m×n) ← Pooling(A, dim=-1)  // 使用SnapKV的池化进行细化
+4: R ∈ ℝ^n ← Defensive Aggregation 算法1 (A)  // 我们的修改
+5: for each v_i ∈ V, i = 1 to n do
+6:    R_i ← R_i × norm(v_i W_O)  // 使用CriticalKV的范数进行细化
+7: end for
+8: if 没有逐层预算分配 then  // 导致DefensiveKV
+9:    选择具有最高风险分数R的缓存条目独立地在每层中，并追加到 \hat{K},\hat{V}
+10: else  // 导致Layer-DefensiveKV
+11:   for each v_i ∈ V, i = 1 to n do
+12:      R_i ← R_i / ∑_i norm(v_i W_O)
+13:   end for
+14:   选择具有最高风险分数R的缓存条目跨所有层联合，并追加到 \hat{K},\hat{V}
+15: end if
+16: return \hat{K}, \hat{V}
+</code></pre>
+<p>DefensiveKV中的关键创新是用我们的防御性聚合策略性地替换传统均值聚合（第6行）。这个简单的修改，只需要最少的更改，将生成质量损失降低超过2倍。Layer-DefensiveKV的扩展也很简单。它包含了两个额外的细化：首先，投影值范数在层间被归一化以解决它们在层间的方差；其次，风险条目是跨所有层联合选择的。这导致了更令人印象深刻的增益，质量损失减少超过4倍。</p>
+<hr />
+<h2>4. Experiments（实验）</h2>
+<h3>4.1 实验设置</h3>
+<p><strong>模型</strong>：我们在三个开源LLM上评估我们的方法：Llama-3.1-8B-Instruct（支持高达128K的上下文长度）、Qwen2.5-32B-Instruct和Mistral-7B-Instruct-v0.3（支持高达32K）。</p>
+<p><strong>基线</strong>：我们将方法与六个基线进行比较。StreamingLLM是一种早期的滑动窗口方法。SnapKV、AdaKV和CAKE使用注意力权重耦合的池化作为重要性指标；CAKE还采用级联架构进行逐层预算分配。SOTA的CriticalKV引入了更准确的重要性指标。DuoAttention是一种基于训练的方法。所有方法使用32的历史窗口大小，并使用FlashAttention-2加速。</p>
+<p><strong>设置</strong>：遵循之前设置，上下文在问题引入之前被独立压缩。这更好地模拟了实际场景（例如，多轮QA或前缀上下文），其中多个问题通常涉及相同的上下文，或者问题在上下文压缩期间不可用。因此，这个设置更具挑战性，更能反映缓存淘汰方法的真实世界性能。</p>
+<p><img src="images/figures/exp_figure/legend_.png" alt="图6：图例" /></p>
+<p><em>图6：图例</em></p>
+<p>:::</p>
+<p><img src="images/figures/exp_figure/Meta-Llama-3.1-8B-Instruct_lines.png" alt="图7：LongBench上16个数据集的平均生成质量概览（Meta-Llama-3.1-8B-Instruct）" /></p>
+<p><em>图7：LongBench上16个数据集的平均生成质量概览（Meta-Llama-3.1-8B-Instruct）</em></p>
+<p>:::</p>
+<p><img src="images/figures/exp_figure/Mistral-7B-Instruct-v0.3_lines.png" alt="图8：LongBench上16个数据集的平均生成质量概览（Mistral-7B-Instruct-v0.3）" /></p>
+<p><em>图8：LongBench上16个数据集的平均生成质量概览（Mistral-7B-Instruct-v0.3）</em></p>
+<p>:::</p>
+<p><img src="images/figures/exp_figure/Qwen2.5-32B-Instruct_lines.png" alt="图9：LongBench上16个数据集的平均生成质量概览（Qwen2.5-32B-Instruct）" /></p>
+<p><em>图9：LongBench上16个数据集的平均生成质量概览（Qwen2.5-32B-Instruct）</em></p>
+<p>:::</p>
+<h3>4.2 LongBench评估</h3>
+<p>LongBench作为综合基准测试，具有16个数据集，分为六个任务领域：单文档问答、多文档问答、摘要、few-shot学习、合成任务和代码补全。</p>
+<p><strong>总体分析</strong>：图7-9说明了我们方法在16个数据集上的平均质量损失的显著优势。随着缓存大小从100%下降到40%，所有基线明显退化，而我们的DefensiveKV和Layer-DefensiveKV保持几乎无损失。例如，在Llama-3.1-8B上使用40%缓存时，CriticalKV（最佳基线）损失3.1%质量，而我们的DefensiveKV显示没有退化，甚至超过基于训练的DuoAttention（2.2%下降，尽管有离线训练成本）。在更小的20%缓存下，CriticalKV的损失为10.6%，而DefensiveKV将其限制在5.1%（超过2倍减少）。我们的Layer-DefensiveKV进一步将损失降至2.3%（超过4倍减少）。类似的优势适用于其他模型。例如，在Mistral-7B上使用20%缓存，DefensiveKV和Layer-DefensiveKV分别达到4.0%和1.3%的损失，远低于CriticalKV的9.7%。</p>
+<p><img src="images/figures/exp_figure/exp_Meta-Llama-3.1-8B-Instruct_20cachescore.png" alt="图10：Llama-3.1-8B-Instruct在LongBench上六个任务领域的分析（20%缓存大小）" /></p>
+<p><em>图10：Llama-3.1-8B-Instruct在LongBench上六个任务领域的分析（20%缓存大小）</em></p>
+<p>:::</p>
+<p><img src="images/figures/exp_figure/exp_Meta-Llama-3.1-8B-Instruct_40cachescore.png" alt="图11：Llama-3.1-8B-Instruct在LongBench上六个任务领域的分析（40%缓存大小）" /></p>
+<p><em>图11：Llama-3.1-8B-Instruct在LongBench上六个任务领域的分析（40%缓存大小）</em></p>
+<p>:::</p>
+<p><img src="images/figures/exp_figure/exp_Meta-Llama-3.1-8B-Instruct_60cachescore.png" alt="图12：Llama-3.1-8B-Instruct在LongBench上六个任务领域的分析（60%缓存大小）" /></p>
+<p><em>图12：Llama-3.1-8B-Instruct在LongBench上六个任务领域的分析（60%缓存大小）</em></p>
+<p>:::</p>
+<p><strong>任务分析</strong>：图10-12显示了Llama-3.1-8B按任务领域的平均分数。DefensiveKV和Layer-DefensiveKV持续表现优异。虽然更简单的任务领域（代码、合成）显示大多数方法都有高绩效，但具有挑战性的领域（文档问答、摘要）显示基线在减少缓存下显著退化。例如，在单文档问答（20%缓存）中，CriticalKV（最强基线）下降到完整缓存质量的74.8%；DefensiveKV达到89.6%，Layer-DefensiveKV达到96.7%。</p>
+<h3>4.3 Needle-in-a-Haystack评估</h3>
+<p>在Needle-in-a-Haystack测试中，关键句子被放置在长上下文中以评估检索能力。我们测试了两个代表性案例，上下文长度为32K：（1）单检索：一个needle被随机插入用于检索。（2）多检索：四个needle被随机插入，都需要被检索。</p>
+<p>如图13所示，我们的DefensiveKV和Layer-DefensiveKV在所有设置中实现了显著更高的分数。例如，在支持128K上下文长度的长上下文模型（如Llama-3.1-8B和Qwen2.5-32B）上，我们的方法保持几乎无损失，在仅10%缓存大小下分别获得194和193的分数。相比之下，即使是最强基线CriticalKV在同一条件下也下降到140，而其他方法都低于100——显示出显著差距。在较弱的长上下文能力模型上，即Mistral-7B（最大上下文长度32K），所有基线都遭受严重性能退化。在10%缓存大小下，大多数基线得分低于6，CriticalKV仅达到28。然而，我们的DefensiveKV和Layer-DefensiveKV分别达到139和161，分别超过5倍和5.8倍的改进。</p>
+<p><img src="images/figures/exp_figure/Meta-Llama-3.1-8B-Instruct_needle.png" alt="图13：Needle-in-a-Haystack任务的评估（Llama-3.1-8B）" /></p>
+<p><em>图13：Needle-in-a-Haystack任务的评估（Llama-3.1-8B）</em></p>
+<p>:::</p>
+<p><img src="images/figures/exp_figure/Mistral-7B-Instruct-v0.3_needle.png" alt="图14：Needle-in-a-Haystack任务的评估（Mistral-7B）" /></p>
+<p><em>图14：Needle-in-a-Haystack任务的评估（Mistral-7B）</em></p>
+<p>:::</p>
+<p><img src="images/figures/exp_figure/Qwen2.5-32B-Instruct_needle.png" alt="图15：Needle-in-a-Haystack任务的评估（Qwen2.5-32B）" /></p>
+<p><em>图15：Needle-in-a-Haystack任务的评估（Qwen2.5-32B）</em></p>
+<p>:::</p>
+<h3>4.4 消融研究</h3>
+<p>为了分析我们防御性聚合中两个关键操作的作用——最坏情况风险估计和自适应先验风险修正——我们基于DefensiveKV方法进行消融研究。首先，我们仅移除自适应先验风险修正（记为Abl2）。然后，我们进一步消融最坏情况风险估计，用常见均值聚合替换（记为Abl1）。</p>
+<p>如图16所示，仅使用最坏情况风险估计（Abl2）已经明显优于使用均值聚合。例如，在Llama-3.1-8B上，Abl2将分数从103（Abl1）提高到179。加上我们的自适应先验风险修正，我们完整的DefensiveKV方法达到194的分数。这些结果确认两个操作都对整体性能有重要贡献。</p>
+<p>为了验证我们先验风险修正的自适应设计，我们将其与固定修正阈值（1E-3、1E-4、1E-5）进行消融比较。如图17所示，固定阈值无效。大多数未能超过无修正基线分数179（Abl2），1E-4情况仅提供边际增益至182。然而，我们的自适应修正达到194的分数，确认根据每个头的风险状况定制修正是至关重要的。此外，我们自适应设计的无超参数性质确保在两个额外模型上表现一致强劲。</p>
+<p><img src="images/figures/exp_figure/needle.png" alt="图16：消融研究（10%缓存）" /></p>
+<p><em>图16：消融研究（10%缓存）</em></p>
+<p>:::</p>
+<p><img src="images/figures/exp_figure/smooth.png" alt="图17：自适应修正" /></p>
+<p><em>图17：自适应修正</em></p>
+<p>:::</p>
+<h3>4.5 效率测试</h3>
+<p>我们比较DefensiveKV和CriticalKV，它们仅在聚合机制上不同，以证明防御性聚合引入了可忽略的计算开销。</p>
+<p>我们的实验在80GB A100 GPU上使用Llama-3.1-8B（20%缓存）进行，表明DefensiveKV和CriticalKV具有几乎相同的首个token时间（TTFT）和解码延迟。所有KV缓存淘汰发生在预填充阶段并包含在TTFT中，确认DefensiveKV添加了可忽略的开销。此外，缓存淘汰显著降低了相对于完整缓存的解码延迟：例如，对于batch size 1和128K上下文长度，延迟从0.081s（完整缓存）下降到约0.028s与基于淘汰的方法（2.9倍加速）。此外，缓存淘汰允许更大的batch size；例如，淘汰方法可以处理batch size为2，而完整缓存导致内存不足错误，导致4.2倍的解码吞吐量提升。</p>
+<p><img src="images/figures/exp_figure/ttft.png" alt="图18：TTFT效率" /></p>
+<p><em>图18：TTFT效率</em></p>
+<p>:::</p>
+<p><img src="images/figures/exp_figure/tpop.png" alt="图19：解码延迟效率" /></p>
+<p><em>图19：解码延迟效率</em></p>
+<p>:::</p>
+<hr />
+<h2>5. Conclusion（结论）</h2>
+<p>这项工作挑战了现有KV缓存淘汰方法背后的脆弱稳定性假设。我们表明广泛使用的均值聚合策略在脆弱稳定性下极其脆弱，导致糟糕的最坏情况性能。为了解决这个问题，我们提出了&quot;防御性聚合&quot;，一种以&quot;最坏情况风险&quot;视角设计的新策略，具有可忽略的计算开销。</p>
+<p>基于此，我们研究了DefensiveKV及其逐层感知变体Layer-DefensiveKV，两者都在综合评估中实现了相对于最先进方法的显著改进。</p>
+<p>我们的工作开创了一个新的研究方向，强调&quot;最坏情况风险&quot;感知的聚合，以减轻缓存淘汰中经常被忽视的脆弱性——这是高效LLM推理的关键但未被充分探索的组成部分。我们希望这些贡献为更有效的缓存淘汰方法铺平道路，这对推进LLM推理至关重要。</p>
+<hr />
+<h1>三、论文简评</h1>
+<h2>创新点</h2>
+<ol>
+<li><p><strong>识别关键问题</strong>：论文首次系统性地揭示了KV缓存淘汰中&quot;稳定性假设&quot;的脆弱性，这是一个之前被忽视的根本性问题。</p>
+</li>
+<li><p><strong>防御性聚合策略</strong>：提出了一个优雅的两步防御性聚合方法（最坏情况风险估计 + 自适应先验风险修正），将金融领域的风险管理思想引入LLM推理优化。</p>
+</li>
+<li><p><strong>显著性能提升</strong>：在20%缓存大小下，DefensiveKV和Layer-DefensiveKV分别将生成质量损失降低2.3倍和4.3倍，相比最强基线CriticalKV。</p>
+</li>
+<li><p><strong>零计算开销</strong>：防御性聚合仅需要两个线性时间操作，与标准均值聚合的计算效率相匹配，几乎不增加额外延迟。</p>
+</li>
+</ol>
+<h2>局限性</h2>
+<ol>
+<li><p><strong>实验规模有限</strong>：主要在3个模型（Llama-3.1-8B、Mistral-7B、Qwen2.5-32B）上评估，未在大规模模型（如70B+）上验证。</p>
+</li>
+<li><p><strong>特定任务优势</strong>：对于简单任务（代码、合成），性能提升相对较小，防御性聚合的优势主要体现在复杂推理任务上。</p>
+</li>
+<li><p><strong>观察窗口限制</strong>：使用32个历史token的观察窗口可能仍然无法捕捉所有极端情况。</p>
+</li>
+</ol>
+<h2>应用场景</h2>
+<ol>
+<li><p><strong>长上下文LLM部署</strong>：适用于需要处理长上下文的应用场景（如文档摘要、长文本问答）。</p>
+</li>
+<li><p><strong>资源受限环境</strong>：在显存有限的设备上，通过缓存淘汰实现更高效的推理。</p>
+</li>
+<li><p><strong>多轮对话系统</strong>：需要保留关键上下文信息的多轮对话场景。</p>
+</li>
+</ol>
+<h2>可改进方向</h2>
+<ol>
+<li><p><strong>动态调整策略</strong>：根据生成内容动态调整最坏情况风险估计的窗口大小。</p>
+</li>
+<li><p><strong>与其他淘汰方法结合</strong>：将防御性聚合思想应用于其他缓存淘汰方法（如H2O、Scissorhands）。</p>
+</li>
+<li><p><strong>长期上下文建模</strong>：探索更长期的历史观察来更准确估计最坏情况风险。</p>
+</li>
+<li><p><strong>硬件协同设计</strong>：针对特定硬件优化防御性聚合的实现。</p>
+</li>
+</ol>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    });
+    </script>
+    
+</body>
+</html>
