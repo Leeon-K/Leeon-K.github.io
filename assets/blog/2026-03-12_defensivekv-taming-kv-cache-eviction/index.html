@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论文报告：DefensiveKV: Taming the Fragility of KV Cache Eviction in LLM Inference</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fc; color: #1a1a2e; line-height: 1.85; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px 40px 60px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 30px; }
+        .back-link:hover { color: #5a6fd6; }
+        .paper-content { background: white; border-radius: 20px; padding: 50px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+        .paper-content h1 { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5em; line-height: 1.3; }
+        .paper-content h2 { font-size: 1.5em; font-weight: 600; color: #1a1a2e; margin: 1.5em 0 0.8em; padding-bottom: 0.3em; border-bottom: 2px solid #f0f0f5; }
+        .paper-content h3 { font-size: 1.25em; font-weight: 600; color: #2d2d44; margin: 1.3em 0 0.6em; }
+        .paper-content h4 { font-size: 1.1em; font-weight: 600; color: #3d3d5c; margin: 1.2em 0 0.5em; }
+        .paper-content p { margin: 1em 0; color: #4a4a6a; }
+        .paper-content strong { color: #1a1a2e; font-weight: 600; }
+        .paper-content a { color: #667eea; text-decoration: none; }
+        .paper-content ul, .paper-content ol { margin: 1em 0; padding-left: 1.5em; color: #4a4a6a; }
+        .paper-content li { margin: 0.5em 0; }
+        .paper-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #f5f5fa; padding: 0.2em 0.5em; border-radius: 4px; color: #e83e8c; }
+        .paper-content pre { background: #2d2d44; border-radius: 12px; padding: 20px; overflow-x: auto; margin: 1.5em 0; }
+        .paper-content pre code { background: transparent; padding: 0; color: #f8f8f2; }
+        .paper-content blockquote { border-left: 4px solid #667eea; padding: 1em 1.5em; margin: 1.5em 0; background: #f8f9fc; border-radius: 0 12px 12px 0; color: #5a5a7a; }
+        .paper-content table { width: 100%; border-collapse: collapse; margin: 1.5em 0; overflow-x: auto; display: block; }
+        
+        /* First table (metadata) - compact list style */
+        .paper-content > table:first-of-type { display: table; border: none; margin: 0.5em 0; }
+        .paper-content > table:first-of-type tr { border-bottom: 1px solid #eee; }
+        .paper-content > table:first-of-type td:first-child { 
+            background: transparent; 
+            font-weight: 600; 
+            width: 100px;
+            white-space: nowrap;
+            padding: 4px 12px 4px 0;
+        }
+        .paper-content > table:first-of-type td:last-child {
+            padding: 4px 0 4px 0;
+        }
+        
+        .paper-content th { background: #f5f5fa; padding: 12px 15px; text-align: left; font-weight: 600; border-bottom: 2px solid #e0e0e8; }
+        .paper-content td { padding: 12px 15px; border-bottom: 1px solid #f0f0f5; }
+        .paper-content hr { border: none; height: 2px; background: #e0e0e8; margin: 2em 0; }
+        .paper-content img { max-width: 100%; height: auto; border-radius: 12px; margin: 1.5em 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .pdf-container { margin: 1.5em 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: #f5f5f5; }
+        .pdf-caption { text-align: center; color: #666; font-size: 14px; padding: 10px; margin: 0; background: #f0f0f0; }
+        .katex { font-size: 1.1em; }
+        .katex-display { margin: 1.5em 0; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回论文列表</a>
+        <div class="paper-content">
+<h1>论文报告：DefensiveKV: Taming the Fragility of KV Cache Eviction in LLM Inference</h1>
+<h2>论文基本信息</h2>
+<table>
+<thead>
+<tr>
+  <th>项目</th>
+  <th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>论文ID</strong></td>
+  <td>2510.13334</td>
+</tr>
+<tr>
+  <td><strong>标题</strong></td>
+  <td>DefensiveKV: Taming the Fragility of KV Cache Eviction in LLM Inference</td>
+</tr>
+<tr>
+  <td><strong>作者</strong></td>
+  <td>Yuan Feng*, Haoyu Guo*, Junlin Lv, S. Kevin Zhou, Xike Xie*</td>
+</tr>
+<tr>
+  <td><strong>单位</strong></td>
+  <td>中国科学技术大学 (USTC)</td>
+</tr>
+<tr>
+  <td><strong>发表</strong></td>
+  <td>arXiv 2025.10</td>
+</tr>
+<tr>
+  <td><strong>代码</strong></td>
+  <td><a href="https://github.com/FFY0/DefensiveKV" target="_blank">GitHub</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>一句话总结</h2>
+<p><strong>DefensiveKV</strong> 针对 LLM 推理中 KV 缓存驱逐方法的"稳定性假设"脆弱性问题，提出了防御性聚合策略，在 20% 缓存大小下将生成质量损失降低 <strong>4.3 倍</strong>。</p>
+<hr />
+<h2>论文摘要</h2>
+<p>大型语言模型（LLM）已经彻底改变了自然语言处理，但其部署仍然受到 Transformer 的 Key-Value 缓存带来的巨大内存和运行时开销的阻碍。为了缓解这一问题，最近的方法采用评分-聚合框架来驱逐不重要的缓存条目，基于"稳定性假设"——即一个固定的条目子集在生成过程中始终保持重要性。然而，之前的工作主要专注于改进评分的重要性指标，而默认使用均值聚合。在本文中，我们认为这个基础假设本质上是脆弱的，使得均值聚合在极端情况下极易失效。为了解决这个问题，我们提出了一种简单而优雅的防御性聚合策略：一种两步、线性时间的方法，控制最坏情况风险，从而以可忽略的计算开销防御极端情况。基于这一策略，我们提出了一种新的缓存驱逐方法 <strong>DefensiveKV</strong> 及其扩展 <strong>Layer-DefensiveKV</strong>，后者结合了层间预算分配。在七个任务领域（18 个数据集）上，我们的方法在 20% 缓存大小下与最强基线相比，将生成质量损失分别降低了 <strong>2.3 倍</strong>和 <strong>4.3 倍</strong>。这些结果设定了新的性能基准，并通过最坏情况风险管理开创了针对缓存驱逐底层脆弱性进行优化的有前景的研究方向。</p>
+<hr />
+<h2>研究背景与问题</h2>
+<h3>KV 缓存的痛点</h3>
+<p>LLM 是<strong>自回归模型</strong>，需要维护一个 Key-Value (KV) 缓存来存储之前 token 的中间表示。但随着序列长度增长，KV 缓存线性增长：</p>
+<ul>
+<li><strong>70B 模型</strong> + batch=8 + seq_len=128k = <strong>330GB 显存</strong>仅用于缓存！</li>
+</ul>
+<p>这给 LLM 部署带来了巨大的存储和 I/O 开销。</p>
+<h3>现有解决方案：评分-聚合框架</h3>
+<p>现有方法（如 SnapKV、CriticalKV 等）采用两步走策略：</p>
+<ol>
+<li><strong>评分（Scoring）</strong>：用历史 token 查询来观察每个 KV 缓存条目的重要性</li>
+<li><strong>聚合（Aggregation）</strong>：将多个重要性分数聚合（通常用<strong>均值聚合</strong>）来估计缓存条目的重要性</li>
+</ol>
+<p>这些方法基于一个<strong>核心假设</strong>："稳定性假设"——一部分缓存条目在生成过程中始终保持重要性。</p>
+<hr />
+<h2>核心问题：稳定性假设是"脆弱的"！</h2>
+<h3>关键发现</h3>
+<p>作者通过实验发现：</p>
+<ul>
+<li>稳定性假设虽然<strong>总体上成立</strong>，但<strong>内在脆弱</strong></li>
+<li>在某些生成步骤（如 150-230 步），重要性分数会<strong>急剧变化</strong></li>
+<li>基于单 token 观察的驱逐策略，最差情况下保留的重要性可降至 <strong>0.5</strong>（正常 > 0.8）</li>
+</ul>
+<h3>均值聚合的脆弱性</h3>
+<p>当前方法使用<strong>均值聚合</strong>（mean aggregation），这在稳定性假设失效时会<strong>放大失败</strong>：</p>
+<ul>
+<li>均值聚合无法防御极端情况</li>
+<li>当大多数单 token 观察都失败时，均值也会被拖下水</li>
+<li>实验显示：均值聚合最差情况下保留重要性仅 <strong>0.33</strong></li>
+</ul>
+<blockquote>
+<p>关键洞察：与其只专注于设计更精确的重要性指标，同样——甚至更重要的是——开发专门为最坏情况风险控制设计的新聚合方法，即使大多数单 token 观察失败时也能提供可靠的估计。</blockquote>
+<hr />
+<h2>核心创新：防御性聚合（Defensive Aggregation）</h2>
+<h3>设计思路</h3>
+<p>从<strong>最坏情况风险控制</strong>角度出发，不追求平均性能最优，而是确保<strong>即使在最差情况下也能保持良好性能</strong>。</p>
+<h3>两步实现（线性时间复杂度）</h3>
+<pre><code>Algorithm: Defensive Aggregation
+
+输入: 重要性分数 I ∈ ℝ^(m×n)（m个历史token，n个缓存条目）
+
+1. 最坏情况风险估计：
+   R̃_i = max_{1≤j≤m} I_{j,i}    （取所有历史token中的最大值）
+   
+2. 自适应先验风险修正：
+   R̄ = (1/n) × Σ R̃_i    （计算该层的平均风险）
+   R_i = max(R̃_i, R̄)    （如果低于平均风险，用平均风险替代）
+   
+输出: 聚合后的风险分数 R ∈ ℝ^n
+</code></pre>
+<h3>关键洞察</h3>
+<ul>
+<li><strong>最坏情况估计</strong>：取最大值而非均值，确保不遗漏任何"曾经在某时刻很重要"的缓存条目</li>
+<li><strong>自适应先验修正</strong>：受拉普拉斯平滑启发，用层级别的平均风险作为先验，避免观察窗口太小导致的低估</li>
+</ul>
+<hr />
+<h2>方法：DefensiveKV 与 Layer-DefensiveKV</h2>
+<h3>DefensiveKV</h3>
+<p>直接在传统缓存驱逐流程中<strong>用防御性聚合替换均值聚合</strong>：</p>
+<pre><code># 传统方法（均值聚合）
+S_i = (1/m) × Σ I_{j,i}
+
+# DefensiveKV（防御性聚合）
+S_i = max(max_j I_{j,i}, (1/n) × Σ max_j I_{j,i})</code></pre>
+<h3>Layer-DefensiveKV</h3>
+<p>进一步加入<strong>层间预算分配</strong>策略：</p>
+<ol>
+<li>对 projected value norm 做层级别归一化</li>
+<li>跨所有层联合选择高风险条目</li>
+</ol>
+<hr />
+<h2>实验结果</h2>
+<h3>LongBench 基准测试（18 数据集，7 个任务领域）</h3>
+<table>
+<thead>
+<tr>
+  <th>模型</th>
+  <th>缓存大小</th>
+  <th>CriticalKV</th>
+  <th>DefensiveKV</th>
+  <th>Layer-DefensiveKV</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Llama-3.1-8B</td>
+  <td>20%</td>
+  <td>10.6% 损失</td>
+  <td>5.1% 损失</td>
+  <td><strong>2.3% 损失</strong></td>
+</tr>
+<tr>
+  <td>Mistral-7B</td>
+  <td>20%</td>
+  <td>9.7% 损失</td>
+  <td>4.0% 损失</td>
+  <td><strong>1.3% 损失</strong></td>
+</tr>
+<tr>
+  <td>Qwen2.5-32B</td>
+  <td>20%</td>
+  <td>11.1% 损失</td>
+  <td>4.8% 损失</td>
+  <td><strong>2.6% 损失</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键数据</strong>：20% 缓存下，Layer-DefensiveKV 质量损失仅为 <strong>2.6%</strong>，比最强基线 CriticalKV <strong>降低 4.3 倍</strong>！</p>
+<h3>"大海捞针"测试</h3>
+<p>在 32K 上下文、10% 缓存下：</p>
+<ul>
+<li>CriticalKV 得分：140</li>
+<li>DefensiveKV 得分：<strong>194</strong> （接近无损！）</li>
+<li>基线方法：&lt; 100</li>
+</ul>
+<h3>消融实验</h3>
+<ul>
+<li>仅最坏情况估计：179 分</li>
+<li>+ 自适应先验修正：<strong>194 分</strong></li>
+</ul>
+<p>证明两个组件都不可或缺。</p>
+<h3>效率</h3>
+<ul>
+<li>TTFT（首个 token 时间）和解码延迟与 CriticalKV <strong>几乎相同</strong></li>
+<li>128K 上下文 + batch=1：解码延迟从 0.081s 降至 <strong>0.028s</strong>（2.9x 加速）</li>
+<li>显存节省允许 batch size 从 1 提升到 2，吞吐量提升 <strong>4.2x</strong></li>
+</ul>
+<hr />
+<h2>贡献总结</h2>
+<ol>
+<li><strong>揭示了稳定性假设的脆弱性</strong>：首次系统性地分析并验证了"均值聚合在极端情况下的脆弱性"</li>
+<li><strong>提出了防御性聚合</strong>：一种简单但高效的 worst-case risk control 方法，线性时间复杂度</li>
+<li><strong>构建了 DefensiveKV 和 Layer-DefensiveKV</strong>：在 7 个任务领域、18 个数据集上取得显著提升</li>
+<li><strong>开辟了新方向</strong>：从"优化重要性指标"转向"最坏情况风险感知聚合"</li>
+</ol>
+<hr />
+<h2>个人点评</h2>
+<p>这篇论文的创新点非常有趣：</p>
+<ol>
+<li><strong>问题视角独特</strong>：不同于大多数工作专注于改进评分方法，本文聚焦于"聚合"这个被忽视的环节</li>
+<li><strong>工程可行性高</strong>：防御性聚合的计算开销与均值聚合相同（O(n)），但效果显著</li>
+<li><strong>思想可迁移</strong>：worst-case risk control 的思想可以应用到其他 LLM 优化场景</li>
+</ol>
+<p>唯一的小遗憾是：论文没有在更极端的缓存大小（如 5%）下测试，也没有与训练驱动的预算分配方法（如 DuoAttention）做更全面的对比。但总体来说是一篇高质量的论文，值得一读！</p>
+
+        </div>
+    </div>
+</body>
+</html>
