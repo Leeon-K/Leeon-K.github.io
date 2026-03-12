@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Step 3.5 Flash: Open Frontier-Level Intelligence with 11B Ac</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fc; color: #1a1a2e; line-height: 1.85; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px 40px 60px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 30px; }
+        .back-link:hover { color: #5a6fd6; }
+        .paper-content { background: white; border-radius: 20px; padding: 50px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+        .paper-content h1 { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5em; line-height: 1.3; }
+        .paper-content h2 { font-size: 1.5em; font-weight: 600; color: #1a1a2e; margin: 1.5em 0 0.8em; padding-bottom: 0.3em; border-bottom: 2px solid #f0f0f5; }
+        .paper-content h3 { font-size: 1.25em; font-weight: 600; color: #2d2d44; margin: 1.3em 0 0.6em; }
+        .paper-content h4 { font-size: 1.1em; font-weight: 600; color: #3d3d5c; margin: 1.2em 0 0.5em; }
+        .paper-content p { margin: 1em 0; color: #4a4a6a; }
+        .paper-content strong { color: #1a1a2e; font-weight: 600; }
+        .paper-content a { color: #667eea; text-decoration: none; }
+        .paper-content ul, .paper-content ol { margin: 1em 0; padding-left: 1.5em; color: #4a4a6a; }
+        .paper-content li { margin: 0.5em 0; }
+        .paper-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #f5f5fa; padding: 0.2em 0.5em; border-radius: 4px; color: #e83e8c; }
+        .paper-content pre { background: #2d2d44; border-radius: 12px; padding: 20px; overflow-x: auto; margin: 1.5em 0; }
+        .paper-content pre code { background: transparent; padding: 0; color: #f8f8f2; }
+        .paper-content blockquote { border-left: 4px solid #667eea; padding: 1em 1.5em; margin: 1.5em 0; background: #f8f9fc; border-radius: 0 12px 12px 0; color: #5a5a7a; }
+        
+        /* Compact centered table style */
+        .paper-content table { 
+            width: auto; 
+            max-width: 90%;
+            margin: 1em auto; 
+            border-collapse: collapse; 
+            font-size: 0.85em; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .paper-content th { 
+            background: #f5f5fa; 
+            padding: 8px 10px; 
+            text-align: left; 
+            font-weight: 600; 
+            border-bottom: 2px solid #e0e0e8; 
+            font-size: 0.9em;
+        }
+        .paper-content td { 
+            padding: 6px 10px; 
+            border-bottom: 1px solid #f0f0f5; 
+        }
+        .paper-content tr:last-child td { 
+            border-bottom: none; 
+        }
+        .paper-content tr:hover { background: #fafafa; }
+        
+        .paper-content hr { border: none; height: 2px; background: #e0e0e8; margin: 2em 0; }
+        
+        /* Image: 70% width = 15% margin on each side, centered */
+        .paper-content img { max-width: 70%; height: auto; border-radius: 12px; margin: 1.5em auto 0.5em; display: block; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        
+        /* Figure and Table caption styling - force the whole caption block to center */
+        .paper-content p:has(> em):has(img),
+        .paper-content p:has(> em):has(table) {
+            text-align: center;
+        }
+
+        .paper-content p:has(img) + p,
+        .paper-content p:has(table) + p {
+            text-align: center;
+            margin: 0.5em auto 1.5em;
+            max-width: 80%;
+        }
+
+        /* Figure and Table caption styling - small, centered, non-italic text */
+        .paper-content img + em,
+        .paper-content table + em,
+        .paper-content table + p,
+        .paper-content figure figcaption,
+        .paper-content .caption {
+            display: block;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            margin: 0.5em auto 1.5em;
+            max-width: 80%;
+            line-height: 1.5;
+            font-style: normal;  /* 去掉斜体 */
+        }
+        
+        /* Handle p > em or p > strong that follows img or table */
+        .paper-content p:has(img) + p em,
+        .paper-content img + p em,
+        .paper-content table + p em,
+        .paper-content table + p strong {
+            display: inline-block;
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            font-style: normal;
+            font-weight: normal;
+        }
+        
+        .katex { font-size: 1.1em; }
+        .katex-display { 
+            margin: 1.5em 0; 
+            overflow-x: visible;  /* 允许公式溢出，不显示滚动条 */
+            overflow-y: visible;
+        }
+        .katex-display > .katex {
+            white-space: normal;  /* 允许公式换行 */
+            max-width: 100%;
+        }
+        
+        /* ==================== Responsive Design ==================== */
+        /* Mobile phones */
+        @media screen and (max-width: 480px) {
+            body { font-size: 14px; line-height: 1.7; }
+            .container { padding: 15px 12px 30px; }
+            .paper-content { padding: 20px 15px; border-radius: 12px; }
+            .paper-content h1 { font-size: 1.4em; }
+            .paper-content h2 { font-size: 1.2em; }
+            .paper-content h3 { font-size: 1.05em; }
+            .paper-content h4 { font-size: 0.95em; }
+            
+            /* Tables - allow horizontal scroll */
+            .paper-content table {
+                font-size: 0.7em;
+                max-width: 100%;
+                width: 100%;
+                display: block;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .paper-content th, .paper-content td { padding: 5px 6px; }
+            
+            /* Images - full width on mobile */
+            .paper-content img {
+                max-width: 100%;
+                width: 100%;
+                margin: 1em auto;
+            }
+            .paper-content p:has(img) + p,
+            .paper-content p:has(table) + p,
+            .paper-content img + em,
+            .paper-content table + em,
+            .paper-content table + p,
+            .paper-content .caption {
+                max-width: 100%;
+                font-size: 0.75em;
+            }
+            
+            /* Code blocks */
+            .paper-content pre { padding: 12px; font-size: 0.8em; }
+            .paper-content code { font-size: 0.8em; }
+            
+            /* Blockquotes */
+            .paper-content blockquote { padding: 0.8em 1em; }
+        }
+        
+        /* Tablets */
+        @media screen and (min-width: 481px) and (max-width: 768px) {
+            body { font-size: 15px; }
+            .container { padding: 20px 20px 40px; }
+            .paper-content { padding: 30px 25px; }
+            .paper-content h1 { font-size: 1.6em; }
+            .paper-content h2 { font-size: 1.3em; }
+            
+            .paper-content table { font-size: 0.8em; }
+            .paper-content img { max-width: 85%; }
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回论文列表</a>
+        <div class="paper-content">
+<h1>Step 3.5 Flash: Open Frontier-Level Intelligence with 11B Active Parameters</h1>
+<h2>论文摘要</h2>
+<p><strong>摘要（中文翻译）</strong></p>
+<p>我们推出了 <strong>Step 3.5 Flash</strong>，这是一个稀疏的专家混合（Mixture-of-Experts，MoE）模型，旨在弥合前沿级智能体能力与计算效率之间的鸿沟。我们在构建智能体时最关注两点：锐利的推理能力，以及快速可靠的执行能力。基于这些优先级，Step 3.5 Flash 采用 <strong>196B 参数的基础模型</strong>进行高保真建模，同时仅需 <strong>11B 活跃参数</strong>进行高效推理，并通过交错的 <strong>3:1 滑动窗口/全注意力机制</strong>和<strong>多令牌预测（MTP-3）</strong>来最小化多轮智能体交互的延迟和成本。</p>
+<p>为了实现前沿级智能，我们设计了一个可扩展的强化学习框架，该框架整合了可验证信号和偏好反馈，同时在大规模离线训练中保持稳定，以推动数学、代码和工具使用领域的持续自我改进。</p>
+<p>Step 3.5 Flash 在智能体、编码和数学任务上展现出强大的智能水平，在 IMO-AnswerBench 上达到 85.4%，在 LiveCodeBench-v6（2024.08–2025.05）上达到 86.4%，在 τ²-Bench 上达到 88.2%，在 BrowseComp（带上下文管理）上达到 69.0%，在 Terminal-Bench 2.0 上达到 51.0%——这些性能与 GPT-5.2 xHigh 和 Gemini 3.0 Pro 等前沿模型相当。</p>
+<p>通过重新定义效率前沿，Step 3.5 Flash 为在真实工业环境中部署复杂智能体提供了高密度基础。</p>
+<hr />
+<h2>一、基本信息</h2>
+<table>
+<thead>
+<tr>
+  <th>项目</th>
+  <th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>论文 ID</strong></td>
+  <td>2602.10604</td>
+</tr>
+<tr>
+  <td><strong>标题</strong></td>
+  <td>Step 3.5 Flash: Open Frontier-Level Intelligence with 11B Active Parameters</td>
+</tr>
+<tr>
+  <td><strong>作者</strong></td>
+  <td>StepFun Team</td>
+</tr>
+<tr>
+  <td><strong>单位</strong></td>
+  <td>StepFun Team</td>
+</tr>
+<tr>
+  <td><strong>会议/期刊</strong></td>
+  <td>arXiv preprint</td>
+</tr>
+<tr>
+  <td><strong>原文保存位置</strong></td>
+  <td>~/.openclaw/workspace/papers/20260312_Step35Flash/source/</td>
+</tr>
+<tr>
+  <td><strong>报告生成日期</strong></td>
+  <td>2026-03-12</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>二、论文主体分析</h2>
+<h3>1. 引言 (Introduction)</h3>
+<h4>1.1 研究背景与挑战</h4>
+<p>开源大型语言模型（LLMs）在与闭源前沿系统在可验证任务上的性能差距正在迅速缩小，然而随着智能体系统的兴起，新的挑战也随之出现。具体而言，开源模型在复杂推理方面仍然落后于闭源前沿系统。此外，关键的效率瓶颈阻碍了它们在长上下文智能体任务中的应用，更不用说在边缘或资源受限环境中的部署了。</p>
+<h4>1.2 Step 3.5 Flash 的设计理念</h4>
+<p>在设计 Step 3.5 Flash 的架构时，我们专注于两个核心方面：<strong>效率</strong>和<strong>能力</strong>。我们采用了稀疏 MoE 架构，总参数 196B，每个 token 仅激活 11B，结合 3:1 的滑动窗口注意力（SWA）与全注意力比例，以及多令牌预测（MTP-3）来降低长上下文延迟。为了在混合注意力下以最小开销提高能力，我们在 SWA 层中将查询头数量从 64 增加到 96，并使用头-wise 门控注意力。这种设计支持大规模在线部署，在 Hopper GPU 上第一周维持约 170 tokens/s 的速度。</p>
+<p>在预训练方面，我们将稳定性作为一等要求，通过轻量级异步指标服务器和微批级连续日志构建全面的可观测性和诊断堆栈。这种基础设施能够系统地识别和缓解大规模 MoE 故障模式。我们实现了稳定的训练，使用 17.2T 高质量多样化令牌，仅出现一次瞬态损失峰值。</p>
+<h4>1.3 后训练框架</h4>
+<p>为了实现前沿级智能，当前后训练系统面临两个紧密耦合的挑战：一是领域特定专家自我蒸馏的迭代效率低下，二是强化学习在 MoE 模型长 horizon 推理中的可扩展性有限。为了解决这些挑战，我们提出了一个统一的大规模 RL 后训练方案，该框架在领域特定的专业化和全局综合之间交替实现。</p>
+<p>我们引入了 <strong>Metropolis Independence Sampling-Filtered Policy Optimization（MIS-PO）</strong>，用离散分布过滤替代连续重要性加权。通过将优化限制在稳定信任区域内的样本，MIS-PO 大幅降低了梯度方差，同时保留了有效的学习信号，使 RL 能够可靠地扩展到长 horizon 推理和智能体行为。</p>
+<p><img src="images/src/img/pdf/teaser_img.png" alt="图 1：Step 3.5 Flash 概览图" /></p>
+<p><em>图 1：Step 3.5 Flash 概览图</em></p>
+<p>:::</p>
+<hr />
+<h3>2. 架构 (Architecture)</h3>
+<h4>2.1 设计理念</h4>
+<p>Step 3.5 Flash 的架构反映了模型-系统协同设计的范式转变。除了传统的智能和成本目标外，自主智能体时代提升了第三个关键约束：<strong>推理延迟</strong>。在交互式智能体工作流中，最小化延迟直接转化为任务完成时间的减少，或者相反，允许在固定时间预算内通过测试时扩展增加智能。</p>
+<p>智能体工作负载通常表现出独特的特征：大量上下文预填充 followed by 长时间的多轮交互式解码。因此，我们沿着三个耦合轴为 Step 3.5 Flash 设计低壁钟延迟：</p>
+<ol>
+<li><strong>注意力</strong>：加速长上下文处理并与 MTP 良好兼容</li>
+<li><strong>稀疏 MoE</strong>：防止分布式部署中的掉队者，提高吞吐量</li>
+<li><strong>多令牌预测（MTP）</strong>：通过投机解码促进快速生成</li>
+</ol>
+<h5>2.1.1 注意力机制</h5>
+<p>为了加速预填充，我们采用混合注意力机制来减轻长上下文处理的二次复杂度。对于解码，我们优先考虑与投机解码的架构兼容性。</p>
+<p><strong>滑动窗口注意力（SWA）</strong>：我们选择 SWA 而非线性注意力来最大化解码效率。虽然两者都具有线性复杂度，但线性注意力的状态更新机制使高效的草稿树生成和并行树验证变得复杂。相比之下，SWA 保持标准注意力语义，并且通过 KV 掩码天生易于并行验证。此外，我们发现窗口大小 W=512 的 SWA 在内核效率和捕获局部依赖之间取得了有利的平衡。</p>
+<p><strong>硬件对齐的分组查询注意力（GQA-8）</strong>：针对在标准 8-GPU 服务器节点上部署，我们将模型配置为 8 个 KV 头（GQA-8）。这使 KV 缓存分片与 8 路张量并行对齐，并改善了内存访问模式。</p>
+<h5>2.2.2 稀疏 MoE</h5>
+<p>在 Feed-Forward 方面，我们采用细粒度 MoE 来降低平均 FFN 计算同时保持容量。我们使用专家并行（EP）来支持可扩展部署。然而，在 EP 下，端到端延迟可能由路由不平衡引起的掉队者主导：token 分配偏斜将工作负载集中在少数专家及其托管 GPU 上，在同步点导致吞吐量节流。因此，我们引入了 <strong>EP-Group Balanced MoE Routing</strong> 策略。</p>
+<h5>2.2.3 多令牌预测（MTP）</h5>
+<p>为了进一步降低自回归延迟，我们将多令牌预测（MTP）作为投机解码的补充手段。为了保持投机轻量级，我们通过利用 SWA 和密集 FFN 来简化 MTP 头。</p>
+<p>我们将模型大小限制在 200B 参数以下，能够在高端工作站的 128GB 内存预算内进行高性能推理。</p>
+<h4>2.2 带混合注意力的稀疏 MoE 骨干网</h4>
+<p><img src="images/src/img/pdf/step.png" alt="图 2：Step 3.5 Flash 架构说明。该模型使用头-wise 门控注意力，包含一个前置全注意力层 followed by L=11 个混合块，每个块交错 3 个滑动窗口注意力（SWA）层与 1 个全注意力层。我们全程应用以零为中心的 RMSNorm。前三个块使用密集 FFN；后续块使用稀疏 MoE FFN。MTP 模块使用 SWA 和密集 FFN。为控制开销，仅在主训练期间训练 MTP 模块 1；MTP 模块 2–3 从中克隆并在轻量级最终阶段联合微调。" /></p>
+<p><em>图 2：Step 3.5 Flash 架构说明。该模型使用头-wise 门控注意力，包含一个前置全注意力层 followed by L=11 个混合块，每个块交错 3 个滑动窗口注意力（SWA）层与 1 个全注意力层。我们全程应用以零为中心的 RMSNorm。前三个块使用密集 FFN；后续块使用稀疏 MoE FFN。MTP 模块使用 SWA 和密集 FFN。为控制开销，仅在主训练期间训练 MTP 模块 1；MTP 模块 2–3 从中克隆并在轻量级最终阶段联合微调。</em></p>
+<p>:::</p>
+<p>如上图所示，Step 3.5 Flash 采用 45 层稀疏-MoE Transformer 骨干网（3 个密集层和 42 个 MoE 层），配以专门的混合注意力层布局。每个 MoE 层包含 288 个路由专家加一个共享专家，每个 token 激活 top-k=8 个专家。该配置保持了广泛的知识容量（196B 总参数），同时将每 token 激活限制在仅 11B，确保推理延迟足够低以支持高度响应的智能体交互。</p>
+<h5>2.2.1 混合注意力层布局</h5>
+<p>为了平衡长上下文效率与健壮的远程连接，Step 3.5 Flash 采用 3:1 比例（SWA: 全）的交错注意力布局。然而，我们发现 naive 交错策略在各种基准测试中持续表现不如密集注意力基线。为了弥补这一性能差距，我们利用两个补充增强：</p>
+<ol>
+<li><p><strong>增加 SWA 查询头数量</strong>：使用更高的查询头数量（从 64 到 96）有效地缓解了从统一全注意力架构过渡到 S3F1 布局时通常观察到的性能下降。</p>
+</li>
+<li><p><strong>头-wise 门控注意力</strong>：naive SWA 的一个局限性是，当输入窗口中没有有用信息时，无法有效吸收未使用的注意力权重。之前的工作引入了可学习的、数据独立的 sink tokens 来解决这个问题。我们选择了一种不同的方法，集成参数高效的头-wise 门控机制，可以视为集成数据依赖的 sink tokens。</p>
+</li>
+</ol>
+<h5>2.2.2 MoE 专家并行负载均衡</h5>
+<p>我们使用无损失负载均衡来鼓励跨专家的全局 token 平衡。然而，这种方法不能保证在微批级别跨 EP 等级的均衡负载，可能导致掉队者和吞吐量降低。因此，我们引入了显式促进统一等级级利用的 EP 级均衡损失。</p>
+<p>EP 将专家 E 划分为 G 个不相交的组 {E_g}。对于 token t，令 S_t 表示 top-K 专家（掩码 s_{t,e}=1[e∈S_t]），p_{t,} 表示路由概率，则 EP 负载均衡损失 L_EP 为：</p>
+<p>$$p_e = \frac{1}{T}\sum_{t=1}^{T} p_{t,e}$$
+$$f_e = \frac{1}{TK}\sum_{t=1}^{T} s_{t,e}$$
+$$p_g = \sum_{e\in\mathcal{E}_g} p_e$$
+$$f_g = \sum_{e\in\mathcal{E}_g} f_e$$
+$$\mathcal{L}_{\mathrm{EP}} = G\sum_{g=1}^{G} f_g\,p_g$$</p>
+<h5>2.2.3 多令牌预测（MTP）</h5>
+<p>为了加速长上下文智能体工作负载上的投机解码，我们附加了三个轻量级多令牌预测（MTP）头。每个 MTP 头由一个 SWA 和一个密集 FFN 组成，仅增加 0.81B 参数（约 0.41%）。我们通过预测偏移量索引这些头：对于 h∈{1,2,3}，MTP-h 预测 token x_{t+1+h}。为控制训练开销，我们在大多数训练阶段仅激活和优化 MTP-1。</p>
+<h4>2.3 架构消融实验</h4>
+<p>我们进行了大量实验来验证 Step 3.5 Flash 中的关键设计选择，重点关注：</p>
+<ol>
+<li>注意力布局，包括 SWA 和头扩展</li>
+<li>头-wise 门控注意力与 sink tokens</li>
+</ol>
+<h5>2.3.1 SWA 与长上下文</h5>
+<p>我们通过完整管道（1.4T-token 预训练 followed by SFT）训练 30B-A3B 模型，以评估混合注意力对推理和长上下文性能的端到端影响。</p>
+<table>
+<thead>
+<tr>
+  <th>布局</th>
+  <th>SWA 头</th>
+  <th>相对 FLOPs</th>
+  <th>预训练平均</th>
+  <th>推理</th>
+  <th>数学</th>
+  <th>代码</th>
+  <th>科学</th>
+  <th>一般</th>
+  <th>长上下文</th>
+  <th>平均</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>FFFF</td>
+  <td>32</td>
+  <td>~2.68/2.90</td>
+  <td>54.1</td>
+  <td>40.8</td>
+  <td>40.9</td>
+  <td>19.6</td>
+  <td>42.7</td>
+  <td>26.5</td>
+  <td>28.8</td>
+  <td>33.2</td>
+</tr>
+<tr>
+  <td>S1F1</td>
+  <td>32</td>
+  <td>~1.58/1.65</td>
+  <td>54.6</td>
+  <td>42.1</td>
+  <td>42.3</td>
+  <td>19.3</td>
+  <td>44.5</td>
+  <td>26.8</td>
+  <td>29.6</td>
+  <td>34.1</td>
+</tr>
+<tr>
+  <td>S3F1</td>
+  <td>32</td>
+  <td>1.00/1.00</td>
+  <td>53.6</td>
+  <td>40.2</td>
+  <td>40.4</td>
+  <td>18.9</td>
+  <td>42.4</td>
+  <td>25.4</td>
+  <td>27.5</td>
+  <td>32.5</td>
+</tr>
+<tr>
+  <td>S3F1+Head</td>
+  <td>48</td>
+  <td>~1.01/1.02</td>
+  <td>55.7</td>
+  <td>40.6</td>
+  <td>40.3</td>
+  <td>18.3</td>
+  <td>44.0</td>
+  <td>26.0</td>
+  <td>28.2</td>
+  <td>32.9</td>
+</tr>
+</tbody>
+</table>
+<p>表 1：30B-A3B 上下游结果。S3F1+Head 配置在预训练期间已经超越 FFFF（55.7 vs 54.1），并在后训练后保持竞争力。</p>
+<h5>2.3.2 头-wise 门控注意力与 Sink Tokens</h5>
+<table>
+<thead>
+<tr>
+  <th>方法</th>
+  <th>BBH</th>
+  <th>MMLU</th>
+  <th>GPQA</th>
+  <th>MBPP</th>
+  <th>C-EVAL</th>
+  <th>CMMLU</th>
+  <th>平均</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>Sink Token</td>
+  <td>70.6</td>
+  <td>65.1</td>
+  <td>27.2</td>
+  <td>61.2</td>
+  <td>76.2</td>
+  <td>74.6</td>
+  <td>62.5</td>
+</tr>
+<tr>
+  <td>Head-wise Gate</td>
+  <td><strong>73.7</strong></td>
+  <td><strong>67.0</strong></td>
+  <td><strong>28.1</strong></td>
+  <td><strong>62.6</strong></td>
+  <td><strong>77.9</strong></td>
+  <td><strong>77.1</strong></td>
+  <td><strong>64.4</strong></td>
+</tr>
+</tbody>
+</table>
+<p>表 2：在 100B-A10B MoE 上 S3F1 布局的预训练评估。头-wise 门控持续改进质量，平均性能从 62.46 提升到 64.43（+1.97）。</p>
+<hr />
+<h3>3. 基础设施 (Infrastructure)</h3>
+<h4>3.1 计算集群</h4>
+<p>Step 3.5 Flash 在大规模集群上进行训练，使用 4,096 个 NVIDIA H800 GPU。每个节点包含 8 个 GPU，通过 NVLink 和 NVSwitch 实现高带宽节点内通信。对于节点间连接，集群依赖 8×200 Gbps RoCE 链路来维持大规模的高效同步和数据交换。</p>
+<h4>3.2 训练框架</h4>
+<p>Step 3.5 Flash 的训练由内部 Steptron 框架提供支持，这是一个基于 PyTorch 和 Megatron-LM 构建的轻量级高性能系统。Steptron 统一了完整的模型开发管道，支持大规模预训练、后训练和强化学习工作负载。</p>
+<p>Step 3.5 Flash 采用混合并行策略，包括 8 路流水线并行（PP）和虚拟流水线阶段（VPP）、8 路专家并行（EP）和 ZeRO-1 数据并行（DP）。</p>
+<h5>3.2.1 解耦并行</h5>
+<p>遵循 Megatron-Core，我们实现了允许注意力和 MoE 模块使用不同并行策略的解耦并行方案。我们为它们分配独立的并行组，并在每个模块的相应数据并行组内执行梯度归约和缩放。</p>
+<h5>3.2.2 通信优化</h5>
+<p>解耦注意力和 MoE 的并发 DP 通信流可能会使 RoCE 链路饱和，导致 DP 开销大幅增加。为此，我们提出两种互补的通信优化：1）<strong>fabric-aware 通信调度</strong>：将 DP 流量分区为节点内 NVLink 和节点间 RoCE 阶段，并进行流水线处理以充分利用两种 fabric。2）<strong>通信感知 rank 放置</strong>：使用作业级通信 profile 跨交换机放置 ranks，减少跳数并将重流量从交换机间热点引开。</p>
+<h5>3.2.3 Muon ZeRO-1 重新分片</h5>
+<p>Muon 需要完整的每参数梯度进行 Newton-Schulz 正交化，这与 ZeRO-1 跨 DP ranks 分散参数梯度的 reduce-scatter 冲突。我们改为将整个参数分配给 DP ranks，并将梯度缓冲区重新打包为 rank-major 缓冲区，这样单个 reduce-scatter 将每个参数的完整梯度传递给其所有者。</p>
+<h5>3.2.4 GPU 内核优化</h5>
+<p>我们还应用了内核级优化来提高训练效率。在注意力中，我们将 QK 归一化与 RoPE 融合。在 MoE 中，我们将多个小操作符融合以减少内核启动开销和内存流量，并实现融合的 MoE gather/scatter 与分组 GEMM。</p>
+<h5>3.2.5 细粒度选择性检查点</h5>
+<p>我们的训练框架支持细粒度激活重计算，具有每层、子模块级切换，使我们能够仅对最内存密集的组件进行选择性重计算，以最小开销减少峰值内存。</p>
+<h4>3.3 高吞吐量轻量级监控</h4>
+<p>我们收集了一套全面的指标进行细粒度训练监控。然而，遥测规模巨大：4,096-GPU 工作负载每轮迭代产生近 600 万条消息。为了缓解这一问题，我们开发了轻量级指标服务器来将遥测处理与训练路径解耦。</p>
+<hr />
+<h3>4. 预训练和中训练 (Pre-Training and Mid-Training)</h3>
+<h4>4.1 训练稳定性</h4>
+<p>训练稳定性是大规模稀疏 MoE 预训练的<strong>一等</strong>要求。为了使稳定性可操作，我们基于轻量级异步指标服务器和微批级连续日志构建了全面的可观测性和诊断堆栈。</p>
+<p><img src="images/src/img/pdf/stepboard_lm_loss_merged.png" alt="图 3：Step 3.5 Flash 的逐步训练损失，绘制时未进行平滑或子采样。我们观察到整个训练过程中仅有一个孤立的损失峰值。" /></p>
+<p><em>图 3：Step 3.5 Flash 的逐步训练损失，绘制时<strong>未进行平滑或子采样</strong>。我们观察到整个训练过程中仅有<strong>一个</strong>孤立的损失峰值。</em></p>
+<p>:::</p>
+<p>在实践中，我们发现三个主要不稳定性：</p>
+<ol>
+<li><strong>Muon 的数值敏感性</strong>：Muon 的 Newton-Schulz 迭代在降低精度下可能出现数值病理</li>
+<li><strong>专家崩溃</strong>：即使路由调度统计看起来很健康，也可能出现专家侧崩溃</li>
+<li><strong>MoE 层中的局部激活爆炸</strong>：在更深层 MoE 层中，一小部分专家的激活范数快速增长</li>
+</ol>
+<p>通过这些诊断指导的缓解措施，预训练损失在整个运行过程中保持平滑，仅出现一次损失峰值。</p>
+<h5>4.1.1 Muon 的数值敏感性</h5>
+<p>Muon 通过 Newton-Schulz（NS）迭代近似半正交更新方向。我们采用 Polar Express 迭代并进行固定 T=6 步以平衡优化质量和吞吐量。然而，我们偶尔会观察到急剧的、不可恢复的损失峰值。模拟表明 bfloat16 Polar Express 在某些更新统计下可能产生极端中间异常值。因此，我们仅将 Polar Express 迭代（状态和中间值）转换为 float16，同时保持训练的其余部分为混合精度。</p>
+<h5>4.1.2 超越路由崩溃的专家崩溃</h5>
+<p>专家崩溃也可能表现为即使路由调度保持稳定也会出现<strong>专家侧</strong>病理，即专家激活消失和专家参数范数停滞或衰减。</p>
+<p>我们观察到两个特别有影响的因素：1）路由专家聚合需要显式缩放；2）微批平衡在细粒度稀疏下可能过于严格。我们建议监控<strong>专家侧</strong>信号，包括每专家激活范数和参数范数。</p>
+<h5>4.1.3 MoE 层中的局部激活爆炸</h5>
+<p><img src="images/src/img/pdf/moe_clip_triptych.png" alt="图 4：专家激活稳定性和缓解策略分析。在面板（b）–（c）中，实线表示最大专家输出范数，虚线表示中位数。(1) 深度依赖的不稳定性：虽然训练损失在不同方法之间看起来相同（面板 a）且中间层保持稳定（例如，层 38 在面板 b），但最终层（即层 45）在无剪裁基线中遭受灾难性范数爆炸。(2) 缓解：权重剪裁只是延迟了这种爆炸。相反，激活剪裁有效地约束了最大范数，确保所有层的稳定性。" /></p>
+<p><em>图 4：专家激活稳定性和缓解策略分析。在面板（b）–（c）中，实线表示最大专家输出范数，虚线表示中位数。(1) 深度依赖的不稳定性：虽然训练损失在不同方法之间看起来相同（面板 a）且中间层保持稳定（例如，层 38 在面板 b），但最终层（即层 45）在无剪裁基线中遭受灾难性范数爆炸。(2) 缓解：权重剪裁只是延迟了这种爆炸。相反，激活剪裁有效地约束了最大范数，确保所有层的稳定性。</em></p>
+<p>:::</p>
+<p>我们发现激活范数的中位数到最大值比率是监控训练稳定性的稳健且必要的指标。</p>
+<h4>4.2 训练课程</h4>
+<p>训练过程从广泛的开放领域覆盖逐步发展到日益智能体化和长上下文专业化。我们首先在 4k 上下文上进行预训练，然后退火到更高质量的知识和更多软件开发数据，同时将上下文窗口扩展到 32k。随后，专门的中间训练阶段将上下文窗口从 32k 扩展到 128k。</p>
+<h4>4.3 数据混合</h4>
+<p>我们的语料库结合了通用开放领域数据和智能体导向数据。</p>
+<ul>
+<li><strong>通用知识数据</strong>：我们构建了 StepCrawl，用于从网页和书籍/文档类来源抓取数万亿高质量令牌。</li>
+<li><strong>代码数据</strong>：我们的代码语料库使用修改后的 OpenCoder 管道进行策划和精炼。</li>
+<li><strong>PR/Issue/Commit 数据</strong>：我们从拥有 10+ 星的 GitHub 仓库中策划了全面的 PR/Issue/Commit 数据集。</li>
+<li><strong>工具使用和推理数据</strong>：我们添加了跨越数学/代码/科学/通用知识的合成和半合成数据，以及针对搜索智能体、SWE 智能体和工具执行的领域特定样本。</li>
+</ul>
+<h4>4.4 训练配置</h4>
+<ul>
+<li><strong>预训练超参数</strong>：整个预训练使用 Muon 优化器，学习率从 0 线性预热到 2.5×10⁻⁴，然后余弦衰减到 5×10⁻⁵。MTP 损失权重在预训练阶段 1 设置为 0.3，在预训练阶段 2 设置为 0.1。</li>
+<li><strong>中训练超参数</strong>：我们在中训练期间继续使用 Muon。我们冻结 MoE 路由器权重并禁用 EP 组平衡损失。</li>
+</ul>
+<hr />
+<h3>5. 后训练 (Post-Training)</h3>
+<p>在本节中，我们介绍了一个统一的大规模强化学习后训练方案，该方案从统一的监督微调（SFT）模型开始。该框架通过结合可验证奖励信号和人类偏好反馈实现一致的自我改进，同时即使在 MoE 模型的大规模离线训练中也能保持稳定。</p>
+<h4>5.1 专家模型构建和自我蒸馏</h4>
+<p>我们采用两阶段 SFT 管道来为后续 RL 建立稳健的基础。第一阶段执行大规模多领域 SFT，涵盖数学、代码、STEM、逻辑、通用 QA、代码智能体、工具使用、搜索智能体和长上下文理解。第二阶段通过注入分布外信号明确最大化推理密度。</p>
+<p>在领域特定 RL 之后，我们将发散的专家能力综合到一个统一的学生模型中。在此阶段，专家模型使用与第一阶段 SFT 语料库共享的 prompt 分布生成高质量轨迹，提供比直接 RL 集成更稳定和高效的替代方案。</p>
+<h4>5.2 可扩展强化学习（MIS-PO）</h4>
+<p>在 LLM 的 RL 中，我们优化策略 π_θ 以最大化轨迹上的终端奖励。然而，对于推理任务，这个过程面临由高梯度方差引起的严重不稳定性，这由极长的时间范围和模型规模进一步放大。</p>
+<h5>5.2.1 MIS 过滤策略优化（MIS-PO）</h5>
+<p>为了应对这些稳定性挑战，我们提出了 MIS-PO，这是一种受 Metropolis Independence Sampling 启发的方法。我们将推理策略视为提议分布，将训练策略视为目标，将更新限制在足够接近目标分布的样本上。</p>
+<p>与重要性采样不同，MIS-PO 应用二元掩码来过滤分布外的样本，并将保留的轨迹视为有效策略内：</p>
+$$\mathcal{L}_{actor} = - \mathbb{E}_{\tau \sim \pi_{\theta_\text{vllm}}} \left[ \mathbb{I}(x_t) \cdot \mathbb{I}(\bar{\rho}(\tau)) \cdot \log \pi_\theta(a_t|s_t) \cdot \hat{A}_t \right]$$
+<p><img src="images/src/img/pdf/tb_plots_grad_norm_biglegend.png" alt="图 5：MIS-PO 与 PPO 在我们内部模型上的可扩展性比较。(1) 效率：MIS-PO 表现出更高的样本效率，以加速收敛趋势实现更高的奖励平台期。(2) 稳定性：MIS-PO 通过抑制梯度噪声和消除策略梯度范数中的大峰值显著稳定训练动力学。(3) 探索持续性：MIS-PO 表现出更慢的熵衰减， enable 更好的探索-利用平衡。" /></p>
+<p><em>图 5：MIS-PO 与 PPO 在我们内部模型上的可扩展性比较。(1) 效率：MIS-PO 表现出更高的样本效率，以加速收敛趋势实现更高的奖励平台期。(2) 稳定性：MIS-PO 通过抑制梯度噪声和消除策略梯度范数中的大峰值显著稳定训练动力学。(3) 探索持续性：MIS-PO 表现出更慢的熵衰减， enable 更好的探索-利用平衡。</em></p>
+<p>:::</p>
+<h5>5.2.2 截断感知值引导</h5>
+<p>将零奖励分配给被截断的轨迹会将截断与任务失败混为一谈。为了解决这个问题，我们将零奖励替换为最终状态的引导值估计。</p>
+<h5>5.2.3 路由置信度作为稳定性代理</h5>
+<p>我们提出<strong>路由置信度</strong>（Σ_k）作为稳定性的代理，它是激活专家的平均概率质量。初步实验确定了独特的稳定性相变：低路由置信度的模型很脆弱，需要极端稳定化；而高路由置信度的模型保持稳健，实现无需复杂干预的离线训练。</p>
+<h4>5.3 奖励系统</h4>
+<p>我们将 RL 框架解耦为可验证奖励的 RL（RLVR）和非可验证奖励的 RL。</p>
+<h5>5.3.1 可验证奖励</h5>
+<p>对于 RLVR，每个 prompt 与一个特定于任务的验证器配对，该验证器输出奖励。基于规则的检查器用于逻辑、指令遵循和代码，而基于模型的验证器用于 STEM 任务。</p>
+<h5>5.3.2 非可验证奖励</h5>
+<p>我们使用成对生成奖励模型（GenRM）处理非可验证任务。GenRM 是一个推理模型，输出表示响应获胜可能性的置信度分数。</p>
+<h5>5.3.3 智能体奖励</h5>
+<p>搜索任务使用基于 LLM 的实体匹配分数进行评估。对于报告生成，基于规则的 LLM 法官评估研究查询、规则规范和候选报告，产生三元判断。</p>
+<h4>5.4 数据合成与策划</h4>
+<p>我们通过聚合开源数据、合成生成和用户轨迹构建了一个多样化且难度平衡的 prompt 池。结果数据集包含 871k 样本（7.23B 令牌）。</p>
+<table>
+<thead>
+<tr>
+  <th>领域</th>
+  <th>样本数</th>
+  <th>令牌数</th>
+  <th>语料库贡献</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>数学</td>
+  <td>68,055</td>
+  <td>0.98B</td>
+  <td>11.19%</td>
+</tr>
+<tr>
+  <td>代码</td>
+  <td>86,421</td>
+  <td>1.23B</td>
+  <td>21.10%</td>
+</tr>
+<tr>
+  <td>STEM</td>
+  <td>120,399</td>
+  <td>0.55B</td>
+  <td>6.31%</td>
+</tr>
+<tr>
+  <td>逻辑</td>
+  <td>93,323</td>
+  <td>0.81B</td>
+  <td>13.87%</td>
+</tr>
+<tr>
+  <td>通用</td>
+  <td>314,495</td>
+  <td>0.80B</td>
+  <td>9.16%</td>
+</tr>
+<tr>
+  <td>代码智能体</td>
+  <td>37,240</td>
+  <td>0.90B</td>
+  <td>17.70%</td>
+</tr>
+<tr>
+  <td>工具使用</td>
+  <td>114,507</td>
+  <td>0.76B</td>
+  <td>8.72%</td>
+</tr>
+<tr>
+  <td>搜索智能体</td>
+  <td>20,256</td>
+  <td>0.50B</td>
+  <td>8.75%</td>
+</tr>
+<tr>
+  <td>长上下文</td>
+  <td>15,565</td>
+  <td>0.70B</td>
+  <td>4.00%</td>
+</tr>
+<tr>
+  <td><strong>总计</strong></td>
+  <td><strong>870,687</strong></td>
+  <td><strong>7.23B</strong></td>
+  <td><strong>100.00%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>表 3：第一阶段 SFT 数据统计。</p>
+<h4>5.5 智能体基础设施</h4>
+<h5>5.5.1 推理与工具使用模板设计</h5>
+<p>关于推理模板，我们评估了三种管理策略。我们采用选择性保留策略：仅保留由最新用户指令触发的工具使用轨迹的推理痕迹。</p>
+<p>关于工具使用模板，我们比较了 JSON 和 XML 格式。XML 格式允许扁平字符串输出，语法开销显著更低。因此，我们选择 XML 格式以确保复杂真实世界智能体编码场景中的鲁棒性。</p>
+<h5>5.5.2 可扩展代码智能体基础设施</h5>
+<p>我们集成的架构专注于可扩展会话管理和跨框架泛化，以促进高吞吐量智能体编码。核心是专有会话路由器，通过 Kubernetes 编排容器生命周期并通过 Tmux 确保交互一致性。</p>
+<hr />
+<h3>6. 评估 (Evaluations)</h3>
+<h4>6.1 预训练评估</h4>
+<h5>预训练评估设置</h5>
+<p>我们在涵盖各种能力的基准测试集上评估 Step 3.5 Flash：</p>
+<ol>
+<li>通用语言理解和推理：BBH、MMLU、MMLU-Redux、MMLU-Pro、HellaSwag、WinoGrande、GPQA、SuperGPQA、SimpleQA</li>
+<li>数学推理：GSM8K、MATH</li>
+<li>编码：HumanEval、MBPP、HumanEval+、MBPP+、MultiPL-E</li>
+<li>中文理解：C-EVAL、CMMLU、C-SimpleQA</li>
+</ol>
+<h5>预训练评估结果</h5>
+<table>
+<thead>
+<tr>
+  <th>基准测试</th>
+  <th>激活参数</th>
+  <th>总参数</th>
+  <th>Step 3.5 Flash Base</th>
+  <th>MiMo-V2 Flash Base</th>
+  <th>DeepSeek V3.2 Exp Base</th>
+  <th>Kimi-K2 Base</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>一般</strong></td>
+  <td>11B</td>
+  <td>196B</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+<tr>
+  <td>BBH (3-shot)</td>
+  <td></td>
+  <td></td>
+  <td><strong>88.2</strong></td>
+  <td>88.5</td>
+  <td>88.7</td>
+  <td>88.7</td>
+</tr>
+<tr>
+  <td>MMLU (5-shot)</td>
+  <td></td>
+  <td></td>
+  <td>85.8</td>
+  <td>86.7</td>
+  <td><strong>87.8</strong></td>
+  <td>87.8</td>
+</tr>
+<tr>
+  <td>SimpleQA (5-shot)</td>
+  <td></td>
+  <td></td>
+  <td><strong>31.6</strong></td>
+  <td>20.6</td>
+  <td>27.0</td>
+  <td>35.3</td>
+</tr>
+<tr>
+  <td><strong>数学</strong></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+<tr>
+  <td>GSM8K (8-shot)</td>
+  <td></td>
+  <td></td>
+  <td>88.2</td>
+  <td><strong>92.3</strong></td>
+  <td>91.1</td>
+  <td>92.1</td>
+</tr>
+<tr>
+  <td>MATH (4-shot)</td>
+  <td></td>
+  <td></td>
+  <td>66.8</td>
+  <td><strong>71.0</strong></td>
+  <td>62.5</td>
+  <td>70.2</td>
+</tr>
+<tr>
+  <td><strong>代码</strong></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+<tr>
+  <td>HumanEval (3-shot)</td>
+  <td></td>
+  <td></td>
+  <td>81.1</td>
+  <td>77.4</td>
+  <td>67.7</td>
+  <td><strong>84.8</strong></td>
+</tr>
+<tr>
+  <td>MBPP (3-shot)</td>
+  <td></td>
+  <td></td>
+  <td>79.4</td>
+  <td>81.0</td>
+  <td>75.6</td>
+  <td><strong>89.0</strong></td>
+</tr>
+</tbody>
+</table>
+<p>表 4：预训练评估结果节选。尽管仅激活 11B 参数（196B 总参数），Step 3.5 Flash 在一般基准测试中保持广泛竞争力，展示了强大的准确率-效率权衡。值得注意的是，Step 3.5 Flash 在 SimpleQA 上达到 31.6%，超越 DeepSeek-V3.2 Exp Base（27.0%），同时仅使用 196B 总参数对比 671B（约为总参数的三分之一）。</p>
+<h4>6.2 后训练评估</h4>
+<p>我们评估 Step 3.5 Flash 在代表性基准测试上的表现，包括推理导向的 HLE、MMLU-Pro、GPQA-Diamond、AIME 2025、HMMT、IMO-AnswerBench；编码相关的 LiveCodeBench-v6、CF-Div2-Stepfun、SWE-Bench Verified、SWE-Bench Multilingual；智能体系列的 τ²-Bench、Terminal-Bench 2.0、GAIA、BrowseComp、xbench-DeepSearch、BrowseComp-zh 和 ResearchRubrics；一般相关的 ArenaHard v2、IFBench 和 MultiChallenge；以及长上下文相关的 LongBench v2、MRCR、FRAMES 和 RepoQA。</p>
+<p>我们进一步采用 <strong>并行协调推理（PaCoRe）</strong> 范式研究 Step 3.5 Flash 在推理、一般和长上下文基准上的测试时缩放特性。</p>
+<h5>后训练评估结果</h5>
+<p>| 基准测试 | Step 3.5 Flash (Vanilla) | Step 3.5 Flash (PaCoRe) | MiniMax M2.1 | MiMo V2 Flash | GLM-4.7 | DeepSeek V3.2 | Kimi K2.5 | Gemini 3.0 Pro | Claude Opus 4.5 | GPT-5.2 xHigh |
+|----------|--------------------------|-------------------------|--------------|---------------|---------|---------------|-----------|----------------|-----------------|---------------|
+| <strong>推理</strong> | | | | | | | | | |
+| AIME 2025 | <strong>97.3</strong> | 99.9 | 83.0 | 95.1 | 95.7 | 93.1 | 96.1 | 95.0 | 92.8 | 100.0 |
+| HMMT 2025 Feb. | <strong>98.4</strong> | 100.0 | 71.0 | 95.4 | 97.1 | 92.5 | 95.4 | 97.5 | 92.9 | 99.4 |
+| IMO-AnswerBench | 85.4 | 88.8 | 60.4 | 80.9 | 82.0 | 78.3 | 81.8 | 83.3 | 84.0 | <strong>86.3</strong> |
+| LiveCodeBench-v6 | 86.4 | 88.9 | 75.4 | 81.6 | 84.9 | 83.3 | 85.0 | <strong>90.7</strong> | 84.8 | 87.7 |
+| <strong>代码智能体</strong> | | | | | | | | | |
+| SWE Verified | <strong>74.4</strong> | - | 74.0 | 73.4 | 73.8 | 73.1 | 76.8 | 76.2 | 80.9 | 80.0 |
+| Terminal-Bench 2.0 | <strong>51.0</strong> | - | 47.9 | 38.5 | 41.0 | 46.4 | 50.8 | 56.9 | 59.3 | 54.0 |
+| <strong>一般智能体</strong> | | | | | | | | | |
+| BrowseComp (w. Ctx) | <strong>69.0</strong> | - | 62.0 | 58.3 | 67.5 | 67.6 | 74.9 | 59.2 | 57.8 | 65.8 |
+| GAIA | <strong>84.5</strong> | - | 64.3 | 78.2 | 61.9 | 75.1 | 75.9 | 76.6 | 76.1 | 83.5 |
+| τ²-Bench | <strong>88.2</strong> | - | 86.6 | 84.1 | 87.4 | 85.2 | 85.4 | 90.7 | 92.5 | 85.5 |
+| <strong>一般</strong> | | | | | | | | | |
+| Arena-Hard-v2.0 | 74.0 | 93.1 | 63.1 | 68.2 | 73.1 | 66.0 | <strong>85.8</strong> | 81.7 | 76.7 | 80.6 |
+| <strong>长上下文</strong> | | | | | | | | | |
+| LongBench v2 | 57.5 | 62.0 | 53.9 | 60.6 | 59.1 | 58.4 | 61.0 | <strong>70.0</strong> | 67.8 | 62.4 |</p>
+<p>表 5：后训练评估结果（节选）。尽管仅激活 11B 参数（196B 总参数），Step 3.5 Flash 在广泛的任务范围内展示强大性能，在推理密集型基准测试（如 AIME 2025、HMMT、IMO-AnswerBench、LiveCodeBench-v6）上表现尤为出色。</p>
+<hr />
+<h3>7. 局限性 (Limitations)</h3>
+<h4>7.1 Token 效率</h4>
+<p>Step 3.5 Flash 实现了前沿级智能，但目前需要比 Gemini 3.0 Pro 更长的生成轨迹才能达到相当的质量。下一步我们将在保持竞争力的同时剪裁和压缩思维过程以提高效率。</p>
+<h4>7.2 高效通用掌握</h4>
+<p>我们的目标是将通用多功能性与深度领域专业知识统一起来。为了高效实现这一点，我们正在推进策略内蒸馏的变体，允许模型以更高的样本效率内化专家行为。</p>
+<h4>7.3 开放世界智能体任务的 RL</h4>
+<p>虽然 Step 3.5 Flash 在学术智能体基准测试上展示了竞争性能，但智能体 AI 的下一个前沿需要将 RL 应用于专业工作、高级工程和科学研究中发现的复杂专家级任务。</p>
+<h4>7.4 操作范围和约束</h4>
+<p>Step 3.5 Flash 专为编码和工作中心任务量身定制，但在分布偏移时可能经历Reduced稳定性。这通常发生在高度专业化领域或长时间、多轮对话中，模型可能表现出重复推理、混合语言输出或时间和身份感知的不一致性。</p>
+<hr />
+<h2>三、论文简评</h2>
+<h3>3.1 创新点</h3>
+<ol>
+<li><p><strong>高效的前沿级智能体模型</strong>：通过稀疏 MoE 架构（196B 总参数/11B 活跃参数）实现了与 GPT-5.2 xHigh 和 Gemini 3.0 Pro 相当的性能，显著降低了推理成本。</p>
+</li>
+<li><p><strong>创新的混合注意力设计</strong>：提出了 3:1 SWA/全注意力的交错布局，结合增加 SWA 查询头和头-wise 门控注意力，在保持低延迟的同时弥补了性能差距。</p>
+</li>
+<li><p><strong>MIS-PO 强化学习框架</strong>：提出了 Metropolis Independence Sampling-Filtered Policy Optimization，有效解决了大规模 MoE 模型在长 horizon 推理任务中的训练不稳定问题。</p>
+</li>
+<li><p><strong>完整的智能体基础设施</strong>：构建了包含代码智能体、搜索智能体、工具使用的完整数据和训练框架。</p>
+</li>
+<li><p><strong>卓越的基准测试表现</strong>：在 IMO-AnswerBench (85.4%)、LiveCodeBench-v6 (86.4%)、τ²-Bench (88.2%)、Terminal-Bench 2.0 (51.0%) 等基准测试上取得了领先成绩。</p>
+</li>
+</ol>
+<h3>3.2 局限性</h3>
+<ol>
+<li><p><strong>Token 效率</strong>：需要更长的生成轨迹才能达到与 Gemini 3.0 Pro 相当的质量。</p>
+</li>
+<li><p><strong>分布偏移下的稳定性</strong>：在高度专业化领域或长时间对话中可能出现不稳定。</p>
+</li>
+<li><p><strong>混合语言输出</strong>：可能出现语言不一致的问题。</p>
+</li>
+</ol>
+<h3>3.3 应用场景</h3>
+<ol>
+<li><p><strong>工业级智能体部署</strong>：高效推理能力使其适合在真实工业环境中部署复杂智能体。</p>
+</li>
+<li><p><strong>代码生成与调试</strong>：在 SWE-Bench Verified 上达到 74.4% 的性能，适用于软件开发自动化。</p>
+</li>
+<li><p><strong>长上下文推理</strong>：支持 128k 上下文，适合长文档分析和复杂推理任务。</p>
+</li>
+<li><p><strong>工具使用与自动化</strong>：在 BrowseComp 和 Terminal-Bench 上表现优异，适用于自动化工作流。</p>
+</li>
+</ol>
+<h3>3.4 可改进方向</h3>
+<ol>
+<li><p><strong>模型压缩</strong>：通过知识蒸馏和模型剪裁提高 token 效率。</p>
+</li>
+<li><p><strong>强化学习扩展</strong>：将 RL 应用于更复杂的开放世界智能体任务。</p>
+</li>
+<li><p><strong>多语言支持</strong>：改善非英语输出的稳定性和一致性。</p>
+</li>
+</ol>
+<hr />
+<p><em>报告生成日期：2026-03-12</em>
+<em>论文位置：~/.openclaw/workspace/papers/20260312_Step35Flash/</em></p>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: "$$", right: "$$", display: true},
+                {left: "$", right: "$", display: false}
+            ],
+            throwOnError: false
+        });
+    });
+    </script>
+    
+</body>
+</html>

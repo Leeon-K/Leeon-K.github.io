@@ -106,3 +106,9 @@
   date: 2026-03-12
   description: "论文报告: DefensiveKV: Taming the Fragility of KV Cache Eviction in LLM Inference"
   tags: ["Papers"]
+
+- title: "Step 3.5 Flash: Open Frontier-Level Intelligence with 11B Active Parameters"
+  file: "/assets/blog/2026-03-12_step-35-flash-open/"
+  date: 2026-03-12
+  description: "论文报告: Step 3.5 Flash: Open Frontier-Level Intelligence with 11B Active Parameters"
+  tags: ["Papers"]
