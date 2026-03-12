@@ -100,3 +100,9 @@
   date: 2026-03-11
   description: "论文报告: Query-Aware Sparsity for Efficient Long-Context LLM Inference"
   tags: ["Papers"]
+
+- title: "DefensiveKV: Taming the Fragility of KV Cache Eviction in LLM Inference"
+  file: "/assets/blog/2026-03-12_defensivekv-taming-the/"
+  date: 2026-03-12
+  description: "论文报告: DefensiveKV: Taming the Fragility of KV Cache Eviction in LLM Inference"
+  tags: ["Papers"]
