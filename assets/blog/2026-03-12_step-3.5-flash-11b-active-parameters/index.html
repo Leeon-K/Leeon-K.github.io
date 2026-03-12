@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论文报告：Step 3.5 Flash - Open Frontier-Level Intelligence with 11B Active Parameters</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8f9fc; color: #1a1a2e; line-height: 1.85; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 30px 40px 60px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: #667eea; text-decoration: none; font-weight: 500; margin-bottom: 30px; }
+        .back-link:hover { color: #5a6fd6; }
+        .paper-content { background: white; border-radius: 20px; padding: 50px; box-shadow: 0 4px 30px rgba(0,0,0,0.08); }
+        .paper-content h1 { font-size: 2em; font-weight: 700; color: #1a1a2e; margin-bottom: 0.5em; line-height: 1.3; }
+        .paper-content h2 { font-size: 1.5em; font-weight: 600; color: #1a1a2e; margin: 1.5em 0 0.8em; padding-bottom: 0.3em; border-bottom: 2px solid #f0f0f5; }
+        .paper-content h3 { font-size: 1.25em; font-weight: 600; color: #2d2d44; margin: 1.3em 0 0.6em; }
+        .paper-content h4 { font-size: 1.1em; font-weight: 600; color: #3d3d5c; margin: 1.2em 0 0.5em; }
+        .paper-content p { margin: 1em 0; color: #4a4a6a; }
+        .paper-content strong { color: #1a1a2e; font-weight: 600; }
+        .paper-content a { color: #667eea; text-decoration: none; }
+        .paper-content ul, .paper-content ol { margin: 1em 0; padding-left: 1.5em; color: #4a4a6a; }
+        .paper-content li { margin: 0.5em 0; }
+        .paper-content code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; background: #f5f5fa; padding: 0.2em 0.5em; border-radius: 4px; color: #e83e8c; }
+        .paper-content pre { background: #2d2d44; border-radius: 12px; padding: 20px; overflow-x: auto; margin: 1.5em 0; }
+        .paper-content pre code { background: transparent; padding: 0; color: #f8f8f2; }
+        .paper-content blockquote { border-left: 4px solid #667eea; padding: 1em 1.5em; margin: 1.5em 0; background: #f8f9fc; border-radius: 0 12px 12px 0; color: #5a5a7a; }
+        .paper-content table { width: 100%; border-collapse: collapse; margin: 1.5em 0; overflow-x: auto; display: block; }
+        
+        /* First table (metadata) - compact list style */
+        .paper-content > table:first-of-type { display: table; border: none; margin: 0.5em 0; }
+        .paper-content > table:first-of-type tr { border-bottom: 1px solid #eee; }
+        .paper-content > table:first-of-type td:first-child { 
+            background: transparent; 
+            font-weight: 600; 
+            width: 100px;
+            white-space: nowrap;
+            padding: 4px 12px 4px 0;
+        }
+        .paper-content > table:first-of-type td:last-child {
+            padding: 4px 0 4px 0;
+        }
+        
+        .paper-content th { background: #f5f5fa; padding: 12px 15px; text-align: left; font-weight: 600; border-bottom: 2px solid #e0e0e8; }
+        .paper-content td { padding: 12px 15px; border-bottom: 1px solid #f0f0f5; }
+        .paper-content hr { border: none; height: 2px; background: #e0e0e8; margin: 2em 0; }
+        .paper-content img { max-width: 100%; height: auto; border-radius: 12px; margin: 1.5em 0; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .pdf-container { margin: 1.5em 0; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); background: #f5f5f5; }
+        .pdf-caption { text-align: center; color: #666; font-size: 14px; padding: 10px; margin: 0; background: #f0f0f0; }
+        .katex { font-size: 1.1em; }
+        .katex-display { margin: 1.5em 0; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← 返回论文列表</a>
+        <div class="paper-content">
+<h1>论文报告：Step 3.5 Flash - Open Frontier-Level Intelligence with 11B Active Parameters</h1>
+<h2>论文基本信息</h2>
+<table>
+<thead>
+<tr>
+  <th>项目</th>
+  <th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>论文ID</strong></td>
+  <td>2602.10604</td>
+</tr>
+<tr>
+  <td><strong>标题</strong></td>
+  <td>Open Frontier-Level Intelligence with 11B Active Parameters</td>
+</tr>
+<tr>
+  <td><strong>作者</strong></td>
+  <td>StepFun 团队</td>
+</tr>
+<tr>
+  <td><strong>参数规模</strong></td>
+  <td>196B 总参数 / 11B 激活参数</td>
+</tr>
+<tr>
+  <td><strong>发表</strong></td>
+  <td>arXiv 2026.02</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>一句话总结</h2>
+<p><strong>Step 3.5 Flash</strong> 是一个 196B 参数稀疏 MoE 模型，每 token 仅激活 11B 参数，通过 3:1 滑动窗口/全注意力混合架构 + MTP-3 推测解码，实现了 <strong>170 tokens/s</strong> 的推理速度，在数学、代码、Agent 任务上达到 frontier 级别性能，可比肩 GPT-5.2 和 Gemini 3.0 Pro。</p>
+<hr />
+<h2>论文摘要</h2>
+<p>我们推出 Step 3.5 Flash，这是一个稀疏 Mixture-of-Experts (MoE) 模型，桥接了 frontier 级别 agentic 智能与计算效率之间的差距。我们专注于构建 agent 时最重要的两个方面：敏锐的推理，以及快速可靠的执行。基于这些优先级，Step 3.5 Flash 配备了一个 196B 参数的基础模型用于高保真建模，以及 11B 激活参数用于高效推理，并通过交替的 3:1 滑动窗口/全注意力和多 Token 预测 (MTP-3) 优化，以最小化多轮 agentic 交互的延迟和成本。</p>
+<p>为了达到 frontier 级智能，我们设计了一个可扩展的 RL 框架，集成可验证信号和偏好反馈，同时在大规模 off-policy 训练中保持稳定，以推动数学、代码和工具使用方面的持续自我改进。</p>
+<p>Step 3.5 Flash 在 agent、coding 和 math 任务上展现出强大的智能，在 IMO-AnswerBench 上达到 85.4%，在 LiveCodeBench-v6 (2024.08–2025.05) 上达到 86.4%，在 τ²-Bench 上达到 88.2%，在 BrowseComp (w. Context Manage) 上达到 69.0%，在 Terminal-Bench 2.0 上达到 51.0%——性能与 GPT-5.2 xHigh 和 Gemini 3.0 Pro 等 frontier 模型相当。</p>
+<hr />
+<h2>研究背景与问题</h2>
+<h3>核心挑战</h3>
+<ol>
+<li><strong>效率 vs 智能的权衡</strong>：开源模型在复杂推理任务上仍落后于闭源 frontier 模型</li>
+<li><strong>长上下文 Agent 场景的延迟瓶颈</strong>：Agent 工作负载需要快速的 prefilling 和多轮交互解码</li>
+<li><strong>MoE 训练稳定性</strong>：大规模稀疏 MoE 面临多种失败模式（专家崩溃、激活爆炸等）</li>
+</ol>
+<h3>设计哲学</h3>
+<p>Step 3.5 Flash 的架构反映了模型-系统协同设计的范式转变。除了传统的智能和成本目标外，自主 agent 时代提升了第三个关键约束：<strong>推理延迟</strong>。在交互式 agentic 工作流中，最小化延迟直接转化为减少任务完成时间，或通过测试时缩放在固定时间预算内增加智能。</p>
+<p>Agent 工作负载具有独特的特征：大量 context prefilling 后是长时间的多轮交互解码。因此，我们沿三个耦合轴共同设计 Step 3.5 Flash 以实现低延迟：</p>
+<ul>
+<li><strong>注意力</strong>：加速长上下文处理，与 MTP 良好兼容</li>
+<li><strong>稀疏 MoE</strong>：防止分布式部署中的 stragglers 提高吞吐量</li>
+<li><strong>多 Token 预测 (MTP)</strong>：通过推测解码促进快速生成</li>
+</ul>
+<hr />
+<h2>核心架构创新</h2>
+<h3>1. 稀疏 MoE 主干</h3>
+<ul>
+<li><strong>45 层 Transformer</strong>：3 层 dense FFN + 42 层 MoE</li>
+<li><strong>每层 288 个路由专家 + 1 个共享专家</li>
+<li><strong>Top-8 路由</strong>：每个 token 激活 8 个专家</li>
+<li>总参数 <strong>196B</strong>，激活 <strong>11B</strong></li>
+</ul>
+<h3>2. 混合注意力布局（S3F1）</h3>
+<blockquote>
+<p><strong>设计选择</strong>：3:1 Sliding Window Attention (SWA) : Full Attention</p>
+<p><strong>动机</strong>：</p>
+<ul>
+<li>SWA 降低长上下文 prefilling 的 FLOPs</li>
+<li>保留全注意力层确保长程信息流通</li>
+<li>与 MTP 推测解码兼容性好（vs 线性注意力）</li>
+</ul>
+</blockquote>
+<p><strong>问题</strong>：Naive S3F1 性能下降明显</p>
+<p><strong>解决方案</strong>：</p>
+<ol>
+<li><strong>增加 SWA 的 Query Head</strong>（64→96）：几乎免费的午餐</li>
+<li><strong>Head-wise Gated Attention</strong>：替代 sink token，作为"数据依赖的 sink"</li>
+</ol>
+<table>
+<thead>
+<tr>
+  <th>布局</th>
+  <th>相对 FLOPs</th>
+  <th>预训练 Avg</th>
+  <th>LongCtx</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>FFFFFFFF</td>
+  <td>2.68/2.90</td>
+  <td>54.1</td>
+  <td>28.8</td>
+</tr>
+<tr>
+  <td>S3F1 (baseline)</td>
+  <td>1.00/1.00</td>
+  <td>53.6</td>
+  <td>27.5</td>
+</tr>
+<tr>
+  <td><strong>S3F1+Head</strong></td>
+  <td>1.01/1.02</td>
+  <td><strong>55.7</strong></td>
+  <td><strong>28.2</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>3. 多 Token 预测 (MTP-3)</h3>
+<ul>
+<li>添加 3 个轻量级 MTP heads（仅 <strong>0.81B 参数，0.41%</strong>）</li>
+<li>支持推测解码加速生成</li>
+<li>训练策略：仅 MTP-1 主训练，后期从 MTP-1 初始化 MTP-2/3 并联合微调</li>
+</ul>
+<h3>4. EP-Group Balanced MoE Routing</h3>
+<p>解决 Expert Parallelism (EP) 下的负载均衡问题：</p>
+<ul>
+<li>传统 loss-free balancing 只保证全局平衡</li>
+<li>引入 EP-level balancing loss，显式促进 rank 级利用率均匀</li>
+</ul>
+<hr />
+<h2>训练稳定性（重要贡献！）</h2>
+<p>训练稳定性是大规模稀疏 MoE 预训练的首要要求。通过轻量级异步指标服务器进行微批次级连续日志记录，构建全面的可观察性和诊断堆栈。该基础设施能够系统识别和缓解大规模 MoE 失败模式。</p>
+<h3>三大失败模式及解决方案</h3>
+<h4>1. Muon 数值敏感性</h4>
+<ul>
+<li><strong>问题</strong>：Muon optimizer 在 bfloat16 下偶发极端 outlier</li>
+<li><strong>解决</strong>：仅对 Polar Express 迭代使用 float16</li>
+</ul>
+<h4>2. 专家崩溃（Expert Collapse）</h4>
+<ul>
+<li><strong>新发现</strong>：专家崩溃可在路由统计稳定时发生（专家侧病理）</li>
+<li><strong>根因</strong>：
+  <ul>
+    <li>共享专家和路由专家的聚合需要显式缩放</li>
+    <li>微批次 load balancing 过于严格</li>
+  </ul>
+</li>
+<li><strong>监控</strong>：专家激活范数 + 参数范数的 min-to-median 比率</li>
+</ul>
+<h4>3. 局部激活爆炸（Localized Activation Blow-up）</h4>
+<ul>
+<li><strong>现象</strong>：深层 MoE 的少数专家激活范数爆炸，训练 loss 完全看不出</li>
+<li><strong>解决方案</strong>：<strong>Activation clipping</strong>（而非 weight clipping）</li>
+</ul>
+<blockquote>
+<p>关键洞察：训练 loss 完全无法反映这种内部不稳定性！必须监控 max-to-median 比率。</p>
+</blockquote>
+<hr />
+<h2>后训练：统一 RL 框架</h2>
+<h3>核心挑战</h3>
+<ul>
+<li>单一通用模型覆盖多领域 → 牺牲领域专业性</li>
+<li>维护多个专家模型 → 碎片化 + 高迭代成本</li>
+<li>MoE + 长程推理 → off-policy rollouts 的梯度方差爆炸</li>
+</ul>
+<h3>MIS-PO (Metropolis Independence Sampling-Filtered Policy Optimization)</h3>
+<p><strong>核心思想</strong>：用离散过滤替代连续 importance weighting</p>
+<ul>
+<li>在 token 和 trajectory 级别进行分布过滤</li>
+<li>限制在稳定 trust region 内优化</li>
+<li>大幅降低梯度方差，同时保留有效学习信号</li>
+</ul>
+<hr />
+<h2>实验结果</h2>
+<h3>预训练基线对比</h3>
+<table>
+<thead>
+<tr>
+  <th>基准</th>
+  <th>DeepSeek-V3.2-Exp Base</th>
+  <th>Kimi-K2-Base</th>
+  <th><strong>Step 3.5 Flash Base</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>SimpleQA</td>
+  <td>26.4%</td>
+  <td>28.5%</td>
+  <td><strong>31.6%</strong></td>
+</tr>
+<tr>
+  <td>参数量比</td>
+  <td>3x</td>
+  <td>3x</td>
+  <td><strong>1x</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>Agent 任务性能</h3>
+<table>
+<thead>
+<tr>
+  <th>任务</th>
+  <th>分数</th>
+  <th>对标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>IMO-AnswerBench</td>
+  <td><strong>85.4%</strong></td>
+  <td>GPT-5.2 xHigh</td>
+</tr>
+<tr>
+  <td>LiveCodeBench-v6</td>
+  <td><strong>86.4%</strong></td>
+  <td>-</td>
+</tr>
+<tr>
+  <td>τ²-Bench</td>
+  <td><strong>88.2%</strong></td>
+  <td>-</td>
+</tr>
+<tr>
+  <td>BrowseComp (w/ Context)</td>
+  <td><strong>69.0%</strong></td>
+  <td>-</td>
+</tr>
+<tr>
+  <td>Terminal-Bench 2.0</td>
+  <td><strong>51.0%</strong></td>
+  <td>-</td>
+</tr>
+</tbody>
+</table>
+<h3>推理效率</h3>
+<ul>
+<li><strong>170 tokens/s</strong> on Hopper GPUs (OpenRouter 部署首周)</li>
+<li>128K context + batch=1：解码延迟从 0.081s → <strong>0.028s</strong>（2.9x）</li>
+<li>吞吐量提升 <strong>4.2x</strong></li>
+</ul>
+<hr />
+<h2>贡献总结</h2>
+<ol>
+<li><strong>精准的问题定义</strong>：抓住 Agent 场景的 latency 这一 third dimension</li>
+<li><strong>工程细节详实</strong>：训练稳定性诊断、负载均衡、监控基础设施</li>
+<li><strong>S3F1+Head 设计</strong>：用"几乎免费"的 head 扩展弥补 SWA 性能损失</li>
+<li><strong>MIS-PO 创新</strong>：解决 MoE + 长程 RL 的核心痛点</li>
+<li><strong>训练稳定性三大发现</strong>：Muon 数值敏感性、专家崩溃新形式、局部激活爆炸</li>
+</ol>
+<hr />
+<h2>个人点评</h2>
+<h3>👍 亮点</h3>
+<ol>
+<li><strong>问题定义精准</strong>：抓住 Agent 场景的 latency 这一 third dimension</li>
+<li><strong>工程细节详实</strong>：训练稳定性诊断、负载均衡、监控基础设施</li>
+<li><strong>S3F1+Head 设计巧妙</strong>：用"几乎免费"的 head 扩展弥补 SWA 性能损失</li>
+<li><strong>后训练创新</strong>：MIS-PO 解决了 MoE + 长程 RL 的核心痛点</li>
+</ol>
+<h3>🤔 思考</h3>
+<ol>
+<li><strong>与 DeepSeek 的对比</strong>：虽然参数量更小，但 SimpleQA 超越 DeepSeek-V3.2-Exp</li>
+<li><strong>Agent 生态</strong>：强调与现有 agent 系统（Claude Agent Workflow, Codex Agent）的协同</li>
+<li><strong>部署友好</strong>：&lt;200B 参数，可在高端工作站 128GB 显存运行</li>
+</ol>
+
+        </div>
+    </div>
+</body>
+</html>
