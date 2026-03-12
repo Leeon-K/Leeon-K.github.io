@@ -6,6 +6,18 @@
 #   description: "博客描述"
 #   tags: ["Papers", "Multi-Agent", "Infra", "Algorithm"]  # 只使用这些标签
 
+- title: "Step 3.5 Flash: Open Frontier-Level Intelligence with 11B Active Parameters"
+  file: "/assets/blog/2026-03-12_step-3.5-flash-11b-active-parameters/"
+  date: 2026-03-12
+  description: "StepFun 推出的 196B MoE 模型，11B 激活参数，达到 frontier 级 Agent 性能"
+  tags: ["Papers", "MoE"]
+
+- title: "DefensiveKV: Taming the Fragility of KV Cache Eviction in LLM Inference"
+  file: "/assets/blog/2026-03-12_defensivekv-taming-kv-cache-eviction/"
+  date: 2026-03-12
+  description: "提出防御性聚合策略，将 20% 缓存下的生成质量损失降低 4.3 倍"
+  tags: ["Papers", "Infra"]
+
 - title: "RAPID: 长上下文推理的检索增强推测解码"
   file: "/assets/blog/2026-03-05_rapid/"
   date: 2026-03-05
