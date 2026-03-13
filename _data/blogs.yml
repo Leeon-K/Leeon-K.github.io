@@ -100,3 +100,9 @@
   date: 2026-03-12
   description: "论文报告: Step 3.5 Flash: Open Frontier-Level Intelligence with 11B Active Parameters"
   tags: ["Papers"]
+
+- title: "Step-3 is Large yet Affordable: Model-system Co-design for Cost-effective Decoding"
+  file: "/assets/blog/2026-03-13_step-3-is-large-yet/"
+  date: 2026-03-13
+  description: "论文报告: Step-3 is Large yet Affordable: Model-system Co-design for Cost-effective Decoding"
+  tags: ["Papers"]
